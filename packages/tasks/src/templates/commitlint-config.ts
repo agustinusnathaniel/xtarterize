@@ -1,4 +1,12 @@
-export function renderCommitlintConfig(): string {
+import type { ProjectProfile } from '@xtarterize/core'
+
+export function renderCommitlintConfig(profile: ProjectProfile): string {
+  const scopeEnum = profile.framework === 'react-native'
+    ? "['components', 'screens', 'hooks', 'config', 'docs']"
+    : profile.framework === 'vue'
+      ? "['components', 'composables', 'views', 'config', 'docs']"
+      : "['components', 'hooks', 'pages', 'utils', 'config', 'docs']"
+
   return `/** @type {import('@commitlint/types').UserConfig} */
 const CommitLintConfiguration = {
   extends: ['@commitlint/config-conventional'],
@@ -7,7 +15,7 @@ const CommitLintConfiguration = {
     'scope-enum': [
       2,
       'always',
-      ['components', 'deps', 'utils', 'config', 'docs'],
+      ${scopeEnum},
     ],
   },
 };

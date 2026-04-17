@@ -1,10 +1,20 @@
-export function renderAutoUpdateWorkflow(): string {
-  return `name: Auto Update
+import type { ProjectProfile } from '@xtarterize/core'
+
+export function renderAutoUpdateWorkflow(profile: ProjectProfile): string {
+  const pm = profile.packageManager
+  const installCmd = pm === 'npm' ? 'npm ci' : pm === 'yarn' ? 'yarn install --frozen-lockfile' : `${pm} install --frozen-lockfile`
+  const nodeVersion = profile.framework === 'react-native' ? '20' : '20'
+
+  return `name: Auto Update Dependencies
 
 on:
   schedule:
-    - cron: '0 0 * * 1'
+    - cron: '0 6 * * 1'
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   update:
@@ -13,10 +23,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${nodeVersion}
+      - run: ${installCmd}
       - run: npx npm-check-updates -u
-      - run: git add .
-      - run: git commit -m "chore: update dependencies" || echo "No changes"
-      - run: git push
+      - run: ${installCmd}
+      - uses: peter-evans/create-pull-request@v6
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore(deps): update dependencies'
+          title: 'chore(deps): update dependencies'
+          body: 'Automated dependency updates'
+          branch: chore/update-dependencies
+          delete-branch: true
 `
 }
