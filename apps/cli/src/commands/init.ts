@@ -1,6 +1,7 @@
 import { defineCommand } from 'citty'
-import { spinner, confirm, isCancel } from '@clack/prompts'
-import { detectProject } from '@xtarterize/core'
+import { spinner, confirm, isCancel, select } from '@clack/prompts'
+import { detectProject, detectFramework } from '@xtarterize/core'
+import type { Framework, ProjectProfile } from '@xtarterize/core'
 import { resolveTasks, resolveTaskStatuses } from '@xtarterize/core'
 import { applyTasks } from '@xtarterize/core'
 import { displayPlan } from '../ui/plan-display.js'
@@ -8,6 +9,36 @@ import { displayDiffs } from '../ui/diff-display.js'
 import { selectTasks } from '../ui/select-menu.js'
 import * as logger from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
+
+async function resolveAmbiguousFramework(pkg: any): Promise<Framework> {
+  const choice = await select({
+    message: 'Detected both React and React Native dependencies. Which best describes this project?',
+    options: [
+      { value: 'react', label: 'React (web)' },
+      { value: 'react-native', label: 'React Native / Expo (mobile)' },
+      { value: 'node', label: 'Universal (web + native, treating as Node)' },
+    ],
+  })
+
+  if (isCancel(choice)) {
+    process.exit(0)
+  }
+
+  return choice as Framework
+}
+
+function resolveFrameworkAmbiguity(profile: ProjectProfile, pkg: any): ProjectProfile {
+  if (profile.framework !== null) return profile
+
+  const allDeps: Record<string, string> = {}
+  if (pkg?.dependencies) Object.assign(allDeps, pkg.dependencies)
+  if (pkg?.devDependencies) Object.assign(allDeps, pkg.devDependencies)
+
+  const framework = detectFramework(allDeps)
+  if (framework !== null) return { ...profile, framework }
+
+  return profile
+}
 
 export const initCommand = defineCommand({
   meta: {
@@ -17,7 +48,19 @@ export const initCommand = defineCommand({
   args: {
     dryRun: {
       type: 'boolean',
-      description: 'Preview changes without applying',
+      description: 'Preview all changes without applying',
+    },
+    yes: {
+      type: 'boolean',
+      description: 'Skip all confirmations, apply all',
+    },
+    skip: {
+      type: 'string',
+      description: 'Exclude a specific task (comma-separated)',
+    },
+    only: {
+      type: 'string',
+      description: 'Apply only a specific task',
     },
   },
   async run({ args }) {
@@ -25,8 +68,26 @@ export const initCommand = defineCommand({
     s.start('Scanning project...')
 
     const cwd = process.cwd()
-    const profile = await detectProject(cwd)
-    s.stop('Project scanned')
+    let profile = await detectProject(cwd)
+
+    // Handle ambiguous framework detection at CLI layer
+    if (profile.framework === null) {
+      s.stop()
+      const pkg = await import('@xtarterize/core').then(m => m.readPackageJson(cwd))
+      const allDeps: Record<string, string> = {}
+      if (pkg?.dependencies) Object.assign(allDeps, pkg.dependencies)
+      if (pkg?.devDependencies) Object.assign(allDeps, pkg.devDependencies)
+
+      const hasReactNative = !!(allDeps['react-native'] || allDeps['expo'])
+      const hasReact = !!allDeps['react']
+
+      if (hasReactNative && hasReact) {
+        const resolved = await resolveAmbiguousFramework(pkg)
+        profile = { ...profile, framework: resolved }
+      }
+    } else {
+      s.stop('Project scanned')
+    }
 
     logger.log('')
     logger.log(logger.bold(`Framework: ${profile.framework ?? 'none'}`))
@@ -35,8 +96,18 @@ export const initCommand = defineCommand({
     logger.log('')
 
     const allTasks = getAllTasks()
-    const tasks = resolveTasks(profile, allTasks)
+    let tasks = resolveTasks(profile, allTasks)
     const statuses = await resolveTaskStatuses(tasks, cwd, profile)
+
+    if (args.skip) {
+      const skipIds = args.skip.split(',').map(s => s.trim())
+      tasks = tasks.filter(t => !skipIds.includes(t.id))
+    }
+
+    if (args.only) {
+      const onlyIds = args.only.split(',').map(s => s.trim())
+      tasks = tasks.filter(t => onlyIds.includes(t.id))
+    }
 
     const actionableTasks = tasks.filter(t => {
       const status = statuses.get(t.id)
@@ -57,6 +128,17 @@ export const initCommand = defineCommand({
         diffs.push(...taskDiffs)
       }
       displayDiffs(diffs)
+      return
+    }
+
+    if (args.yes) {
+      const result = await applyTasks(actionableTasks, cwd, profile)
+      logger.log('')
+      logger.logSuccess(`Applied ${result.applied} tasks`)
+      if (result.errors.length > 0) {
+        logger.logError(`${result.errors.length} errors`)
+        result.errors.forEach(e => logger.logError(`  - ${e}`))
+      }
       return
     }
 

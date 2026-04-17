@@ -12,7 +12,17 @@ const main = defineCommand({
   meta: {
     name: 'xtarterize',
     version: '0.1.0',
-    description: 'Apply conformance configurations to JS/TS projects',
+    description: 'Apply conformance configuration to JS/TS projects',
+  },
+  args: {
+    cwd: {
+      type: 'string',
+      description: 'Target directory (default: current working directory)',
+    },
+    json: {
+      type: 'boolean',
+      description: 'Output machine-readable JSON',
+    },
   },
   subCommands: {
     init: initCommand,

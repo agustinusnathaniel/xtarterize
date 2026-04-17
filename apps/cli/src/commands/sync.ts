@@ -19,6 +19,18 @@ export const syncCommand = defineCommand({
       type: 'boolean',
       description: 'Preview changes without applying',
     },
+    yes: {
+      type: 'boolean',
+      description: 'Skip all confirmations, apply all',
+    },
+    skip: {
+      type: 'string',
+      description: 'Exclude a specific task (comma-separated)',
+    },
+    only: {
+      type: 'string',
+      description: 'Apply only a specific task',
+    },
   },
   async run({ args }) {
     const s = spinner()
@@ -29,8 +41,18 @@ export const syncCommand = defineCommand({
     s.stop('Project scanned')
 
     const allTasks = getAllTasks()
-    const tasks = resolveTasks(profile, allTasks)
+    let tasks = resolveTasks(profile, allTasks)
     const statuses = await resolveTaskStatuses(tasks, cwd, profile)
+
+    if (args.skip) {
+      const skipIds = args.skip.split(',').map(s => s.trim())
+      tasks = tasks.filter(t => !skipIds.includes(t.id))
+    }
+
+    if (args.only) {
+      const onlyIds = args.only.split(',').map(s => s.trim())
+      tasks = tasks.filter(t => onlyIds.includes(t.id))
+    }
 
     const actionableTasks = tasks.filter(t => {
       const status = statuses.get(t.id)
@@ -51,6 +73,17 @@ export const syncCommand = defineCommand({
         diffs.push(...taskDiffs)
       }
       displayDiffs(diffs)
+      return
+    }
+
+    if (args.yes) {
+      const result = await applyTasks(actionableTasks, cwd, profile)
+      logger.log('')
+      logger.logSuccess(`Applied ${result.applied} tasks`)
+      if (result.errors.length > 0) {
+        logger.logError(`${result.errors.length} errors`)
+        result.errors.forEach(e => logger.logError(`  - ${e}`))
+      }
       return
     }
 
