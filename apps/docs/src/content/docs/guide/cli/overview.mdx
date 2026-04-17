@@ -1,0 +1,40 @@
+---
+title: CLI Overview
+description: Overview of the Xtarterize command-line interface and available commands.
+---
+
+# CLI Overview
+
+The Xtarterize CLI provides a simple interface to scaffold and configure your TypeScript projects.
+
+## Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `xtarterize init` | Initialize a new project |
+| `xtarterize analyze` | Analyze an existing project |
+| `xtarterize add` | Add a specific configuration or tool |
+| `xtarterize remove` | Remove a configuration or tool |
+| `xtarterize list` | List available templates and tasks |
+
+## Global Options
+
+| Option | Description |
+|--------|-------------|
+| `--help` | Show help information |
+| `--version` | Show version number |
+| `--verbose` | Enable verbose logging |
+| `--dry-run` | Preview changes without applying them |
+
+## Examples
+
+```bash
+# Show help
+npx xtarterize --help
+
+# Initialize with verbose output
+npx xtarterize init --verbose
+
+# Preview changes without applying
+npx xtarterize analyze --dry-run
+```

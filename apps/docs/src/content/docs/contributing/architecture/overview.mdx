@@ -1,0 +1,61 @@
+---
+title: Architecture Overview
+description: Understand how Xtarterize is structured and how the packages work together.
+---
+
+# Architecture Overview
+
+Xtarterize is organized as a monorepo using Turborepo for task orchestration and pnpm for package management.
+
+## Package Structure
+
+```
+xtarterize/
+├── packages/
+│   ├── core/      # @xtarterize/core - Project detection and analysis
+│   ├── patchers/  # @xtarterize/patchers - File modification utilities
+│   └── tasks/     # @xtarterize/tasks - Predefined setup tasks
+├── apps/
+│   ├── cli/       # @xtarterize/cli - Command-line interface
+│   └── docs/      # @xtarterize/docs - This documentation site
+└── test/
+    └── fixtures/  # Test fixtures for various project types
+```
+
+## Package Dependencies
+
+```
+@xtarterize/cli
+├── @xtarterize/core
+├── @xtarterize/patchers
+└── @xtarterize/tasks
+
+@xtarterize/tasks
+└── @xtarterize/core
+
+@xtarterize/patchers
+└── @xtarterize/core
+```
+
+## How It Works
+
+1. **CLI** receives user input and determines which tasks to run
+2. **Core** analyzes the project directory to detect existing configurations
+3. **Tasks** define what changes need to be made based on the detection results
+4. **Patchers** safely apply those changes to configuration files
+
+## Development Workflow
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Run tests
+pnpm test
+
+# Start development
+pnpm dev
+```

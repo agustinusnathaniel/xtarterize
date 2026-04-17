@@ -1,0 +1,61 @@
+---
+title: Initialization
+description: Initialize a new project with Xtarterize.
+---
+
+# Initialization
+
+## Initialize a New Project
+
+To scaffold a new project from scratch:
+
+```bash
+npx xtarterize init
+```
+
+This will:
+
+1. Prompt you for project details
+2. Detect what tools and frameworks you want to use
+3. Generate the project structure
+4. Install dependencies
+5. Run initial configuration tasks
+
+## Configuration
+
+You can configure Xtarterize behavior with a `xtarterize.config.js` file:
+
+```js
+export default {
+  // Project name
+  name: 'my-project',
+  
+  // Packages to include
+  packages: ['core', 'patchers', 'tasks'],
+  
+  // Tasks to run on init
+  tasks: ['setup-vite', 'setup-biome', 'setup-vitest'],
+}
+```
+
+## Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--name` | Project name | Current directory name |
+| `--template` | Template to use | `default` |
+| `--package-manager` | Package manager to use | `pnpm` |
+| `--dry-run` | Show what would be done without making changes | `false` |
+
+## Examples
+
+```bash
+# Initialize with specific name
+npx xtarterize init --name my-app
+
+# Use npm instead of pnpm
+npx xtarterize init --package-manager npm
+
+# Dry run to see what would happen
+npx xtarterize init --dry-run
+```

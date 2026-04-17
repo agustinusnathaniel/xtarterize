@@ -1,0 +1,80 @@
+---
+title: Project Detection
+description: How Xtarterize detects existing project configurations.
+---
+
+# Project Detection
+
+The `@xtarterize/core` package provides the foundation for detecting and analyzing existing project configurations.
+
+## Overview
+
+Project detection is the first step in Xtarterize's workflow. It analyzes your project directory to understand:
+
+- What build tools are configured (Vite, Webpack, etc.)
+- What linters and formatters are in use (Biome, ESLint, Prettier)
+- What testing frameworks are set up (Vitest, Jest)
+- What frameworks are being used (React, Vue, Next.js, etc.)
+- Package manager in use (pnpm, npm, yarn)
+
+## detectProject Function
+
+The main entry point is the `detectProject` function:
+
+```typescript
+import { detectProject } from '@xtarterize/core'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const projectRoot = path.resolve(__dirname, '..')
+
+const project = await detectProject(projectRoot)
+
+console.log(project.packageManager) // 'pnpm', 'npm', or 'yarn'
+console.log(project.frameworks)     // ['react', 'vite', 'typescript']
+console.log(project.linters)        // ['biome', 'eslint']
+```
+
+## Detection Results
+
+The detection returns an object containing:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `packageManager` | `string` | Detected package manager |
+| `frameworks` | `string[]` | List of detected frameworks |
+| `linters` | `string[]` | List of detected linters/formatters |
+| `testRunners` | `string[]` | List of detected test runners |
+| `buildTools` | `string[]` | List of detected build tools |
+| `configFiles` | `Record<string, string>` | Map of config file paths |
+
+## How Detection Works
+
+Detection works by:
+
+1. Scanning for known configuration files (`vite.config.ts`, `biome.json`, etc.)
+2. Analyzing `package.json` dependencies and scripts
+3. Checking for framework-specific directories and patterns
+
+## Examples
+
+### Detect a Vite + React project
+
+```typescript
+const project = await detectProject('/path/to/project')
+
+if (project.frameworks.includes('react') && project.buildTools.includes('vite')) {
+  // Apply Vite + React specific configurations
+}
+```
+
+### Check for existing linter
+
+```typescript
+const project = await detectProject('/path/to/project')
+
+if (!project.linters.includes('biome')) {
+  // Suggest adding Biome
+}
+```

@@ -1,0 +1,69 @@
+---
+title: Overview
+description: Overview of the patchers package and how it modifies configuration files.
+---
+
+# Patchers Overview
+
+The `@xtarterize/patchers` package provides utilities for safely modifying configuration files without overwriting existing customizations.
+
+## Why Patchers?
+
+When scaffolding a project, you often need to modify existing configuration files. Simply overwriting them would lose any custom settings the user has already configured.
+
+Patchers solve this by:
+
+1. Reading the existing configuration
+2. Merging new settings intelligently
+3. Preserving existing customizations
+4. Formatting the output correctly
+
+## Available Patchers
+
+| Patcher | Description |
+|---------|-------------|
+| `jsonMerge` | Merge JSON configuration files |
+| `packageJson` | Add dependencies, scripts, and fields to package.json |
+| `tsconfigPaths` | Add path aliases to tsconfig.json |
+| `vitePlugins` | Add plugins to Vite configuration |
+
+## Example: JSON Merge
+
+```typescript
+import { jsonMerge } from '@xtarterize/patchers'
+
+const result = await jsonMerge('vite.config.ts', {
+  plugins: ['newPlugin()'],
+  resolve: {
+    alias: { '@': './src' }
+  }
+})
+```
+
+## Example: Package.json
+
+```typescript
+import { patchPackageJson } from '@xtarterize/patchers'
+
+await patchPackageJson('package.json', {
+  dependencies: {
+    'react': '^19.0.0'
+  },
+  devDependencies: {
+    'vite': '^6.0.0'
+  },
+  scripts: {
+    'dev': 'vite',
+    'build': 'vite build'
+  }
+})
+```
+
+## Safety Features
+
+Patchers include several safety features:
+
+- **Backup creation** - Original files are backed up before modification
+- **Validation** - Merged configurations are validated before writing
+- **Formatting** - Output is formatted to match project conventions
+- **Rollback** - Changes can be rolled back if needed

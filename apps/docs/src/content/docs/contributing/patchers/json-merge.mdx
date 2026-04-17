@@ -1,0 +1,101 @@
+---
+title: JSON Merge Patcher
+description: How to use the JSON merge patcher to modify configuration files.
+---
+
+# JSON Merge Patcher
+
+The JSON merge patcher allows you to safely merge changes into JSON and JSON-like configuration files.
+
+## Usage
+
+```typescript
+import { jsonMerge } from '@xtarterize/patchers'
+
+const result = await jsonMerge(filePath, patch)
+```
+
+## Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `filePath` | `string` | Path to the file to patch |
+| `patch` | `object` | The patch to apply (deep merge) |
+
+## Return Value
+
+Returns a `PatchResult` object:
+
+```typescript
+interface PatchResult {
+  success: boolean
+  original: object
+  patched: object
+  changes: string[]
+}
+```
+
+## Deep Merge Behavior
+
+The patcher performs a deep merge, meaning nested objects are merged recursively:
+
+```typescript
+// Original vite.config.ts
+{
+  resolve: {
+    alias: { '@': './src' }
+  }
+}
+
+// Patch
+{
+  resolve: {
+    tsconfigPaths: true
+  }
+}
+
+// Result
+{
+  resolve: {
+    alias: { '@': './src' },
+    tsconfigPaths: true
+  }
+}
+```
+
+## Array Handling
+
+Arrays are replaced, not merged:
+
+```typescript
+// Original
+{ plugins: ['pluginA'] }
+
+// Patch
+{ plugins: ['pluginB'] }
+
+// Result
+{ plugins: ['pluginB'] }
+```
+
+## Examples
+
+### Add Vite plugin
+
+```typescript
+await jsonMerge('vite.config.ts', {
+  plugins: ['react()', 'newPlugin()']
+})
+```
+
+### Add TypeScript paths
+
+```typescript
+await jsonMerge('tsconfig.json', {
+  compilerOptions: {
+    paths: {
+      '@/*': ['./src/*']
+    }
+  }
+})
+```

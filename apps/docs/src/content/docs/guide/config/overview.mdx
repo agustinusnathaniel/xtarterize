@@ -1,0 +1,48 @@
+---
+title: Configuration
+description: How to configure Xtarterize for your project.
+---
+
+# Configuration
+
+Xtarterize can be configured using a `xtarterize.config.js` (or `.ts`) file in your project root.
+
+## Basic Configuration
+
+```js
+export default {
+  // Project metadata
+  name: 'my-project',
+  version: '1.0.0',
+  
+  // Framework detection
+  detect: {
+    // Auto-detect existing configurations (default: true)
+    auto: true,
+  },
+  
+  // Tasks to run
+  tasks: {
+    // Run these tasks on init
+    onInit: ['setup-vite', 'setup-biome'],
+  },
+}
+```
+
+## Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `name` | `string` | Directory name | Project name |
+| `version` | `string` | `'0.0.1'` | Project version |
+| `detect.auto` | `boolean` | `true` | Auto-detect existing configs |
+| `tasks.onInit` | `string[]` | `[]` | Tasks to run on initialization |
+
+## Environment Variables
+
+Xtarterize also respects the following environment variables:
+
+| Variable | Description |
+|----------|-------------|
+| `XTARTERIZE_DEBUG` | Enable debug mode |
+| `XTARTERIZE_CONFIG` | Path to custom config file |

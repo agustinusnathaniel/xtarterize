@@ -1,0 +1,49 @@
+---
+title: Templates
+description: Available project templates and how to use them.
+---
+
+# Templates
+
+Xtarterize provides several templates to help you quickly scaffold different types of projects.
+
+## Available Templates
+
+| Template | Description | Use Case |
+|----------|-------------|----------|
+| `default` | Basic TypeScript project | Simple libraries or tools |
+| `web` | Web application with Vite | SPAs, static sites |
+| `api` | Node.js API server | REST APIs, GraphQL |
+| `fullstack` | Full-stack with Turborepo | Monorepos with frontend + backend |
+| `react` | React + Vite + TypeScript | React applications |
+| `vue` | Vue + Vite + TypeScript | Vue applications |
+| `next` | Next.js application | React SSR/SSG apps |
+
+## Using Templates
+
+```bash
+# Use a specific template
+npx xtarterize init --template react
+
+# List available templates
+npx xtarterize list templates
+```
+
+## Custom Templates
+
+You can create your own templates by adding a `templates/` directory to your project:
+
+```
+my-templates/
+├── my-template/
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── src/
+│       └── index.ts
+```
+
+Then use it with:
+
+```bash
+npx xtarterize init --template ./my-templates/my-template
+```
