@@ -5,7 +5,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Xtarterize',
-      description: 'A toolkit to scaffold and configure full-stack TypeScript projects with best practices.',
+      description: 'An adaptive CLI tool that automates conformance configuration for JavaScript/TypeScript projects.',
       social: [
         {
           icon: 'github',
@@ -26,12 +26,12 @@ export default defineConfig({
               autogenerate: { directory: 'guide/cli' },
             },
             {
-              label: 'Configuration',
-              autogenerate: { directory: 'guide/config' },
+              label: 'Conformance Tasks',
+              autogenerate: { directory: 'guide/tasks' },
             },
             {
-              label: 'Templates',
-              autogenerate: { directory: 'guide/templates' },
+              label: 'Configuration',
+              autogenerate: { directory: 'guide/config' },
             },
           ],
         },
@@ -49,10 +49,6 @@ export default defineConfig({
             {
               label: 'Patchers',
               autogenerate: { directory: 'contributing/patchers' },
-            },
-            {
-              label: 'Tasks',
-              autogenerate: { directory: 'contributing/tasks' },
             },
           ],
         },
