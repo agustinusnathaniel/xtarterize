@@ -1,0 +1,6 @@
+docs/init/**
+node_modules
+*.tsbuildinfo
+dist
+
+.turbo
