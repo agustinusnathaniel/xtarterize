@@ -40,7 +40,9 @@ describe('detectProject', () => {
 
   it('detects react-native-expo correctly', async () => {
     const profile = await detectProject(path.join(fixtures, 'react-native-expo'))
-    expect(profile.framework).toBe('react-native')
+    // Framework is null because both react and react-native are present (ambiguous)
+    // CLI layer should prompt for clarification
+    expect(profile.framework).toBe(null)
     expect(profile.bundler).toBe('expo')
     expect(profile.packageManager).toBe('yarn')
   })

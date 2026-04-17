@@ -46,12 +46,21 @@ function isStringRecord(value: unknown): value is Record<string, string> {
   return Object.values(value).every((v): v is string => typeof v === 'string')
 }
 
-function detectFramework(deps: Record<string, string>): Framework {
-  if (deps['react-native'] || deps['expo']) return 'react-native'
-  if (deps['react']) return 'react'
-  if (deps['vue']) return 'vue'
-  if (deps['svelte']) return 'svelte'
-  if (deps['solid-js']) return 'solid'
+export function detectFramework(deps: Record<string, string>): Framework {
+  const hasReactNative = !!(deps['react-native'] || deps['expo'])
+  const hasReact = !!deps['react']
+  const hasVue = !!deps['vue']
+  const hasSvelte = !!deps['svelte']
+  const hasSolid = !!deps['solid-js']
+
+  if (hasReactNative && hasReact) {
+    return null // ambiguous, will be resolved by prompt
+  }
+  if (hasReactNative) return 'react-native'
+  if (hasReact) return 'react'
+  if (hasVue) return 'vue'
+  if (hasSvelte) return 'svelte'
+  if (hasSolid) return 'solid'
   return 'node'
 }
 
