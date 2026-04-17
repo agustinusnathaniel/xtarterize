@@ -3,6 +3,7 @@ import type { ProjectProfile } from '@xtarterize/core'
 import { fileExists, readFile, writeFile, resolvePath, readPackageJson } from '@xtarterize/core'
 import { injectVitePlugin } from '@xtarterize/patchers'
 import { addDependency } from 'nypm'
+import { loadFile, generateCode } from 'magicast'
 
 export const viteCheckerTask: Task = {
   id: 'vite/checker',
@@ -25,17 +26,25 @@ export const viteCheckerTask: Task = {
     const configPath = resolvePath(cwd, 'vite.config.ts')
     const before = await readFile(configPath)
 
-    const after = before
-      .replace(
-        /^(import.*from.*['"]vite['"])/m,
-        `import checker from 'vite-plugin-checker'\n$1`
-      )
-      .replace(
-        /plugins:\s*\[/,
-        `plugins: [\n      checker({ typescript: true }),`
-      )
+    const mod = await loadFile(configPath)
+    const code = mod.$code
 
-    return [{ filepath: 'vite.config.ts', before, after }]
+    if (code.includes('vite-plugin-checker')) {
+      return [{ filepath: 'vite.config.ts', before, after: before }]
+    }
+
+    const defaultExport = mod.exports.default
+    if (!defaultExport || !Array.isArray(defaultExport.plugins)) {
+      return [{ filepath: 'vite.config.ts', before, after: before }]
+    }
+
+    const plugins: any[] = defaultExport.plugins
+    plugins.push('checker({ typescript: true })')
+
+    const { code: after } = generateCode(mod)
+    const finalAfter = `import checker from 'vite-plugin-checker'\n${after}`
+
+    return [{ filepath: 'vite.config.ts', before, after: finalAfter }]
   },
 
   async apply(cwd, profile): Promise<void> {
@@ -47,17 +56,13 @@ export const viteCheckerTask: Task = {
     const configPath = resolvePath(cwd, 'vite.config.ts')
     const result = await injectVitePlugin(
       configPath,
-      "import checker from 'vite-plugin-checker'",
-      "checker({ typescript: true })",
-      'vite-plugin-checker'
+      'vite-plugin-checker',
+      'checker',
+      'checker({ typescript: true })'
     )
 
     if (!result.success) {
-      const before = await readFile(configPath)
-      const after = before
-        .replace(/^(import.*from.*['"]vite['"].*)/m, "import checker from 'vite-plugin-checker'\n$1")
-        .replace(/plugins:\s*\[/, 'plugins: [\n      checker({ typescript: true }),')
-      await writeFile(configPath, after)
+      throw new Error(result.fallback ?? 'Failed to inject vite-plugin-checker')
     }
   }
 }

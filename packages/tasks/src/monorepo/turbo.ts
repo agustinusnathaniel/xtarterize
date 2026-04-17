@@ -1,6 +1,6 @@
 import type { Task, TaskStatus, FileDiff } from '@xtarterize/core'
 import type { ProjectProfile } from '@xtarterize/core'
-import { fileExists, readFile, writeFile, resolvePath, readPackageJson } from '@xtarterize/core'
+import { fileExists, readFile, writeFile, resolvePath, readPackageJson, readJsonIfExists } from '@xtarterize/core'
 import { mergeJson } from '@xtarterize/patchers'
 import { addDependency } from 'nypm'
 
@@ -42,7 +42,12 @@ export const turboTask: Task = {
     const hasTurbo = pkg?.devDependencies?.['turbo']
     if (!hasTurbo) return 'patch'
 
-    return 'skip'
+    const expected = JSON.parse(TURBO_JSON)
+    const actual = await readJsonIfExists(turboPath)
+    const merged = mergeJson(actual ?? {}, expected)
+    if (JSON.stringify(actual) === JSON.stringify(merged)) return 'skip'
+
+    return 'patch'
   },
 
   async dryRun(cwd, profile): Promise<FileDiff[]> {

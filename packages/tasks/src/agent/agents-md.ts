@@ -14,7 +14,7 @@ export const agentsMdTask: Task = {
     const exists = await fileExists(agentsPath)
     if (!exists) return 'new'
 
-    return 'skip'
+    return 'conflict'
   },
 
   async dryRun(cwd, profile): Promise<FileDiff[]> {

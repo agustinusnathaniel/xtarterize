@@ -2,6 +2,7 @@ import type { Task } from '@xtarterize/core'
 import { biomeTask } from './lint/biome.js'
 import { ultraciteTask } from './lint/ultracite.js'
 import { agentsMdTask } from './agent/agents-md.js'
+import { skillsTask } from './agent/skills.js'
 import { vscodeTask } from './editor/vscode.js'
 import { vscodeExtensionsTask } from './editor/vscode-extensions.js'
 import { turboTask } from './monorepo/turbo.js'
@@ -23,6 +24,7 @@ export {
   biomeTask,
   ultraciteTask,
   agentsMdTask,
+  skillsTask,
   vscodeTask,
   vscodeExtensionsTask,
   turboTask,
@@ -61,6 +63,7 @@ export function getAllTasks(): Task[] {
     vscodeTask,
     vscodeExtensionsTask,
     agentsMdTask,
+    skillsTask,
     packageScriptsTask,
   ]
 }

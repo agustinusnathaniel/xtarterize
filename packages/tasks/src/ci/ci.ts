@@ -14,7 +14,11 @@ export const ciWorkflowTask: Task = {
     const exists = await fileExists(workflowPath)
     if (!exists) return 'new'
 
-    return 'skip'
+    const expected = renderCiWorkflow(profile)
+    const actual = await readFile(workflowPath)
+    if (actual.trim() === expected.trim()) return 'skip'
+
+    return 'conflict'
   },
 
   async dryRun(cwd, profile): Promise<FileDiff[]> {

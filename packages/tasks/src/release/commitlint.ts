@@ -15,18 +15,22 @@ export const commitlintTask: Task = {
     const exists = await fileExists(configPath)
     if (!exists) return 'new'
 
+    const expected = renderCommitlintConfig(profile)
+    const actual = await readFile(configPath)
+    if (actual.trim() === expected.trim()) return 'skip'
+
     const pkg = await readPackageJson(cwd)
     const hasCommitlint = pkg?.devDependencies?.['@commitlint/config-conventional']
     if (!hasCommitlint) return 'patch'
 
-    return 'skip'
+    return 'conflict'
   },
 
   async dryRun(cwd, profile): Promise<FileDiff[]> {
     const configPath = resolvePath(cwd, 'commitlint.config.ts')
     const exists = await fileExists(configPath)
     const before = exists ? await readFile(configPath) : null
-    const after = renderCommitlintConfig()
+    const after = renderCommitlintConfig(profile)
 
     return [{ filepath: 'commitlint.config.ts', before, after }]
   },

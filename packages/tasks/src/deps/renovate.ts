@@ -14,14 +14,18 @@ export const renovateTask: Task = {
     const exists = await fileExists(renovatePath)
     if (!exists) return 'new'
 
-    return 'skip'
+    const expected = renderRenovateJson(profile)
+    const actual = await readFile(renovatePath)
+    if (actual.trim() === expected.trim()) return 'skip'
+
+    return 'patch'
   },
 
   async dryRun(cwd, profile): Promise<FileDiff[]> {
     const renovatePath = resolvePath(cwd, 'renovate.json')
     const exists = await fileExists(renovatePath)
     const before = exists ? await readFile(renovatePath) : null
-    const after = renderRenovateJson()
+    const after = renderRenovateJson(profile)
 
     return [{ filepath: 'renovate.json', before, after }]
   },

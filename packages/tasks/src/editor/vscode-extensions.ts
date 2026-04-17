@@ -1,6 +1,7 @@
 import type { Task, TaskStatus, FileDiff } from '@xtarterize/core'
 import type { ProjectProfile } from '@xtarterize/core'
-import { fileExists, readFile, writeFile, resolvePath } from '@xtarterize/core'
+import { fileExists, readFile, writeFile, resolvePath, readJsonIfExists } from '@xtarterize/core'
+import { mergeJson } from '@xtarterize/patchers'
 import { renderVscodeExtensions } from '../templates/vscode/extensions.js'
 
 export const vscodeExtensionsTask: Task = {
@@ -14,14 +15,29 @@ export const vscodeExtensionsTask: Task = {
     const exists = await fileExists(extensionsPath)
     if (!exists) return 'new'
 
-    return 'skip'
+    const existing = await readJsonIfExists(extensionsPath)
+    const incoming = JSON.parse(renderVscodeExtensions(profile))
+    const merged = mergeJson(existing ?? {}, incoming)
+    const mergedStr = JSON.stringify(merged, null, 2)
+    const actual = await readFile(extensionsPath)
+    if (actual.trim() === mergedStr.trim()) return 'skip'
+
+    return 'patch'
   },
 
   async dryRun(cwd, profile): Promise<FileDiff[]> {
     const extensionsPath = resolvePath(cwd, '.vscode', 'extensions.json')
     const exists = await fileExists(extensionsPath)
     const before = exists ? await readFile(extensionsPath) : null
-    const after = renderVscodeExtensions(profile)
+
+    let after: string
+    if (exists && before) {
+      const existing = JSON.parse(before)
+      const incoming = JSON.parse(renderVscodeExtensions(profile))
+      after = JSON.stringify(mergeJson(existing, incoming), null, 2)
+    } else {
+      after = renderVscodeExtensions(profile)
+    }
 
     return [{ filepath: '.vscode/extensions.json', before, after }]
   },

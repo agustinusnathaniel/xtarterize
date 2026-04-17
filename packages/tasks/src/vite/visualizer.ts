@@ -3,6 +3,7 @@ import type { ProjectProfile } from '@xtarterize/core'
 import { fileExists, readFile, writeFile, resolvePath, readPackageJson } from '@xtarterize/core'
 import { injectVitePlugin } from '@xtarterize/patchers'
 import { addDependency } from 'nypm'
+import { loadFile, generateCode } from 'magicast'
 
 export const viteVisualizerTask: Task = {
   id: 'vite/visualizer',
@@ -25,17 +26,25 @@ export const viteVisualizerTask: Task = {
     const configPath = resolvePath(cwd, 'vite.config.ts')
     const before = await readFile(configPath)
 
-    const after = before
-      .replace(
-        /^(import.*from.*['"]vite['"])/m,
-        `import { visualizer } from 'rollup-plugin-visualizer'\n$1`
-      )
-      .replace(
-        /plugins:\s*\[/,
-        `plugins: [\n      visualizer({ open: false, gzipSize: true }),`
-      )
+    const mod = await loadFile(configPath)
+    const code = mod.$code
 
-    return [{ filepath: 'vite.config.ts', before, after }]
+    if (code.includes('rollup-plugin-visualizer')) {
+      return [{ filepath: 'vite.config.ts', before, after: before }]
+    }
+
+    const defaultExport = mod.exports.default
+    if (!defaultExport || !Array.isArray(defaultExport.plugins)) {
+      return [{ filepath: 'vite.config.ts', before, after: before }]
+    }
+
+    const plugins: any[] = defaultExport.plugins
+    plugins.push('visualizer({ open: false, gzipSize: true })')
+
+    const { code: after } = generateCode(mod)
+    const finalAfter = `import { visualizer } from 'rollup-plugin-visualizer'\n${after}`
+
+    return [{ filepath: 'vite.config.ts', before, after: finalAfter }]
   },
 
   async apply(cwd, profile): Promise<void> {
@@ -47,17 +56,13 @@ export const viteVisualizerTask: Task = {
     const configPath = resolvePath(cwd, 'vite.config.ts')
     const result = await injectVitePlugin(
       configPath,
-      "import { visualizer } from 'rollup-plugin-visualizer'",
-      "visualizer({ open: false, gzipSize: true })",
-      'rollup-plugin-visualizer'
+      'rollup-plugin-visualizer',
+      '{ visualizer }',
+      'visualizer({ open: false, gzipSize: true })'
     )
 
     if (!result.success) {
-      const before = await readFile(configPath)
-      const after = before
-        .replace(/^(import.*from.*['"]vite['"].*)/m, "import { visualizer } from 'rollup-plugin-visualizer'\n$1")
-        .replace(/plugins:\s*\[/, 'plugins: [\n      visualizer({ open: false, gzipSize: true }),')
-      await writeFile(configPath, after)
+      throw new Error(result.fallback ?? 'Failed to inject rollup-plugin-visualizer')
     }
   }
 }

@@ -17,7 +17,12 @@ export const knipTask: Task = {
     const pkg = await readPackageJson(cwd)
     const hasKnip = pkg?.devDependencies?.['knip']
 
-    if (exists && hasKnip) return 'skip'
+    if (exists && hasKnip) {
+      const expected = renderKnipConfig(profile)
+      const actual = await readFile(configPath)
+      if (actual.trim() === expected.trim()) return 'skip'
+      return 'patch'
+    }
     if (!exists && !hasKnip) return 'new'
     return 'patch'
   },

@@ -1,6 +1,6 @@
 import type { Task, TaskStatus, FileDiff } from '@xtarterize/core'
 import type { ProjectProfile } from '@xtarterize/core'
-import { fileExists, readFile, writeFile, resolvePath, readPackageJson } from '@xtarterize/core'
+import { fileExists, readFile, writeFile, resolvePath, readPackageJson, readJsonIfExists } from '@xtarterize/core'
 import { mergeJson } from '@xtarterize/patchers'
 import { addDependency } from 'nypm'
 import { renderBiomeJson } from '../templates/biome-json.js'
@@ -20,7 +20,12 @@ export const biomeTask: Task = {
     const hasBiome = pkg?.devDependencies?.['@biomejs/biome']
     if (!hasBiome) return 'patch'
 
-    return 'skip'
+    const expected = JSON.parse(renderBiomeJson(profile))
+    const actual = await readJsonIfExists(biomePath)
+    const merged = mergeJson(actual ?? {}, expected)
+    if (JSON.stringify(actual) === JSON.stringify(merged)) return 'skip'
+
+    return 'patch'
   },
 
   async dryRun(cwd, profile): Promise<FileDiff[]> {

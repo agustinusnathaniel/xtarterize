@@ -17,10 +17,10 @@ export const ultraciteTask: Task = {
 
     const content = await readFile(biomePath)
     const parsed = JSON.parse(content)
-    if (parsed.extends?.includes('ultracite')) return 'skip'
-
-    const pkg = await readPackageJson(cwd)
-    if (!pkg?.devDependencies?.['ultracite']) return 'patch'
+    if (parsed.extends?.includes('ultracite')) {
+      const pkg = await readPackageJson(cwd)
+      if (pkg?.devDependencies?.['ultracite']) return 'skip'
+    }
 
     return 'patch'
   },

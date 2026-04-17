@@ -17,7 +17,12 @@ export const plopTask: Task = {
     const pkg = await readPackageJson(cwd)
     const hasPlop = pkg?.devDependencies?.['plop']
 
-    if (exists && hasPlop) return 'skip'
+    if (exists && hasPlop) {
+      const expected = renderPlopfile(profile)
+      const actual = await readFile(plopfilePath)
+      if (actual.trim() === expected.trim()) return 'skip'
+      return 'patch'
+    }
     if (!exists && !hasPlop) return 'new'
     return 'patch'
   },
