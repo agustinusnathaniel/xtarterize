@@ -1,0 +1,290 @@
+import path from 'node:path'
+import { fileExists, readJsonIfExists, resolvePath } from './utils/fs.js'
+import { hasDependency, readPackageJson, type PackageJson } from './utils/pkg.js'
+
+export type Framework = 'react' | 'react-native' | 'vue' | 'svelte' | 'solid' | 'node' | null
+export type Bundler = 'vite' | 'nextjs' | 'tanstack-start' | 'expo' | 'webpack' | 'rspack' | 'none' | null
+export type Router = 'tanstack-router' | 'react-router' | 'next' | 'expo-router' | 'vue-router' | null
+export type Styling = 'tailwind' | 'css-modules' | 'styled-components' | 'vanilla-extract' | 'nativewind' | 'vanilla'
+export type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun'
+
+export interface ProjectProfile {
+  framework: Framework
+  frameworkVersion: string | null
+  bundler: Bundler
+  router: Router
+  styling: Styling[]
+  typescript: boolean
+  runtime: 'browser' | 'node' | 'edge' | 'native' | 'universal'
+  packageManager: PackageManager
+  vitePlus: boolean
+  monorepo: boolean
+  monorepoTool: 'turbo' | 'nx' | 'lerna' | null
+  workspaceRoot: boolean
+  hasGitHub: boolean
+  hasGit: boolean
+  existing: {
+    biome: boolean
+    tsconfig: boolean
+    renovate: boolean
+    commitlint: boolean
+    knip: boolean
+    plop: boolean
+    turbo: boolean
+    vscodeSettings: boolean
+    agentsMd: boolean
+    githubWorkflows: string[]
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isStringRecord(value: unknown): value is Record<string, string> {
+  if (!isRecord(value)) return false
+  return Object.values(value).every((v): v is string => typeof v === 'string')
+}
+
+function detectFramework(deps: Record<string, string>): Framework {
+  if (deps['react-native'] || deps['expo']) return 'react-native'
+  if (deps['react']) return 'react'
+  if (deps['vue']) return 'vue'
+  if (deps['svelte']) return 'svelte'
+  if (deps['solid-js']) return 'solid'
+  return 'node'
+}
+
+function detectFrameworkVersion(pkg: unknown, framework: Framework): string | null {
+  if (!isRecord(pkg)) return null
+  const allDeps: Record<string, string> = {}
+  if (isStringRecord(pkg['dependencies'])) {
+    Object.assign(allDeps, pkg['dependencies'])
+  }
+  if (isStringRecord(pkg['devDependencies'])) {
+    Object.assign(allDeps, pkg['devDependencies'])
+  }
+
+  const frameworkPkg = framework === 'react-native'
+    ? (allDeps['react-native'] ?? allDeps['expo'])
+    : framework === 'node'
+      ? null
+      : framework
+        ? allDeps[framework === 'solid' ? 'solid-js' : framework]
+        : null
+
+  if (!frameworkPkg) return null
+
+  const cleaned = frameworkPkg.replace(/^[^0-9]*/, '')
+  return cleaned || null
+}
+
+function detectBundler(deps: Record<string, string>, cwd: string): Bundler {
+  if (deps['@tanstack/start']) return 'tanstack-start'
+  if (deps['next']) return 'nextjs'
+  if (deps['expo']) return 'expo'
+  if (deps['vite']) return 'vite'
+  if (deps['webpack']) return 'webpack'
+  if (deps['@rspack/core']) return 'rspack'
+  return 'none'
+}
+
+function detectRouter(deps: Record<string, string>, bundler: Bundler): Router {
+  if (bundler === 'nextjs') return 'next'
+  if (bundler === 'expo') return 'expo-router'
+  if (deps['@tanstack/react-router']) return 'tanstack-router'
+  if (deps['react-router'] || deps['react-router-dom']) return 'react-router'
+  if (deps['vue-router']) return 'vue-router'
+  return null
+}
+
+function detectStyling(deps: Record<string, string>): Styling[] {
+  const result: Styling[] = []
+  if (deps['tailwindcss'] || deps['@tailwindcss/vite']) result.push('tailwind')
+  if (deps['styled-components']) result.push('styled-components')
+  if (deps['@vanilla-extract/css']) result.push('vanilla-extract')
+  if (deps['nativewind']) result.push('nativewind')
+  if (result.length === 0) result.push('vanilla')
+  return result
+}
+
+function detectRuntime(framework: Framework, bundler: Bundler): 'browser' | 'node' | 'edge' | 'native' | 'universal' {
+  if (framework === 'react-native') return 'native'
+  if (bundler === 'nextjs') return 'edge'
+  if (framework === 'node') return 'node'
+  return 'browser'
+}
+
+function detectVitePlus(deps: Record<string, string>): boolean {
+  return 'vite-plus' in deps || 'vp' in deps
+}
+
+async function detectPackageManager(cwd: string): Promise<PackageManager> {
+  const pkg = await readPackageJson(cwd)
+  if (pkg?.packageManager) {
+    const pm = pkg.packageManager.split('@')[0]
+    if (pm === 'npm' || pm === 'pnpm' || pm === 'yarn' || pm === 'bun') {
+      return pm
+    }
+  }
+
+  if (await fileExists(resolvePath(cwd, 'bun.lockb'))) return 'bun'
+  if (await fileExists(resolvePath(cwd, 'bun.lock'))) return 'bun'
+  if (await fileExists(resolvePath(cwd, 'pnpm-lock.yaml'))) return 'pnpm'
+  if (await fileExists(resolvePath(cwd, 'yarn.lock'))) return 'yarn'
+  if (await fileExists(resolvePath(cwd, 'package-lock.json'))) return 'npm'
+
+  return 'npm'
+}
+
+async function detectMonorepo(cwd: string): Promise<{ monorepo: boolean; monorepoTool: 'turbo' | 'nx' | 'lerna' | null; workspaceRoot: boolean }> {
+  const hasPnpmWorkspace = await fileExists(resolvePath(cwd, 'pnpm-workspace.yaml'))
+  const hasTurboJson = await fileExists(resolvePath(cwd, 'turbo.json'))
+  const hasNxJson = await fileExists(resolvePath(cwd, 'nx.json'))
+  const hasLernaJson = await fileExists(resolvePath(cwd, 'lerna.json'))
+  const hasPackagesDir = await fileExists(resolvePath(cwd, 'packages'))
+  const hasAppsDir = await fileExists(resolvePath(cwd, 'apps'))
+
+  const monorepo = hasPnpmWorkspace || hasTurboJson || hasNxJson || hasLernaJson || (hasPackagesDir && hasAppsDir)
+
+  let monorepoTool: 'turbo' | 'nx' | 'lerna' | null = null
+  if (hasTurboJson) monorepoTool = 'turbo'
+  else if (hasNxJson) monorepoTool = 'nx'
+  else if (hasLernaJson) monorepoTool = 'lerna'
+
+  return { monorepo, monorepoTool, workspaceRoot: monorepo }
+}
+
+async function detectGitHubWorkflows(cwd: string): Promise<string[]> {
+  const workflowsDir = resolvePath(cwd, '.github', 'workflows')
+  const exists = await fileExists(workflowsDir)
+  if (!exists) return []
+
+  const fs = await import('fs-extra')
+  const entries = await fs.readdir(workflowsDir)
+  return entries
+    .filter((e): e is string => typeof e === 'string' && e.endsWith('.yml') || e.endsWith('.yaml'))
+    .map((e) => e.replace(/\.(yml|yaml)$/, ''))
+}
+
+async function detectExistingConfigs(cwd: string): Promise<ProjectProfile['existing']> {
+  const [
+    biome,
+    tsconfig,
+    renovate,
+    commitlint,
+    knip,
+    plop,
+    turbo,
+    vscodeSettings,
+    agentsMd,
+    githubWorkflows,
+  ] = await Promise.all([
+    fileExists(resolvePath(cwd, 'biome.json'))
+      .then((v) => v ? v : fileExists(resolvePath(cwd, 'biome.jsonc'))),
+    fileExists(resolvePath(cwd, 'tsconfig.json'))
+      .then((v) => v ? v : fileExists(resolvePath(cwd, 'tsconfig.base.json'))),
+    fileExists(resolvePath(cwd, 'renovate.json'))
+      .then((v) => v ? v : fileExists(resolvePath(cwd, '.github', 'renovate.json'))),
+    fileExists(resolvePath(cwd, 'commitlint.config.js'))
+      .then((v) => v ? true : fileExists(resolvePath(cwd, 'commitlint.config.ts'))
+        .then((v2) => v2 ? true : v2)),
+    fileExists(resolvePath(cwd, 'knip.json'))
+      .then((v) => v ? v : fileExists(resolvePath(cwd, 'knip.jsonc'))),
+    fileExists(resolvePath(cwd, 'plopfile.js'))
+      .then((v) => v ? true : fileExists(resolvePath(cwd, 'plopfile.ts'))
+        .then((v2) => v2 ? true : v2)),
+    fileExists(resolvePath(cwd, 'turbo.json')),
+    fileExists(resolvePath(cwd, '.vscode', 'settings.json')),
+    fileExists(resolvePath(cwd, 'AGENTS.md'))
+      .then((v) => v ? v : fileExists(resolvePath(cwd, 'CLAUDE.md'))),
+    detectGitHubWorkflows(cwd),
+  ])
+
+  return {
+    biome,
+    tsconfig,
+    renovate,
+    commitlint,
+    knip,
+    plop,
+    turbo,
+    vscodeSettings,
+    agentsMd,
+    githubWorkflows,
+  }
+}
+
+export async function detectProject(cwd: string): Promise<ProjectProfile> {
+  const pkg = await readPackageJson(cwd)
+
+  if (!pkg) {
+    const monorepoInfo = await detectMonorepo(cwd)
+    const [hasGitHub, hasGit] = await Promise.all([
+      fileExists(resolvePath(cwd, '.github')),
+      fileExists(resolvePath(cwd, '.git')),
+    ])
+    const existing = await detectExistingConfigs(cwd)
+    const packageManager = await detectPackageManager(cwd)
+
+    return {
+      framework: null,
+      frameworkVersion: null,
+      bundler: null,
+      router: null,
+      styling: ['vanilla'],
+      typescript: existing.tsconfig,
+      runtime: 'node',
+      packageManager,
+      vitePlus: false,
+      monorepo: monorepoInfo.monorepo,
+      monorepoTool: monorepoInfo.monorepoTool,
+      workspaceRoot: monorepoInfo.workspaceRoot,
+      hasGitHub,
+      hasGit,
+      existing,
+    }
+  }
+
+  const allDeps: Record<string, string> = {}
+  if (isStringRecord(pkg.dependencies)) {
+    Object.assign(allDeps, pkg.dependencies)
+  }
+  if (isStringRecord(pkg.devDependencies)) {
+    Object.assign(allDeps, pkg.devDependencies)
+  }
+
+  const framework = detectFramework(allDeps)
+  const bundler = detectBundler(allDeps, cwd)
+  const router = detectRouter(allDeps, bundler)
+  const styling = detectStyling(allDeps)
+  const runtime = detectRuntime(framework, bundler)
+  const vitePlus = detectVitePlus(allDeps)
+  const typescript = 'typescript' in allDeps || await fileExists(resolvePath(cwd, 'tsconfig.json'))
+
+  const [monorepoInfo, hasGitHub, hasGit, packageManager, existing] = await Promise.all([
+    detectMonorepo(cwd),
+    fileExists(resolvePath(cwd, '.github')),
+    fileExists(resolvePath(cwd, '.git')),
+    detectPackageManager(cwd),
+    detectExistingConfigs(cwd),
+  ])
+
+  return {
+    framework,
+    frameworkVersion: detectFrameworkVersion(pkg as unknown, framework),
+    bundler,
+    router,
+    styling,
+    typescript,
+    runtime,
+    vitePlus,
+    packageManager,
+    monorepo: monorepoInfo.monorepo,
+    monorepoTool: monorepoInfo.monorepoTool,
+    workspaceRoot: monorepoInfo.workspaceRoot,
+    hasGitHub,
+    hasGit,
+    existing,
+  }
+}
