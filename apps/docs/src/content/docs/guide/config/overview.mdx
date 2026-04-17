@@ -1,48 +1,52 @@
 ---
 title: Configuration
-description: How to configure Xtarterize for your project.
+description: How Xtarterize detects and adapts to your project.
 ---
 
 # Configuration
 
-Xtarterize can be configured using a `xtarterize.config.js` (or `.ts`) file in your project root.
+Xtarterize doesn't require a config file. It detects your project's stack automatically and applies only what's appropriate.
 
-## Basic Configuration
+## Detection
 
-```js
-export default {
-  // Project metadata
-  name: 'my-project',
-  version: '1.0.0',
-  
-  // Framework detection
-  detect: {
-    // Auto-detect existing configurations (default: true)
-    auto: true,
-  },
-  
-  // Tasks to run
-  tasks: {
-    // Run these tasks on init
-    onInit: ['setup-vite', 'setup-biome'],
-  },
-}
+When you run `init`, Xtarterize scans your project to build a `ProjectProfile`:
+
+- **Framework** — React, Vue, Svelte, Solid, React Native, or Node (from `package.json` deps)
+- **Bundler** — Vite, Next.js, TanStack Start, Expo, Webpack, or none
+- **Router** — TanStack Router, React Router, Vue Router, Expo Router, or none
+- **Styling** — Tailwind, CSS Modules, Styled Components, Vanilla Extract, NativeWind, or Vanilla
+- **Package Manager** — pnpm, npm, yarn, or bun (from lockfiles or `packageManager` field)
+- **Monorepo** — Detected via `pnpm-workspace.yaml`, `turbo.json`, `packages/` + `apps/` dirs
+- **GitHub** — `.github/` directory presence
+- **Existing Configs** — Checks for `biome.json`, `tsconfig.json`, `renovate.json`, etc.
+
+## Ambiguity Resolution
+
+If both `react` and `react-native` are detected, Xtarterize prompts you to clarify which describes the project.
+
+## Task Gating
+
+Tasks are gated on the detected profile:
+
+- Vite plugin tasks only run when `bundler === 'vite'`
+- Monorepo tasks only run when `monorepo === true`
+- CI tasks only run when `hasGitHub === true`
+- TypeScript tasks only run when `typescript === true`
+
+## Parameterized Templates
+
+All templates adapt to the detected profile:
+
+- GitHub workflows use the detected package manager for install commands
+- Knip entry points are inferred from the bundler/framework
+- Plop generators vary by framework (React gets component+hook, Vue gets component+composable, etc.)
+- VS Code extensions include framework-specific recommendations
+- AGENTS.md includes framework-specific instructions
+
+## Backup System
+
+Before any file is modified, Xtarterize creates a backup in `.xtarterize/backups/<filename>.<timestamp>`. An index file tracks all backups. Restore with:
+
+```bash
+npx xtarterize restore tsconfig.json
 ```
-
-## Configuration Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `name` | `string` | Directory name | Project name |
-| `version` | `string` | `'0.0.1'` | Project version |
-| `detect.auto` | `boolean` | `true` | Auto-detect existing configs |
-| `tasks.onInit` | `string[]` | `[]` | Tasks to run on initialization |
-
-## Environment Variables
-
-Xtarterize also respects the following environment variables:
-
-| Variable | Description |
-|----------|-------------|
-| `XTARTERIZE_DEBUG` | Enable debug mode |
-| `XTARTERIZE_CONFIG` | Path to custom config file |

@@ -1,36 +1,40 @@
 ---
 title: Welcome to Xtarterize
-description: Get started with Xtarterize, a toolkit to scaffold and configure full-stack TypeScript projects.
+description: Get started with Xtarterize, an adaptive CLI tool that automates conformance configuration for JavaScript/TypeScript projects.
 ---
 
 # Welcome to Xtarterize
 
-Xtarterize is a toolkit designed to scaffold and configure full-stack TypeScript projects with best practices built-in.
+Xtarterize is an intelligent CLI tool that automates the setup, enforcement, and ongoing synchronization of developer conformance configurations across JavaScript/TypeScript projects.
 
 ## What is Xtarterize?
 
-Xtarterize helps you quickly set up new projects with:
+Xtarterize helps you maintain consistent, high-quality project configurations by:
 
-- **Project detection** - Automatically detect existing project configurations and frameworks
-- **Smart patching** - Apply targeted modifications to configuration files without overwriting customizations
-- **Task execution** - Run predefined tasks for common setup operations
-- **CLI interface** - Simple command-line interface to scaffold new projects
+- **Detection-first** — Scans your project before doing anything, building a full profile of your stack
+- **Context-aware** — Applies only what's appropriate for your detected framework and tools
+- **Non-destructive** — Never overwrites without confirmation; always previews diffs
+- **Idempotent** — Safe to run multiple times; no corruption, no duplicate entries
+- **Evolvable** — `sync` and `diff` commands keep existing projects up to date over time
 
 ## Quick Start
 
 ```bash
-# Scaffold a new project
+# Initialize conformance for a project
 npx xtarterize init
 
-# Or run from an existing project
-npx xtarterize analyze
+# Check current conformance status
+npx xtarterize check
+
+# See what changes sync would make
+npx xtarterize diff
 ```
 
 ## Next Steps
 
 - Read the [Getting Started](/getting-started/introduction/) guide to learn the basics
-- Explore the [CLI Reference](/guide/cli/overview/) for available commands
-- Check out the [Configuration](/guide/config/overview/) guide to customize your setup
+- Explore the [CLI Reference](/guide/cli/overview/) for all available commands and flags
+- Check out the [Tasks](/guide/tasks/overview/) guide to see what conformance tasks are available
 
 ## For Contributors
 

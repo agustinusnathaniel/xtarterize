@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Install and set up Xtarterize in your project.
+description: Install and set up Xtarterize.
 ---
 
 # Installation
@@ -8,38 +8,29 @@ description: Install and set up Xtarterize in your project.
 ## Prerequisites
 
 - Node.js 18 or later
-- pnpm (recommended) or npm
+- A JavaScript/TypeScript project (or starting fresh)
 
-## Install Xtarterize
+## Run Without Installing
 
-You can use Xtarterize without installing it by using `npx`:
+You can use Xtarterize without installing it globally by using `npx`:
 
 ```bash
 npx xtarterize init
 ```
 
-Or install it as a development dependency:
+This is the recommended approach — you always get the latest version.
 
-```bash
-# Using pnpm
-pnpm add -D @xtarterize/cli
-
-# Using npm
-npm install --save-dev @xtarterize/cli
-```
-
-## Verify Installation
-
-After installation, verify that Xtarterize is working:
+## Verify It Works
 
 ```bash
 npx xtarterize --version
+npx xtarterize --help
 ```
 
 ## Next Steps
 
-Now that you have Xtarterize installed, you can:
+Now that Xtarterize is ready, you can:
 
-1. [Initialize a new project](/getting-started/initialization/)
-2. [Analyze an existing project](/getting-started/analyze/)
-3. [Run specific tasks](/guide/cli/tasks/)
+1. [Initialize a project](/getting-started/initialization/) — run `init` to detect and apply conformance
+2. [Check status](/guide/cli/overview/) — run `check` to audit current conformance
+3. [Explore tasks](/guide/tasks/overview/) — see what conformance tasks are available

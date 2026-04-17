@@ -1,101 +1,75 @@
 ---
-title: JSON Merge Patcher
-description: How to use the JSON merge patcher to modify configuration files.
+title: JSON Merge
+description: How the JSON merge patcher safely combines configuration objects.
 ---
 
-# JSON Merge Patcher
+# JSON Merge
 
-The JSON merge patcher allows you to safely merge changes into JSON and JSON-like configuration files.
+The `mergeJson` function performs a deep merge of two JavaScript objects using the `defu` library. It's used whenever Xtarterize needs to modify JSON configuration files like `tsconfig.json`, `biome.json`, or `.vscode/settings.json`.
 
 ## Usage
 
 ```typescript
-import { jsonMerge } from '@xtarterize/patchers'
+import { mergeJson } from '@xtarterize/patchers'
 
-const result = await jsonMerge(filePath, patch)
+const existing = { compilerOptions: { strict: true, target: "ES2022" } }
+const incoming = { compilerOptions: { incremental: true } }
+
+const merged = mergeJson(existing, incoming)
+// { compilerOptions: { strict: true, target: "ES2022", incremental: true } }
 ```
 
 ## Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `filePath` | `string` | Path to the file to patch |
-| `patch` | `object` | The patch to apply (deep merge) |
+| `existing` | `object` | The current configuration (takes precedence) |
+| `incoming` | `object` | The new configuration to merge in (fills gaps) |
 
 ## Return Value
 
-Returns a `PatchResult` object:
-
-```typescript
-interface PatchResult {
-  success: boolean
-  original: object
-  patched: object
-  changes: string[]
-}
-```
+Returns the merged `object`. Existing keys always take precedence over incoming keys.
 
 ## Deep Merge Behavior
 
-The patcher performs a deep merge, meaning nested objects are merged recursively:
+Nested objects are merged recursively:
 
 ```typescript
-// Original vite.config.ts
-{
-  resolve: {
-    alias: { '@': './src' }
+const existing = {
+  compilerOptions: {
+    strict: true,
+    target: "ES2022"
   }
 }
 
-// Patch
-{
-  resolve: {
-    tsconfigPaths: true
+const incoming = {
+  compilerOptions: {
+    incremental: true,
+    tsBuildInfoFile: ".tsbuildinfo"
   }
 }
 
-// Result
-{
-  resolve: {
-    alias: { '@': './src' },
-    tsconfigPaths: true
-  }
-}
+const merged = mergeJson(existing, incoming)
+// {
+//   compilerOptions: {
+//     strict: true,           // preserved from existing
+//     target: "ES2022",       // preserved from existing
+//     incremental: true,      // added from incoming
+//     tsBuildInfoFile: ".tsbuildinfo"  // added from incoming
+//   }
+// }
 ```
 
 ## Array Handling
 
-Arrays are replaced, not merged:
+Arrays are replaced, not merged. This is `defu`'s default behavior:
 
 ```typescript
-// Original
-{ plugins: ['pluginA'] }
+const existing = { plugins: ['pluginA'] }
+const incoming = { plugins: ['pluginB'] }
 
-// Patch
-{ plugins: ['pluginB'] }
-
-// Result
-{ plugins: ['pluginB'] }
+const merged = mergeJson(existing, incoming)
+// { plugins: ['pluginA'] } — existing wins
 ```
 
-## Examples
-
-### Add Vite plugin
-
-```typescript
-await jsonMerge('vite.config.ts', {
-  plugins: ['react()', 'newPlugin()']
-})
-```
-
-### Add TypeScript paths
-
-```typescript
-await jsonMerge('tsconfig.json', {
-  compilerOptions: {
-    paths: {
-      '@/*': ['./src/*']
-    }
-  }
-})
-```
+For cases where arrays need to be combined (like Vite plugins), use the AST patcher instead.

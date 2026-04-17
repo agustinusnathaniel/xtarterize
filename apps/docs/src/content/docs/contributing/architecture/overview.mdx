@@ -12,37 +12,50 @@ Xtarterize is organized as a monorepo using Turborepo for task orchestration and
 ```
 xtarterize/
 ├── packages/
-│   ├── core/      # @xtarterize/core - Project detection and analysis
-│   ├── patchers/  # @xtarterize/patchers - File modification utilities
-│   └── tasks/     # @xtarterize/tasks - Predefined setup tasks
+│   ├── core/      # @xtarterize/core — Detection, task interface, utils, backup
+│   ├── patchers/  # @xtarterize/patchers — JSON/YAML merge, AST patching
+│   └── tasks/     # @xtarterize/tasks — All conformance task implementations
 ├── apps/
-│   ├── cli/       # @xtarterize/cli - Command-line interface
-│   └── docs/      # @xtarterize/docs - This documentation site
+│   ├── cli/       # xtarterize — CLI binary (citty + @clack/prompts)
+│   └── docs/      # @xtarterize/docs — This documentation site (Astro/Starlight)
 └── test/
-    └── fixtures/  # Test fixtures for various project types
+    └── fixtures/  — Test fixtures for various project types
 ```
 
 ## Package Dependencies
 
 ```
-@xtarterize/cli
+xtarterize (apps/cli)
 ├── @xtarterize/core
-├── @xtarterize/patchers
 └── @xtarterize/tasks
 
 @xtarterize/tasks
-└── @xtarterize/core
+├── @xtarterize/core
+└── @xtarterize/patchers
 
 @xtarterize/patchers
-└── @xtarterize/core
+└── (no internal workspace deps)
+
+@xtarterize/core
+└── (no internal workspace deps)
 ```
 
 ## How It Works
 
-1. **CLI** receives user input and determines which tasks to run
-2. **Core** analyzes the project directory to detect existing configurations
-3. **Tasks** define what changes need to be made based on the detection results
-4. **Patchers** safely apply those changes to configuration files
+1. **CLI** (`apps/cli`) receives user input via citty commands
+2. **Core** (`packages/core`) detects the project stack via `detectProject()`, returning a `ProjectProfile`
+3. **Resolver** maps the profile to applicable tasks via `resolveTasks()`
+4. **Tasks** (`packages/tasks`) each implement `check()`, `dryRun()`, and `apply()`
+5. **Patchers** (`packages/patchers`) safely modify files via deep merge (`defu`) or AST manipulation (`magicast`)
+6. **Backup** system saves originals before any write
+
+## Key Design Decisions
+
+- **Detection lives in core** — No CLI dependency, reusable by other consumers
+- **Tasks are independent** — Each task can run standalone via `add <task-id>`
+- **Dry-run is exact** — `dryRun()` output is bit-for-bit identical to what `apply()` writes
+- **Idempotency is non-negotiable** — Running twice produces no changes on second run
+- **Templates are parameterized** — All templates receive `ProjectProfile` and adapt accordingly
 
 ## Development Workflow
 
@@ -54,8 +67,8 @@ pnpm install
 pnpm build
 
 # Run tests
-pnpm test
+pnpm test:run
 
-# Start development
+# Start development (watch mode)
 pnpm dev
 ```

@@ -1,40 +1,106 @@
 ---
 title: CLI Overview
-description: Overview of the Xtarterize command-line interface and available commands.
+description: Complete reference for the Xtarterize command-line interface.
 ---
 
 # CLI Overview
 
-The Xtarterize CLI provides a simple interface to scaffold and configure your TypeScript projects.
+The Xtarterize CLI provides commands to detect, apply, and maintain conformance configuration for JavaScript/TypeScript projects.
 
 ## Available Commands
 
 | Command | Description |
 |---------|-------------|
-| `xtarterize init` | Initialize a new project |
-| `xtarterize analyze` | Analyze an existing project |
-| `xtarterize add` | Add a specific configuration or tool |
-| `xtarterize remove` | Remove a configuration or tool |
-| `xtarterize list` | List available templates and tasks |
+| [`xtarterize init`](#init) | Full conformance setup — detect, plan, apply |
+| [`xtarterize sync`](#sync) | Update existing configs to latest templates |
+| [`xtarterize diff`](#diff) | Show pending changes without applying |
+| [`xtarterize check`](#check) | Audit current conformance status |
+| [`xtarterize add <task-id>`](#add) | Apply a single conformance task |
+| [`xtarterize restore <file>`](#restore) | Restore a file from backup |
+| [`xtarterize list`](#list) | List all available tasks with status |
 
-## Global Options
+## `init`
 
-| Option | Description |
-|--------|-------------|
-| `--help` | Show help information |
-| `--version` | Show version number |
-| `--verbose` | Enable verbose logging |
-| `--dry-run` | Preview changes without applying them |
-
-## Examples
+Full conformance setup. Detects your project stack, shows a plan, and applies changes.
 
 ```bash
-# Show help
-npx xtarterize --help
-
-# Initialize with verbose output
-npx xtarterize init --verbose
-
-# Preview changes without applying
-npx xtarterize analyze --dry-run
+npx xtarterize init
+npx xtarterize init --dry-run
+npx xtarterize init --yes
+npx xtarterize init --skip lint/oxlint
+npx xtarterize init --only lint/biome,ts/incremental
 ```
+
+## `sync`
+
+Update existing project configs to match the latest conformance templates. Only shows tasks with `patch` or `conflict` status.
+
+```bash
+npx xtarterize sync
+npx xtarterize sync --dry-run
+npx xtarterize sync --yes
+```
+
+## `diff`
+
+Show what `sync` would change, without applying anything. Read-only.
+
+```bash
+npx xtarterize diff
+```
+
+## `check`
+
+Audit which tasks are conformant and which need attention.
+
+```bash
+npx xtarterize check
+```
+
+Output shows:
+- ✔ green = conformant (`skip`)
+- ~ yellow = needs update (`patch`)
+- ✗ red = missing entirely (`new`)
+- ⚠ orange = incompatible config (`conflict`)
+
+## `add`
+
+Apply a single conformance task.
+
+```bash
+npx xtarterize add lint/biome
+npx xtarterize add ci/release
+npx xtarterize add codegen/plop
+```
+
+## `restore`
+
+Restore a file from a previous backup.
+
+```bash
+npx xtarterize restore tsconfig.json
+npx xtarterize restore biome.json
+```
+
+## `list`
+
+List all registered tasks grouped by category, with current status.
+
+```bash
+npx xtarterize list
+```
+
+## Task Status Values
+
+Each task reports one of four statuses:
+
+| Status | Meaning |
+|--------|---------|
+| `new` | File/config doesn't exist yet |
+| `patch` | File exists but needs additions/updates |
+| `skip` | Already conformant, nothing to do |
+| `conflict` | Existing config is incompatible; requires decision |
+
+## Backup System
+
+Before any file is modified, Xtarterize creates a backup in `.xtarterize/backups/`. You can restore any file using the `restore` command.

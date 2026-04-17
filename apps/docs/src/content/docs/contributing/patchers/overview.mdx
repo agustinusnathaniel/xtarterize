@@ -1,69 +1,79 @@
 ---
-title: Overview
-description: Overview of the patchers package and how it modifies configuration files.
+title: Patchers Overview
+description: How Xtarterize safely modifies configuration files.
 ---
 
 # Patchers Overview
 
 The `@xtarterize/patchers` package provides utilities for safely modifying configuration files without overwriting existing customizations.
 
-## Why Patchers?
-
-When scaffolding a project, you often need to modify existing configuration files. Simply overwriting them would lose any custom settings the user has already configured.
-
-Patchers solve this by:
-
-1. Reading the existing configuration
-2. Merging new settings intelligently
-3. Preserving existing customizations
-4. Formatting the output correctly
-
 ## Available Patchers
 
 | Patcher | Description |
 |---------|-------------|
-| `jsonMerge` | Merge JSON configuration files |
-| `packageJson` | Add dependencies, scripts, and fields to package.json |
-| `tsconfigPaths` | Add path aliases to tsconfig.json |
-| `vitePlugins` | Add plugins to Vite configuration |
+| `mergeJson` | Deep merge JSON objects using `defu` — existing keys take precedence |
+| `mergeYaml` | Deep merge YAML objects using `defu` and `js-yaml` |
+| `injectVitePlugin` | AST-based plugin injection into `vite.config.ts` using `magicast` |
 
-## Example: JSON Merge
-
-```typescript
-import { jsonMerge } from '@xtarterize/patchers'
-
-const result = await jsonMerge('vite.config.ts', {
-  plugins: ['newPlugin()'],
-  resolve: {
-    alias: { '@': './src' }
-  }
-})
-```
-
-## Example: Package.json
+## JSON Merge
 
 ```typescript
-import { patchPackageJson } from '@xtarterize/patchers'
+import { mergeJson } from '@xtarterize/patchers'
 
-await patchPackageJson('package.json', {
-  dependencies: {
-    'react': '^19.0.0'
-  },
-  devDependencies: {
-    'vite': '^6.0.0'
-  },
-  scripts: {
-    'dev': 'vite',
-    'build': 'vite build'
-  }
-})
+const existing = { compilerOptions: { strict: true, target: "ES2022" } }
+const incoming = { compilerOptions: { incremental: true, strict: true } }
+
+const merged = mergeJson(existing, incoming)
+// { compilerOptions: { strict: true, target: "ES2022", incremental: true } }
 ```
 
-## Safety Features
+The `defu` library ensures that existing user configuration is never overwritten — incoming values only fill gaps.
 
-Patchers include several safety features:
+## YAML Merge
 
-- **Backup creation** - Original files are backed up before modification
-- **Validation** - Merged configurations are validated before writing
-- **Formatting** - Output is formatted to match project conventions
-- **Rollback** - Changes can be rolled back if needed
+```typescript
+import { mergeYaml } from '@xtarterize/patchers'
+
+const existing = `
+name: CI
+on:
+  push:
+    branches: [main]
+`
+
+const incoming = `
+name: CI
+on:
+  pull_request:
+    branches: [main]
+`
+
+const merged = mergeYaml(existing, incoming)
+// Both push and pull_request triggers preserved
+```
+
+## AST Patching (Vite Plugins)
+
+```typescript
+import { injectVitePlugin } from '@xtarterize/patchers'
+
+const result = await injectVitePlugin(
+  '/path/to/vite.config.ts',
+  'vite-plugin-checker',    // import path
+  'checker',                // import name
+  'checker({ typescript: true })'  // plugin expression
+)
+
+if (!result.success) {
+  console.log(result.fallback) // Manual instructions if AST structure is unsupported
+}
+```
+
+The AST patcher:
+1. Parses `vite.config.ts` using `magicast`
+2. Checks if the plugin is already imported (idempotent)
+3. Inserts the import at the top of the file
+4. Appends the plugin call to the `plugins` array
+5. Writes the file back
+
+If the config structure is non-standard (factory functions, conditional exports), it falls back to returning manual instructions rather than corrupting the file.

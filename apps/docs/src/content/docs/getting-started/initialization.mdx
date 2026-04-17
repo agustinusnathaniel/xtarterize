@@ -1,13 +1,13 @@
 ---
 title: Initialization
-description: Initialize a new project with Xtarterize.
+description: Initialize conformance configuration for a project with Xtarterize.
 ---
 
 # Initialization
 
-## Initialize a New Project
+## Initialize a Project
 
-To scaffold a new project from scratch:
+To apply conformance configuration to a project:
 
 ```bash
 npx xtarterize init
@@ -15,47 +15,72 @@ npx xtarterize init
 
 This will:
 
-1. Prompt you for project details
-2. Detect what tools and frameworks you want to use
-3. Generate the project structure
-4. Install dependencies
-5. Run initial configuration tasks
+1. **Scan** your project directory to detect framework, bundler, package manager, monorepo status, and existing configs
+2. **Resolve** which conformance tasks are applicable for your stack
+3. **Check** each task's current status (`new`, `patch`, `skip`, or `conflict`)
+4. **Display** a conformance plan table showing what will change
+5. **Prompt** you to apply all, select specific tasks, dry-run, or quit
 
-## Configuration
+## Example Output
 
-You can configure Xtarterize behavior with a `xtarterize.config.js` file:
+```
+✦ Scanning project...
 
-```js
-export default {
-  // Project name
-  name: 'my-project',
-  
-  // Packages to include
-  packages: ['core', 'patchers', 'tasks'],
-  
-  // Tasks to run on init
-  tasks: ['setup-vite', 'setup-biome', 'setup-vitest'],
-}
+  Detected:
+    Framework:   React 18
+    Bundler:     Vite 5
+    Package Manager: pnpm
+
+  Conformance plan:
+
+    ✔ Biome (lint + format)              lint/biome           [new]
+    ✔ vite-plugin-checker                vite/checker         [new]
+    ~ tsconfig — incremental: true       ts/incremental       [patch]
+    = Turbo                              monorepo/turbo       [skip — no monorepo]
+
+  [A] Apply all   [S] Select items   [D] Dry-run   [Q] Quit
 ```
 
 ## Options
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--name` | Project name | Current directory name |
-| `--template` | Template to use | `default` |
-| `--package-manager` | Package manager to use | `pnpm` |
-| `--dry-run` | Show what would be done without making changes | `false` |
+| Flag | Description |
+|------|-------------|
+| `--dry-run` | Preview all changes without applying anything |
+| `--yes` | Skip all confirmations, apply all changes automatically |
+| `--skip <task-id>` | Exclude a specific task (comma-separated) |
+| `--only <task-id>` | Apply only a specific task (comma-separated) |
 
 ## Examples
 
 ```bash
-# Initialize with specific name
-npx xtarterize init --name my-app
-
-# Use npm instead of pnpm
-npx xtarterize init --package-manager npm
-
-# Dry run to see what would happen
+# Preview changes without applying
 npx xtarterize init --dry-run
+
+# Apply all without prompts
+npx xtarterize init --yes
+
+# Skip the plop code generator
+npx xtarterize init --skip codegen/plop
+
+# Only apply Biome
+npx xtarterize init --only lint/biome
 ```
+
+## What Gets Applied
+
+The `init` command applies all tasks that are applicable to your detected stack. This includes:
+
+- **Linting & Formatting** — Biome, Ultracite
+- **TypeScript** — incremental builds, strict mode
+- **Vite Plugins** — type checker, bundle visualizer
+- **CI/CD** — GitHub workflows for release, CI, auto-updates
+- **Dependencies** — Renovate config
+- **Release** — Commitlint, czg, commit-and-tag-version
+- **Quality** — Knip (unused code detection)
+- **Codegen** — Plop (code generation scaffolds)
+- **Monorepo** — Turbo (when monorepo detected)
+- **Editor** — VS Code settings and extensions
+- **Agent** — AGENTS.md, AI skills directory
+- **Scripts** — package.json scripts
+
+Each task checks if it's already applied and skips if conformant.

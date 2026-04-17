@@ -1,37 +1,37 @@
 ---
 title: Introduction
-description: Learn what Xtarterize is and how it can help you scaffold TypeScript projects.
+description: Learn what Xtarterize is and how it automates conformance configuration for JS/TS projects.
 ---
 
 # Introduction
 
-Xtarterize is a toolkit for scaffolding and configuring full-stack TypeScript projects. It provides a set of utilities to detect existing project configurations, apply targeted modifications, and run predefined setup tasks.
+Xtarterize is an adaptive CLI tool that automates the setup, enforcement, and ongoing synchronization of developer conformance configurations across JavaScript/TypeScript projects.
 
 ## Why Xtarterize?
 
-Starting a new project often means:
+Modern JS/TS projects require a large and growing set of tooling configuration: linters, formatters, bundler plugins, TypeScript settings, CI/CD workflows, release automation, code generation scaffolds, dependency management, and editor settings. Setting these up consistently across projects is:
 
-1. Setting up build tools (Vite, Turborepo, etc.)
-2. Configuring linters and formatters (Biome, ESLint, etc.)
-3. Setting up testing frameworks
-4. Configuring CI/CD pipelines
-5. Creating project structure
+- **Repetitive** — the same configs are rewritten or copy-pasted project to project
+- **Error-prone** — manual patching of `package.json`, `tsconfig.json`, or `vite.config.ts` often misses edge cases
+- **Inconsistent** — configs diverge between projects over time as standards evolve
+- **Context-blind** — a React project needs different config than a React Native or Vue project
 
-Xtarterize automates this process by detecting what you already have and applying only the necessary changes.
+Xtarterize solves this by being detection-first, context-aware, non-destructive, idempotent, and evolvable.
 
 ## How It Works
 
 Xtarterize follows a simple workflow:
 
-1. **Detect** - Analyze your project to understand its current state
-2. **Plan** - Determine what changes are needed
-3. **Patch** - Apply targeted modifications to configuration files
-4. **Execute** - Run setup tasks to complete the configuration
+1. **Detect** — Scans your project to build a full `ProjectProfile` (framework, bundler, styling, package manager, monorepo status, existing configs)
+2. **Resolve** — Maps the profile to applicable conformance tasks (e.g., vite tasks only for Vite projects)
+3. **Check** — Determines each task's status: `new` (file doesn't exist), `patch` (needs merging), `skip` (already conformant), or `conflict` (incompatible)
+4. **Plan** — Displays a conformance plan table for review
+5. **Apply** — Backs up files, then applies changes using deep merge or AST manipulation
 
 ## Getting Help
 
 If you have questions or need help:
 
-- Check the [CLI Reference](/guide/cli/overview/) for command options
-- Review the [Configuration](/guide/config/overview/) guide for customization options
+- Check the [CLI Reference](/guide/cli/overview/) for all commands and flags
+- Review the [Tasks Guide](/guide/tasks/overview/) to see what conformance tasks are available
 - Look at the [Contributing](/contributing/architecture/overview/) section if you want to contribute to the project
