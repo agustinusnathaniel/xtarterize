@@ -16,12 +16,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "diff": "^8.0.2",
-    "fs-extra": "^11.3.0"
+    "diff": "^8.0.2"
   },
   "devDependencies": {
     "@types/diff": "^8.0.0",
-    "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.1.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.0"

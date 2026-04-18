@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { defineCommand, runMain } from 'citty'
 import { initCommand } from './commands/init.js'
 import { syncCommand } from './commands/sync.js'

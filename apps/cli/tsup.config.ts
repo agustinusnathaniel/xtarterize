@@ -7,5 +7,6 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   dts: true,
+  banner: { js: '#!/usr/bin/env node' },
   noExternal: [/^@xtarterize\//],
 })

@@ -1,5 +1,5 @@
 import { loadFile, generateCode } from 'magicast'
-import fs from 'fs-extra'
+import { writeFile } from 'node:fs/promises'
 
 export async function injectVitePlugin(
   configPath: string,
@@ -43,7 +43,7 @@ export async function injectVitePlugin(
     plugins.push(pluginExpression)
 
     const { code: generatedCode } = generateCode(mod)
-    await fs.writeFile(configPath, generatedCode)
+    await writeFile(configPath, generatedCode)
 
     return { success: true }
   } catch (error) {

@@ -169,8 +169,8 @@ async function detectGitHubWorkflows(cwd: string): Promise<string[]> {
   const exists = await fileExists(workflowsDir)
   if (!exists) return []
 
-  const fs = await import('fs-extra')
-  const entries = await fs.readdir(workflowsDir)
+  const { readdir } = await import('node:fs/promises')
+  const entries = await readdir(workflowsDir)
   return entries
     .filter((e): e is string => typeof e === 'string' && e.endsWith('.yml') || e.endsWith('.yaml'))
     .map((e) => e.replace(/\.(yml|yaml)$/, ''))
