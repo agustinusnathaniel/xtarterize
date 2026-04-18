@@ -1,7 +1,7 @@
 import { defineCommand } from 'citty'
 import { spinner, select, isCancel } from '@clack/prompts'
 import { listBackups, restoreBackup } from '@xtarterize/core'
-import * as logger from '@xtarterize/core'
+import { logger } from '@xtarterize/core'
 
 export const restoreCommand = defineCommand({
   meta: {

@@ -2,7 +2,7 @@ import { defineCommand } from 'citty'
 import { spinner } from '@clack/prompts'
 import { detectProject } from '@xtarterize/core'
 import { resolveTasks, resolveTaskStatuses } from '@xtarterize/core'
-import * as logger from '@xtarterize/core'
+import { logger } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 
 export const listCommand = defineCommand({

@@ -1,6 +1,6 @@
 import type { FileDiff } from '@xtarterize/core'
 import { generateDiff, formatDiffHeader } from '@xtarterize/core'
-import * as logger from '@xtarterize/core'
+import { logger } from '@xtarterize/core'
 
 export function displayDiffs(diffs: FileDiff[]): void {
   for (const diff of diffs) {

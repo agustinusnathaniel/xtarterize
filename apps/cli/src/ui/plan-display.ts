@@ -1,5 +1,5 @@
 import type { Task, TaskStatus } from '@xtarterize/core'
-import * as logger from '@xtarterize/core'
+import { logger } from '@xtarterize/core'
 
 export function displayPlan(
   tasks: Task[],

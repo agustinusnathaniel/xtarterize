@@ -2,7 +2,7 @@ import { defineCommand } from 'citty'
 import { spinner, confirm, isCancel } from '@clack/prompts'
 import { detectProject } from '@xtarterize/core'
 import { displayDiffs } from '../ui/diff-display.js'
-import * as logger from '@xtarterize/core'
+import { logger } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 
 export const addCommand = defineCommand({
@@ -22,7 +22,7 @@ export const addCommand = defineCommand({
       logger.logError('Task ID required. Usage: xtarterize add <task-id>')
       logger.logInfo('Available tasks:')
       const allTasks = getAllTasks()
-      allTasks.forEach(t => logger.log(`  ${t.id}`))
+      allTasks.forEach(t => { logger.log(`  ${t.id}`) })
       return
     }
 
@@ -39,7 +39,7 @@ export const addCommand = defineCommand({
     if (!task) {
       logger.logError(`Task "${taskId}" not found`)
       logger.logInfo('Available tasks:')
-      allTasks.forEach(t => logger.log(`  ${t.id}`))
+      allTasks.forEach(t => { logger.log(`  ${t.id}`) })
       return
     }
 

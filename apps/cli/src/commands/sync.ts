@@ -6,7 +6,7 @@ import { applyTasks } from '@xtarterize/core'
 import { displayPlan } from '../ui/plan-display.js'
 import { displayDiffs } from '../ui/diff-display.js'
 import { selectTasks } from '../ui/select-menu.js'
-import * as logger from '@xtarterize/core'
+import { logger } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 
 export const syncCommand = defineCommand({
@@ -82,7 +82,7 @@ export const syncCommand = defineCommand({
       logger.logSuccess(`Applied ${result.applied} tasks`)
       if (result.errors.length > 0) {
         logger.logError(`${result.errors.length} errors`)
-        result.errors.forEach(e => logger.logError(`  - ${e}`))
+        result.errors.forEach(e => { logger.logError(`  - ${e}`) })
       }
       return
     }
@@ -108,7 +108,7 @@ export const syncCommand = defineCommand({
       logger.logSuccess(`Applied ${result.applied} tasks`)
       if (result.errors.length > 0) {
         logger.logError(`${result.errors.length} errors`)
-        result.errors.forEach(e => logger.logError(`  - ${e}`))
+        result.errors.forEach(e => { logger.logError(`  - ${e}`) })
       }
       return
     }
