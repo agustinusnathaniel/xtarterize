@@ -1,9 +1,17 @@
 import type { Task, TaskStatus, FileDiff } from '@xtarterize/core'
 import type { ProjectProfile } from '@xtarterize/core'
 import { fileExists, readFile, writeFile, resolvePath, readPackageJson, readJsonIfExists } from '@xtarterize/core'
-import { mergeJson } from '@xtarterize/patchers'
+import { mergeJson, parseJsonc } from '@xtarterize/patchers'
 import { addDependency } from 'nypm'
 import { renderBiomeJson } from '../templates/biome-json.js'
+
+async function findBiomeConfigPath(cwd: string): Promise<string | null> {
+  const jsonPath = resolvePath(cwd, 'biome.json')
+  if (await fileExists(jsonPath)) return jsonPath
+  const jsoncPath = resolvePath(cwd, 'biome.jsonc')
+  if (await fileExists(jsoncPath)) return jsoncPath
+  return null
+}
 
 export const biomeTask: Task = {
   id: 'lint/biome',
@@ -12,9 +20,8 @@ export const biomeTask: Task = {
   applicable: () => true,
 
   async check(cwd, profile): Promise<TaskStatus> {
-    const biomePath = resolvePath(cwd, 'biome.json')
-    const exists = await fileExists(biomePath)
-    if (!exists) return 'new'
+    const biomePath = await findBiomeConfigPath(cwd)
+    if (!biomePath) return 'new'
 
     const pkg = await readPackageJson(cwd)
     const hasBiome = pkg?.devDependencies?.['@biomejs/biome']
@@ -29,20 +36,20 @@ export const biomeTask: Task = {
   },
 
   async dryRun(cwd, profile): Promise<FileDiff[]> {
-    const biomePath = resolvePath(cwd, 'biome.json')
-    const exists = await fileExists(biomePath)
-    const before = exists ? await readFile(biomePath) : null
+    const biomePath = await findBiomeConfigPath(cwd)
+    const before = biomePath ? await readFile(biomePath) : null
 
     let after: string
-    if (exists && before) {
-      const existing = JSON.parse(before)
+    if (before) {
+      const existing = parseJsonc(before) as object
       const incoming = JSON.parse(renderBiomeJson(profile))
       after = JSON.stringify(mergeJson(existing, incoming), null, 2)
     } else {
       after = renderBiomeJson(profile)
     }
 
-    return [{ filepath: 'biome.json', before, after }]
+    const filepath = biomePath?.endsWith('.jsonc') ? 'biome.jsonc' : 'biome.json'
+    return [{ filepath, before, after }]
   },
 
   async apply(cwd, profile): Promise<void> {

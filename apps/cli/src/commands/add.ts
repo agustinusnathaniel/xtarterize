@@ -1,6 +1,6 @@
 import { defineCommand } from 'citty'
 import { spinner, confirm, isCancel } from '@clack/prompts'
-import { detectProject } from '@xtarterize/core'
+import { detectProject, runPreflight } from '@xtarterize/core'
 import { displayDiffs } from '../ui/diff-display.js'
 import { logger } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
@@ -15,6 +15,10 @@ export const addCommand = defineCommand({
       type: 'positional',
       description: 'Task ID (e.g., lint/biome)',
     },
+    quiet: {
+      type: 'boolean',
+      description: 'Suppress interactive prompts',
+    },
   },
   async run({ args }) {
     const taskId = args.taskId
@@ -26,12 +30,30 @@ export const addCommand = defineCommand({
       return
     }
 
-    const s = spinner()
-    s.start('Scanning project...')
-
     const cwd = process.cwd()
+    const isCI = process.env.CI === 'true' || process.env.CI === '1'
+    const quiet = args.quiet || isCI
+
+    const preflight = await runPreflight(cwd)
+    if (!preflight.valid) {
+      logger.log('')
+      logger.log(logger.red('✖ Preflight checks failed'))
+      logger.log('')
+      for (const error of preflight.errors) {
+        logger.log(logger.red(`  ✗ ${error.message}`))
+        if (error.hint) {
+          logger.log(`  ${logger.dim(error.hint)}`)
+        }
+      }
+      logger.log('')
+      process.exit(1)
+    }
+
+    const s = spinner()
+    if (!quiet) s.start('Scanning project...')
+
     const profile = await detectProject(cwd)
-    s.stop('Project scanned')
+    if (!quiet) s.stop('Project scanned')
 
     const allTasks = getAllTasks()
     const task = allTasks.find(t => t.id === taskId)
@@ -49,7 +71,7 @@ export const addCommand = defineCommand({
     }
 
     const status = await task.check(cwd, profile)
-    logger.log(`Status: ${status}`)
+    if (!quiet) logger.log(`Status: ${status}`)
 
     if (status === 'skip') {
       logger.logSuccess('Already conformant')
@@ -57,10 +79,12 @@ export const addCommand = defineCommand({
     }
 
     const diffs = await task.dryRun(cwd, profile)
-    displayDiffs(diffs)
+    if (!quiet) displayDiffs(diffs)
 
-    const proceed = await confirm({ message: 'Apply this change?' })
-    if (isCancel(proceed) || !proceed) return
+    if (!quiet) {
+      const proceed = await confirm({ message: 'Apply this change?' })
+      if (isCancel(proceed) || !proceed) return
+    }
 
     await task.apply(cwd, profile)
     logger.logSuccess(`${task.id} applied successfully`)

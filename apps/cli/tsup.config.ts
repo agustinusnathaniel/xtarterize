@@ -8,5 +8,7 @@ export default defineConfig({
   sourcemap: true,
   dts: true,
   banner: { js: '#!/usr/bin/env node' },
-  noExternal: [/^@xtarterize\//],
+  minify: true,
+  treeshake: true,
+  noExternal: [/^@xtarterize\//, 'nypm'],
 })

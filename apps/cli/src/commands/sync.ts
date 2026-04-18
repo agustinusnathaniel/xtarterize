@@ -1,6 +1,6 @@
 import { defineCommand } from 'citty'
 import { spinner, confirm, isCancel } from '@clack/prompts'
-import { detectProject } from '@xtarterize/core'
+import { detectProject, runPreflight } from '@xtarterize/core'
 import { resolveTasks, resolveTaskStatuses } from '@xtarterize/core'
 import { applyTasks } from '@xtarterize/core'
 import { displayPlan } from '../ui/plan-display.js'
@@ -31,14 +31,36 @@ export const syncCommand = defineCommand({
       type: 'string',
       description: 'Apply only a specific task',
     },
+    quiet: {
+      type: 'boolean',
+      description: 'Suppress interactive prompts and verbose output',
+    },
   },
   async run({ args }) {
-    const s = spinner()
-    s.start('Scanning project...')
-
     const cwd = process.cwd()
+    const isCI = process.env.CI === 'true' || process.env.CI === '1'
+    const quiet = args.quiet || isCI
+
+    const preflight = await runPreflight(cwd)
+    if (!preflight.valid) {
+      logger.log('')
+      logger.log(logger.red('✖ Preflight checks failed'))
+      logger.log('')
+      for (const error of preflight.errors) {
+        logger.log(logger.red(`  ✗ ${error.message}`))
+        if (error.hint) {
+          logger.log(`  ${logger.dim(error.hint)}`)
+        }
+      }
+      logger.log('')
+      process.exit(1)
+    }
+
+    const s = spinner()
+    if (!quiet) s.start('Scanning project...')
+
     const profile = await detectProject(cwd)
-    s.stop('Project scanned')
+    if (!quiet) s.stop('Project scanned')
 
     const allTasks = getAllTasks()
     let tasks = resolveTasks(profile, allTasks)
@@ -64,7 +86,7 @@ export const syncCommand = defineCommand({
       return
     }
 
-    displayPlan(actionableTasks, statuses, 'Updates available')
+    if (!quiet) displayPlan(actionableTasks, statuses, 'Updates available')
 
     if (args.dryRun) {
       const diffs: any[] = []
@@ -76,7 +98,7 @@ export const syncCommand = defineCommand({
       return
     }
 
-    if (args.yes) {
+    if (args.yes || quiet) {
       const result = await applyTasks(actionableTasks, cwd, profile)
       logger.log('')
       logger.logSuccess(`Applied ${result.applied} tasks`)

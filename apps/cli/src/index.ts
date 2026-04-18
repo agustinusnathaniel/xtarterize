@@ -7,6 +7,9 @@ import { addCommand } from './commands/add.js'
 import { restoreCommand } from './commands/restore.js'
 import { listCommand } from './commands/list.js'
 
+process.on('SIGINT', () => process.exit(0))
+process.on('SIGTERM', () => process.exit(0))
+
 const main = defineCommand({
   meta: {
     name: 'xtarterize',

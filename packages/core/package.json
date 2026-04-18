@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "diff": "^8.0.2"
+    "diff": "^8.0.2",
+    "nypm": "^0.6.5"
   },
   "devDependencies": {
     "@types/diff": "^8.0.0",

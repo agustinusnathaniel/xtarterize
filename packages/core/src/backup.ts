@@ -44,3 +44,83 @@ export async function restoreBackup(cwd: string, backup: Backup): Promise<void> 
   const sourcePath = resolvePath(cwd, backup.filepath)
   await fs.cp(backup.backupPath, sourcePath)
 }
+
+const FILE_BACKUP_SUFFIX = '.bak'
+
+export function createFileBackup(filePath: string): string | null {
+  const fsSync = require('node:fs')
+  if (!fsSync.existsSync(filePath)) {
+    return null
+  }
+
+  const backupPath = `${filePath}${FILE_BACKUP_SUFFIX}`
+  try {
+    fsSync.renameSync(filePath, backupPath)
+    return backupPath
+  } catch {
+    return null
+  }
+}
+
+export function restoreFileBackup(filePath: string): boolean {
+  const fsSync = require('node:fs')
+  const backupPath = `${filePath}${FILE_BACKUP_SUFFIX}`
+
+  if (!fsSync.existsSync(backupPath)) {
+    return false
+  }
+
+  try {
+    fsSync.renameSync(backupPath, filePath)
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function deleteFileBackup(filePath: string): boolean {
+  const fsSync = require('node:fs')
+  const backupPath = `${filePath}${FILE_BACKUP_SUFFIX}`
+
+  if (!fsSync.existsSync(backupPath)) {
+    return false
+  }
+
+  try {
+    fsSync.unlinkSync(backupPath)
+    return true
+  } catch {
+    return false
+  }
+}
+
+export async function withFileBackup<T>(
+  filePath: string,
+  task: () => Promise<T>,
+): Promise<T> {
+  const fsSync = require('node:fs')
+  if (!fsSync.existsSync(filePath)) {
+    return task()
+  }
+
+  const backupPath = createFileBackup(filePath)
+
+  if (!backupPath) {
+    throw new Error(`Could not back up ${filePath}.`)
+  }
+
+  const restoreBackupOnExit = () => restoreFileBackup(filePath)
+
+  process.on('exit', restoreBackupOnExit)
+
+  try {
+    const result = await task()
+    process.removeListener('exit', restoreBackupOnExit)
+    deleteFileBackup(filePath)
+    return result
+  } catch (error) {
+    process.removeListener('exit', restoreBackupOnExit)
+    restoreFileBackup(filePath)
+    throw error
+  }
+}

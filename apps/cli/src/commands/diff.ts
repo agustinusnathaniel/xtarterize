@@ -1,6 +1,6 @@
 import { defineCommand } from 'citty'
 import { spinner } from '@clack/prompts'
-import { detectProject } from '@xtarterize/core'
+import { detectProject, runPreflight } from '@xtarterize/core'
 import { resolveTasks, resolveTaskStatuses } from '@xtarterize/core'
 import { displayDiffs } from '../ui/diff-display.js'
 import { logger } from '@xtarterize/core'
@@ -11,13 +11,37 @@ export const diffCommand = defineCommand({
     name: 'diff',
     description: 'Show pending changes without applying',
   },
-  async run() {
-    const s = spinner()
-    s.start('Scanning project...')
-
+  args: {
+    quiet: {
+      type: 'boolean',
+      description: 'Suppress verbose output',
+    },
+  },
+  async run({ args }) {
     const cwd = process.cwd()
+    const isCI = process.env.CI === 'true' || process.env.CI === '1'
+    const quiet = args.quiet || isCI
+
+    const preflight = await runPreflight(cwd)
+    if (!preflight.valid) {
+      logger.log('')
+      logger.log(logger.red('✖ Preflight checks failed'))
+      logger.log('')
+      for (const error of preflight.errors) {
+        logger.log(logger.red(`  ✗ ${error.message}`))
+        if (error.hint) {
+          logger.log(`  ${logger.dim(error.hint)}`)
+        }
+      }
+      logger.log('')
+      process.exit(1)
+    }
+
+    const s = spinner()
+    if (!quiet) s.start('Scanning project...')
+
     const profile = await detectProject(cwd)
-    s.stop('Project scanned')
+    if (!quiet) s.stop('Project scanned')
 
     const allTasks = getAllTasks()
     const tasks = resolveTasks(profile, allTasks)

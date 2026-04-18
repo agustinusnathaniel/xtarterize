@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { detectPackageManager as detectPM } from 'nypm'
 import { fileExists, readJsonIfExists, resolvePath } from './utils/fs.js'
 import { hasDependency, readPackageJson, type PackageJson } from './utils/pkg.js'
 
@@ -128,15 +129,13 @@ function detectVitePlus(deps: Record<string, string>): boolean {
   return 'vite-plus' in deps || 'vp' in deps
 }
 
-async function detectPackageManager(cwd: string): Promise<PackageManager> {
-  const pkg = await readPackageJson(cwd)
-  if (pkg?.packageManager) {
-    const pm = pkg.packageManager.split('@')[0]
-    if (pm === 'npm' || pm === 'pnpm' || pm === 'yarn' || pm === 'bun') {
-      return pm
-    }
+export async function detectPackageManager(cwd: string): Promise<PackageManager> {
+  const detected = await detectPM(cwd)
+  if (detected?.name === 'npm' || detected?.name === 'pnpm' || detected?.name === 'yarn' || detected?.name === 'bun') {
+    return detected.name
   }
 
+  // Fallback to lockfile detection if nypm fails
   if (await fileExists(resolvePath(cwd, 'bun.lockb'))) return 'bun'
   if (await fileExists(resolvePath(cwd, 'bun.lock'))) return 'bun'
   if (await fileExists(resolvePath(cwd, 'pnpm-lock.yaml'))) return 'pnpm'

@@ -1,6 +1,6 @@
 import { defineCommand } from 'citty'
 import { spinner, confirm, isCancel, select } from '@clack/prompts'
-import { detectProject, detectFramework } from '@xtarterize/core'
+import { detectProject, detectFramework, runPreflight } from '@xtarterize/core'
 import type { Framework, ProjectProfile } from '@xtarterize/core'
 import { resolveTasks, resolveTaskStatuses } from '@xtarterize/core'
 import { applyTasks } from '@xtarterize/core'
@@ -62,17 +62,39 @@ export const initCommand = defineCommand({
       type: 'string',
       description: 'Apply only a specific task',
     },
+    quiet: {
+      type: 'boolean',
+      description: 'Suppress interactive prompts and verbose output',
+    },
   },
   async run({ args }) {
-    const s = spinner()
-    s.start('Scanning project...')
-
     const cwd = process.cwd()
+    const isCI = process.env.CI === 'true' || process.env.CI === '1'
+    const quiet = args.quiet || isCI
+
+    const preflight = await runPreflight(cwd)
+    if (!preflight.valid) {
+      logger.log('')
+      logger.log(logger.red('✖ Preflight checks failed'))
+      logger.log('')
+      for (const error of preflight.errors) {
+        logger.log(logger.red(`  ✗ ${error.message}`))
+        if (error.hint) {
+          logger.log(`  ${logger.dim(error.hint)}`)
+        }
+      }
+      logger.log('')
+      process.exit(1)
+    }
+
+    const s = spinner()
+    if (!quiet) s.start('Scanning project...')
+
     let profile = await detectProject(cwd)
 
     // Handle ambiguous framework detection at CLI layer
     if (profile.framework === null) {
-      s.stop()
+      if (!quiet) s.stop()
       const pkg = await import('@xtarterize/core').then(m => m.readPackageJson(cwd))
       const allDeps: Record<string, string> = {}
       if (pkg?.dependencies) Object.assign(allDeps, pkg.dependencies)
@@ -82,18 +104,24 @@ export const initCommand = defineCommand({
       const hasReact = !!allDeps['react']
 
       if (hasReactNative && hasReact) {
-        const resolved = await resolveAmbiguousFramework(pkg)
-        profile = { ...profile, framework: resolved }
+        if (quiet) {
+          profile = { ...profile, framework: 'react' }
+        } else {
+          const resolved = await resolveAmbiguousFramework(pkg)
+          profile = { ...profile, framework: resolved }
+        }
       }
     } else {
-      s.stop('Project scanned')
+      if (!quiet) s.stop('Project scanned')
     }
 
-    logger.log('')
-    logger.log(logger.bold(`Framework: ${profile.framework ?? 'none'}`))
-    logger.log(logger.bold(`Bundler: ${profile.bundler ?? 'none'}`))
-    logger.log(logger.bold(`Package Manager: ${profile.packageManager}`))
-    logger.log('')
+    if (!quiet) {
+      logger.log('')
+      logger.log(logger.bold(`Framework: ${profile.framework ?? 'none'}`))
+      logger.log(logger.bold(`Bundler: ${profile.bundler ?? 'none'}`))
+      logger.log(logger.bold(`Package Manager: ${profile.packageManager}`))
+      logger.log('')
+    }
 
     const allTasks = getAllTasks()
     let tasks = resolveTasks(profile, allTasks)
@@ -119,7 +147,7 @@ export const initCommand = defineCommand({
       return
     }
 
-    displayPlan(tasks, statuses)
+    if (!quiet) displayPlan(tasks, statuses)
 
     if (args.dryRun) {
       const diffs: any[] = []
@@ -131,7 +159,7 @@ export const initCommand = defineCommand({
       return
     }
 
-    if (args.yes) {
+    if (args.yes || quiet) {
       const result = await applyTasks(actionableTasks, cwd, profile)
       logger.log('')
       logger.logSuccess(`Applied ${result.applied} tasks`)
