@@ -27,8 +27,9 @@ export const ultraciteTask: Task = {
 
   async dryRun(cwd, profile): Promise<FileDiff[]> {
     const biomePath = resolvePath(cwd, 'biome.json')
-    const before = await readFile(biomePath)
-    const existing = JSON.parse(before)
+    const exists = await fileExists(biomePath)
+    const before = exists ? await readFile(biomePath) : null
+    const existing = before ? JSON.parse(before) : {}
     const incoming = { extends: ['ultracite'] }
     const merged = mergeJson(existing, incoming)
     const after = JSON.stringify(merged, null, 2)
