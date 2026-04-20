@@ -34,6 +34,7 @@ export {
 	copyFile,
 	ensureDir,
 	fileExists,
+	findConfigFile,
 	readFile,
 	readJson,
 	readJsonIfExists,

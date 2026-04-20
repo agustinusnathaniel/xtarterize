@@ -27,6 +27,18 @@ export async function fileExists(filePath: string): Promise<boolean> {
 	}
 }
 
+export async function findConfigFile(
+	cwd: string,
+	baseName: string,
+	extensions: string[],
+): Promise<string | null> {
+	for (const ext of extensions) {
+		const filePath = resolvePath(cwd, `${baseName}${ext}`)
+		if (await fileExists(filePath)) return filePath
+	}
+	return null
+}
+
 export async function readJson<T = Record<string, unknown>>(
 	filePath: string,
 ): Promise<T> {
