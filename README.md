@@ -28,14 +28,12 @@ That's it. Your project gets Biome, TypeScript incremental builds, Renovate, com
 
 ## Supported Stacks
 
-| Framework | Bundlers | Styling | Package Managers |
-|-----------|----------|---------|-----------------|
-| React | Vite | Tailwind | pnpm |
-| React Native | Next.js | Vanilla | npm |
-| Vue | Expo | CSS Modules | yarn |
-| Svelte | TanStack Start | Styled Components | bun |
-| Solid | Webpack | NativeWind | |
-| Node.js | Rspack | Vanilla Extract | |
+| Category | Supported |
+|----------|-----------|
+| Frameworks | React, React Native, Vue, Svelte, Solid, Node.js |
+| Bundlers | Vite, Next.js, Expo, TanStack Start, Webpack, Rspack |
+| Styling | Tailwind, Vanilla, CSS Modules, Styled Components, NativeWind, Vanilla Extract |
+| Package Managers | pnpm, npm, yarn, bun |
 
 ## How It Works
 

@@ -1,0 +1,127 @@
+---
+title: Conformance Task Architecture
+description: How tasks are structured, implemented, and contributed to Xtarterize.
+---
+
+import { Aside, FileTree, LinkButton } from '@astrojs/starlight/components'
+
+# Conformance Task Architecture
+
+Xtarterize applies conformance configuration through discrete, independently applicable tasks. This page covers the architecture and how to contribute new tasks.
+
+## Task Interface
+
+All tasks implement the `Task` interface from `@xtarterize/core`:
+
+```typescript
+interface Task {
+  id: string
+  label: string
+  group: string
+  applicable: (profile: ProjectProfile) => boolean
+  check: (cwd: string, profile: ProjectProfile) => Promise<TaskStatus>
+  dryRun: (cwd: string, profile: ProjectProfile) => Promise<FileDiff[]>
+  apply: (cwd: string, profile: ProjectProfile) => Promise<void>
+}
+```
+
+## Task Architecture
+
+```mermaid
+classDiagram
+    class Task {
+        +string id
+        +string label
+        +string group
+        +applicable(profile) boolean
+        +check(cwd, profile) TaskStatus
+        +dryRun(cwd, profile) FileDiff[]
+        +apply(cwd, profile) void
+    }
+    class TaskStatus {
+        <<enumeration>>
+        new
+        patch
+        skip
+        conflict
+    }
+    class FileDiff {
+        +string filepath
+        +string before
+        +string after
+    }
+    class ProjectProfile {
+        +Framework framework
+        +Bundler bundler
+        +PackageManager packageManager
+        +boolean typescript
+        +boolean monorepo
+        +boolean hasGitHub
+    }
+    Task --> TaskStatus
+    Task --> FileDiff
+    Task --> ProjectProfile
+```
+
+## Task Directory Structure
+
+<FileTree>
+- packages/tasks/src/
+  - agent/
+    - agents-md.ts
+    - skills.ts
+  - ci/
+    - auto-update.ts
+    - ci.ts
+    - release.ts
+  - codegen/
+    - plop.ts
+  - deps/
+    - renovate.ts
+  - editor/
+    - vscode.ts
+  - factory.ts
+  - lint/
+    - biome.ts
+    - ultracite.ts
+  - monorepo/
+    - turbo.ts
+  - quality/
+    - knip.ts
+  - release/
+    - cat-version.ts
+    - commitlint.ts
+    - czg.ts
+  - scripts/
+    - package-scripts.ts
+  - ts/
+    - incremental.ts
+  - vite/
+    - checker.ts
+    - visualizer.ts
+</FileTree>
+
+## Task Factory
+
+Most tasks are created through factory functions in `factory.ts` that eliminate boilerplate:
+
+- **`createSimpleFileTask`** — For tasks that write a single file (CI workflows, renovate, commitlint, knip, plop, agents-md)
+- **`createJsonMergeTask`** — For tasks that deep-merge JSON configs (tsconfig, vscode settings, biome, turbo)
+- **`createFileTask`** — For tasks with custom check logic (ultracite, vite plugins)
+
+This reduces most tasks from 40-80 lines to 10-15 lines of declarative configuration.
+
+## Adding New Tasks
+
+1. Implement the `Task` interface from `@xtarterize/core`
+2. Create your task file in `packages/tasks/src/<category>/<task>.ts`
+3. Export it from `packages/tasks/src/index.ts`
+4. Add tests in `test/tasks/`
+
+Each task must implement:
+- `applicable(profile)` — Should this task run for this project?
+- `check(cwd, profile)` — What's the current status?
+- `dryRun(cwd, profile)` — What would change?
+- `apply(cwd, profile)` — Make the changes
+
+<LinkButton href="/contributing/architecture/overview/">Learn about the overall architecture →</LinkButton>
