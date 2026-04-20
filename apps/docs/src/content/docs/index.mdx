@@ -1,31 +1,97 @@
 ---
-title: Welcome to Xtarterize
-description: An adaptive CLI tool that automates conformance configuration for JavaScript/TypeScript projects.
+title: Xtarterize
+description: The conformance CLI for JavaScript/TypeScript projects. Detect, validate, and sync your tooling automatically.
 template: splash
+editUrl: false
+lastUpdated: false
+hero:
+  title: The conformance CLI for JavaScript & TypeScript
+  tagline: Detect your project's stack. Validate your configs. Keep everything in sync — without overwriting a single file without your say-so.
+  actions:
+    - text: Get Started
+      icon: right-arrow
+      link: /getting-started/installation/
+    - text: View CLI Reference
+      icon: external
+      variant: minimal
+      link: /guide/cli/overview/
 ---
 
 import { LinkCard, CardGrid, LinkButton } from '@astrojs/starlight/components'
 
-**Xtarterize** is an intelligent CLI tool that automates the setup, enforcement, and ongoing synchronization of developer conformance configurations across JavaScript/TypeScript projects.
+<div class="terminal-demo">
+<div class="terminal-header">
+<span class="terminal-dot red"></span>
+<span class="terminal-dot yellow"></span>
+<span class="terminal-dot green"></span>
+<span class="terminal-title">terminal</span>
+</div>
+<div class="terminal-body">
+<div class="terminal-line"><span class="prompt">$</span> <span class="command">npx xtarterize init</span></div>
+<div class="terminal-line output"><span class="success">✓</span> Detected: React + TypeScript + Vite</div>
+<div class="terminal-line output"><span class="success">✓</span> ESLint config applied</div>
+<div class="terminal-line output"><span class="success">✓</span> Prettier config applied</div>
+<div class="terminal-line output"><span class="success">✓</span> TypeScript strict mode enabled</div>
+<div class="terminal-line output"><span class="success">✓</span> EditorConfig created</div>
+<div class="terminal-line output"><span class="info">ℹ</span> 5 configs applied · 0 conflicts</div>
+<div class="terminal-line"><span class="prompt">$</span> <span class="cursor">_</span></div>
+</div>
+</div>
 
-## What is Xtarterize?
+## Why Xtarterize?
 
-Xtarterize helps you maintain consistent, high-quality project configurations by:
+Every JavaScript/TypeScript project needs ESLint, Prettier, TypeScript, editor configs, and more. Setting them up is tedious. Keeping them consistent across projects is worse.
 
-- **Detection-first** — Scans your project before doing anything, building a full profile of your stack
-- **Context-aware** — Applies only what's appropriate for your detected framework and tools
-- **Non-destructive** — Never overwrites without confirmation; always previews diffs
-- **Idempotent** — Safe to run multiple times; no corruption, no duplicate entries
-- **Evolvable** — `sync` and `diff` commands keep existing projects up to date over time
+<div class="features-grid">
 
-## How It Works
+<div class="feature-card">
+<div class="feature-icon">🔍</div>
+<h3>Detects your stack</h3>
+<p>Scans your project to understand what frameworks, tools, and configs you're using — before touching anything.</p>
+</div>
+
+<div class="feature-card">
+<div class="feature-icon">🎯</div>
+<h3>Applies only what fits</h3>
+<p>Never gets in your way. Only suggests configs that match your detected tooling and project structure.</p>
+</div>
+
+<div class="feature-card">
+<div class="feature-icon">🛡️</div>
+<h3>Never destructive</h3>
+<p>Shows you a diff before any change. Backs up your files. You're always in control.</p>
+</div>
+
+<div class="feature-card">
+<div class="feature-icon">🔄</div>
+<h3>Safe to rerun</h3>
+<p>Idempotent by design. Run it ten times — no duplicates, no corruption, no drift.</p>
+</div>
+
+<div class="feature-card">
+<div class="feature-icon">📈</div>
+<h3>Evolves with you</h3>
+<p>As your project grows, <code>sync</code> and <code>diff</code> keep your configs up to date without manual work.</p>
+</div>
+
+<div class="feature-card">
+<div class="feature-icon">⚡</div>
+<h3>Works everywhere</h3>
+<p>React, Vue, Svelte, Node, Deno, Bun — if it's JS/TS, Xtarterize knows how to configure it.</p>
+</div>
+
+</div>
+
+---
+
+## How it works
 
 ```mermaid
 flowchart LR
-    A["Detect<br/>Project Stack"] --> B["Resolve<br/>Applicable Tasks"]
-    B --> C["Check<br/>Task Statuses"]
-    C --> D["Plan<br/>Show Diffs"]
-    D --> E["Apply<br/>With Backups"]
+    A["🔍 Detect<br/>Project Stack"] --> B["🎯 Resolve<br/>Applicable Tasks"]
+    B --> C["✅ Check<br/>Task Statuses"]
+    C --> D["📋 Plan<br/>Show Diffs"]
+    D --> E["🚀 Apply<br/>With Backups"]
 
     style A fill:#6366f1,color:#fff
     style B fill:#8b5cf6,color:#fff
@@ -34,33 +100,47 @@ flowchart LR
     style E fill:#22c55e,color:#fff
 ```
 
+---
+
 ## Quick Start
 
+Get up and running in under a minute:
+
 ```bash
-# Initialize conformance for a project
+# 1. Initialize conformance for your project
 npx xtarterize init
 
-# Check current conformance status
+# 2. Check your current conformance status
 npx xtarterize check
 
-# See what changes sync would make
+# 3. Preview what changes sync would make
 npx xtarterize diff
 ```
 
+<LinkButton href="/getting-started/installation/" size="lg">Install Xtarterize →</LinkButton>
+
+---
+
+## Explore the docs
+
 <CardGrid>
-  <LinkCard title="Getting Started" href="/getting-started/introduction/" description="Learn the basics of Xtarterize and set up your first project." />
-  <LinkCard title="CLI Reference" href="/guide/cli/overview/" description="Complete reference for all available commands and flags." />
-  <LinkCard title="Conformance Tasks" href="/guide/tasks/overview/" description="See what conformance tasks are available and how they work." />
-  <LinkCard title="Configuration" href="/guide/config/overview/" description="Understand how Xtarterize detects and adapts to your project." />
-  <LinkCard title="Architecture" href="/contributing/architecture/overview/" description="Learn about the project structure and how packages work together." />
-  <LinkCard title="Contributing" href="/contributing/architecture/overview/" description="Get involved and help build Xtarterize." />
+  <LinkCard title="Getting Started" href="/getting-started/introduction/" description="Learn the basics and set up your first project in minutes." />
+  <LinkCard title="CLI Reference" href="/guide/cli/overview/" description="Complete command reference with all flags and options." />
+  <LinkCard title="Conformance Tasks" href="/guide/tasks/overview/" description="See what tasks are available and how to customize them." />
+  <LinkCard title="Configuration" href="/guide/config/overview/" description="How Xtarterize detects and adapts to your project." />
+  <LinkCard title="Architecture" href="/contributing/architecture/overview/" description="Understand the internal design and package structure." />
+  <LinkCard title="Contributing" href="/contributing/guidelines/" description="Get involved, report issues, or help build Xtarterize." />
 </CardGrid>
 
-## Related Tools
+---
 
-| Tool | When to Use |
+## New project or existing?
+
+Xtarterize works with both:
+
+| Tool | When to use |
 |------|-------------|
-| **create-xtarter-app** | Day 0 — Scaffold a new project from curated templates |
-| **xtarterize** | Day 1+ — Apply production configs to any existing project |
+| **[create-xtarter-app](/getting-started/installation/)** | Day 0 — Scaffold a new project from curated templates |
+| **[xtarterize](/getting-started/installation/)** | Day 1+ — Bring conformance to any existing project |
 
-<LinkButton href="/getting-started/installation/">Install Xtarterize →</LinkButton>
+<LinkButton href="/getting-started/installation/">Start now →</LinkButton>

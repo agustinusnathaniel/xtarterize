@@ -1,25 +1,44 @@
 import starlight from '@astrojs/starlight'
 import astroMermaid from 'astro-mermaid'
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
 
 export default defineConfig({
+	vite: {
+		plugins: [tailwindcss()],
+	},
 	integrations: [
 		astroMermaid(),
 		starlight({
-			title: 'Xtarterize',
+			title: 'xtarterize',
 			description:
-				'An adaptive CLI tool that automates conformance configuration for JavaScript/TypeScript projects.',
+				'an adaptive CLI tool that automates conformance configuration for JavaScript/TypeScript projects.',
+			customCss: ['./src/styles/global.css'],
 			social: [
 				{
 					icon: 'github',
-					href: 'https://github.com/your-org/xtarterize',
+					href: 'https://github.com/agustinusnathaniel/xtarterize',
 					label: 'GitHub',
 				},
 			],
 			sidebar: [
 				{
 					label: 'Getting Started',
-					autogenerate: { directory: 'getting-started' },
+					// autogenerate: { directory: 'getting-started' },
+					items: [
+						{
+							label: 'Introduction',
+							link: '/getting-started/introduction/'
+						},
+						{
+							label: 'Installation',
+							link: '/getting-started/installation/'
+						},
+						{
+							label: 'Initialization',
+							link: '/getting-started/initialization/'
+						}
+					]
 				},
 				{
 					label: 'CLI Reference',

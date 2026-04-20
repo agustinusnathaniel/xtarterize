@@ -1,0 +1,332 @@
+@layer base, starlight, theme, components, utilities;
+
+@import '@astrojs/starlight-tailwind';
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import "@fontsource/lora";
+@import "@fontsource-variable/atkinson-hyperlegible-next";
+@import "@fontsource-variable/geist-mono";
+
+@theme {
+	--font-heading: "Lora", serif;
+	--font-sans: "Atkinson Hyperlegible Next Variable", sans-serif;
+	--font-mono: "Geist Mono Variable", monospace;
+
+	/* https://starlight.astro.build/guides/css-and-tailwind/#color-theme-editor */
+	/* Generated accent color palettes. */
+	--color-accent-200: #feb3a6;
+	--color-accent-600: #a60a00;
+	--color-accent-900: #640300;
+	--color-accent-950: #460b05;
+	/* Generated gray color palettes. */
+	--color-gray-100: #f9f5f5;
+	--color-gray-200: #f3ecea;
+	--color-gray-300: #c8c0be;
+	--color-gray-400: #978784;
+	--color-gray-500: #635451;
+	--color-gray-700: #423432;
+	--color-gray-800: #302321;
+	--color-gray-900: #1d1715;
+}
+
+:root {
+	--sl-font: var(--font-sans);
+	--sl-font-mono: var(--font-mono);
+	--sl-color-accent: #f97316;
+	--sl-color-accent-high: #fb923c;
+	--sl-color-accent-low: #ea580c;
+}
+
+:root[data-theme="dark"] {
+	--sl-color-accent: #fb923c;
+	--sl-color-accent-high: #fdba74;
+	--sl-color-accent-low: #f97316;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-heading);
+}
+
+/* ============================================
+   LANDING PAGE - HERO SECTION (Starlight native)
+   ============================================ */
+
+/* Starlight splash hero wrapper */
+.hero {
+	position: relative;
+	text-align: center;
+	padding: 4rem 1rem 2rem;
+}
+
+/* Radial glow behind hero */
+.hero::before {
+	content: '';
+	position: absolute;
+	top: -40%;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 900px;
+	height: 700px;
+	background: radial-gradient(
+		circle at center,
+		rgba(249, 115, 22, 0.12) 0%,
+		rgba(249, 115, 22, 0.04) 35%,
+		transparent 65%
+	);
+	pointer-events: none;
+	z-index: -1;
+}
+
+/* Hero title - larger, bolder, sans-serif */
+.hero h1 {
+	font-size: clamp(2.5rem, 6vw, 4rem) !important;
+	font-weight: 800 !important;
+	line-height: 1.1 !important;
+	letter-spacing: -0.03em !important;
+	font-family: var(--font-sans) !important;
+	margin-bottom: 1.5rem;
+}
+
+/* Gradient text for "JavaScript & TypeScript" */
+.hero h1 {
+	background: linear-gradient(135deg, var(--sl-color-white) 0%, var(--sl-color-white) 45%, var(--sl-color-accent) 50%, #fbbf24 75%, var(--sl-color-accent-high) 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+/* Hero tagline - Starlight uses .tagline div, not <p> */
+.hero .tagline {
+	font-size: clamp(1.1rem, 2vw, 1.35rem) !important;
+	color: var(--sl-color-gray-2) !important;
+	max-width: 640px;
+	margin: 0 auto 2rem !important;
+	line-height: 1.6 !important;
+}
+
+/* Hero action buttons */
+.hero .sl-link-button {
+	font-size: 1.125rem !important;
+	padding: 0.75rem 1.75rem !important;
+}
+
+/* Hero image area (if used) */
+.hero .hero-html {
+	margin-top: 2rem;
+}
+
+/* ============================================
+   TERMINAL DEMO (for future use)
+   ============================================ */
+
+.terminal-demo {
+	max-width: 720px;
+	margin: 0 auto 3rem;
+	border-radius: 12px;
+	overflow: hidden;
+	border: 1px solid var(--sl-color-gray-5);
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.terminal-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 16px;
+	background: var(--sl-color-gray-8, #1a1a1a);
+	border-bottom: 1px solid var(--sl-color-gray-6);
+}
+
+.terminal-dot {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+}
+
+.terminal-dot.red { background: #ff5f57; }
+.terminal-dot.yellow { background: #ffbd2e; }
+.terminal-dot.green { background: #28c840; }
+
+.terminal-title {
+	margin-left: auto;
+	font-size: 0.8rem;
+	color: var(--sl-color-gray-4);
+	font-family: var(--font-mono);
+}
+
+.terminal-body {
+	padding: 1.5rem;
+	background: var(--sl-color-gray-9, #0d0d0d);
+	font-family: var(--font-mono);
+	font-size: 0.9rem;
+	line-height: 1.8;
+	min-height: 200px;
+}
+
+.terminal-line {
+	white-space: pre;
+}
+
+.terminal-line .prompt {
+	color: var(--sl-color-accent);
+	margin-right: 0.5rem;
+}
+
+.terminal-line .command {
+	color: var(--sl-color-white);
+}
+
+.terminal-line.output {
+	padding-left: 0;
+}
+
+.terminal-line .success {
+	color: #22c55e;
+	margin-right: 0.5rem;
+}
+
+.terminal-line .info {
+	color: #60a5fa;
+	margin-right: 0.5rem;
+}
+
+.terminal-line .cursor {
+	animation: blink 1s step-end infinite;
+	color: var(--sl-color-accent);
+}
+
+@keyframes blink {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0; }
+}
+
+/* ============================================
+   FEATURE CARDS
+   ============================================ */
+
+.features-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1.5rem;
+	margin: 2.5rem 0;
+}
+
+.feature-card {
+	display: flex;
+	flex-direction: column;
+	padding: 1.75rem;
+	border-radius: 12px;
+	border: 1px solid var(--sl-color-gray-5);
+	background: var(--sl-color-gray-6, rgba(0, 0, 0, 0.02));
+	transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+	height: 100%;
+}
+
+.feature-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+	border-color: var(--sl-color-accent-low);
+}
+
+[data-theme="dark"] .feature-card {
+	background: var(--sl-color-gray-6, rgba(255, 255, 255, 0.02));
+}
+
+[data-theme="dark"] .feature-card:hover {
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.feature-icon {
+	font-size: 1.75rem;
+	margin-bottom: 1rem;
+	line-height: 1;
+}
+
+.feature-card h3 {
+	font-size: 1.05rem;
+	margin: 0 0 0.5rem;
+	font-family: var(--font-sans);
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+
+.feature-card p {
+	margin: 0;
+	color: var(--sl-color-gray-2);
+	line-height: 1.6;
+	font-size: 0.95rem;
+	flex: 1;
+}
+
+/* ============================================
+   RESPONSIVE FEATURE CARDS
+   ============================================ */
+
+@media (max-width: 900px) {
+	.features-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (max-width: 600px) {
+	.features-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ============================================
+   SECTION DIVIDERS
+   ============================================ */
+
+hr {
+	margin: 3rem 0;
+	border: none;
+	border-top: 1px solid var(--sl-color-gray-5);
+}
+
+/* ============================================
+   CTA BUTTONS
+   ============================================ */
+
+.sl-markdown-content .hero-buttons .sl-link-button {
+	font-size: 1.125rem;
+	padding: 0.75rem 1.75rem;
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+
+.sl-markdown-content pre {
+	position: relative;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 640px) {
+	.hero-section {
+		padding: 2rem 0.5rem 2rem;
+	}
+
+	.terminal-demo {
+		margin: 0 -0.5rem 2rem;
+		border-radius: 8px;
+	}
+
+	.terminal-body {
+		font-size: 0.8rem;
+		padding: 1rem;
+	}
+
+	.hero-buttons {
+		flex-direction: column;
+		align-items: center;
+	}
+}
