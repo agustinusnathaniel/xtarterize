@@ -32,12 +32,6 @@ importers:
       '@clack/prompts':
         specifier: ^0.11.0
         version: 0.11.0
-      '@xtarterize/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@xtarterize/tasks':
-        specifier: workspace:*
-        version: link:../../packages/tasks
       citty:
         specifier: ^0.1.6
         version: 0.1.6
@@ -45,6 +39,12 @@ importers:
       '@types/node':
         specifier: ^24.1.0
         version: 24.12.2
+      '@xtarterize/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@xtarterize/tasks':
+        specifier: workspace:*
+        version: link:../../packages/tasks
       tsdown:
         specifier: ^0.21.9
         version: 0.21.9(typescript@5.9.3)
