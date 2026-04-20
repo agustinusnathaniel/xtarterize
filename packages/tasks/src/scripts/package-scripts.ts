@@ -1,9 +1,18 @@
-import type { FileDiff, Task, TaskStatus } from '@xtarterize/core'
+import type { FileDiff, ProjectProfile, Task, TaskStatus } from '@xtarterize/core'
 import { fileExists, readPackageJson, resolvePath, writePackageJson } from '@xtarterize/core'
 
 async function hasUltracite(cwd: string): Promise<boolean> {
 	const pkg = await readPackageJson(cwd)
 	return !!(pkg?.devDependencies?.ultracite || pkg?.dependencies?.ultracite)
+}
+
+function dlxCommand(pm: ProjectProfile['packageManager']): string {
+	switch (pm) {
+		case 'pnpm': return 'pnpm dlx'
+		case 'yarn': return 'yarn dlx'
+		case 'bun': return 'bunx'
+		default: return 'npx'
+	}
 }
 
 export const packageScriptsTask: Task = {
@@ -31,17 +40,18 @@ export const packageScriptsTask: Task = {
 
 		const pm = profile.packageManager
 		const useUltracite = await hasUltracite(cwd)
+		const dlx = dlxCommand(pm)
 
 		const scriptsToAdd = useUltracite
 			? {
 					lint: 'ultracite',
 					typecheck: 'tsc --noEmit',
-					upgrade: `npx npm-check-updates -u && ${pm} install`,
+					upgrade: `${dlx} npm-check-updates -u && ${pm} install`,
 				}
 			: {
 					lint: 'biome check --write .',
 					typecheck: 'tsc --noEmit',
-					upgrade: `npx npm-check-updates -u && ${pm} install`,
+					upgrade: `${dlx} npm-check-updates -u && ${pm} install`,
 				}
 
 		const existing = pkg.scripts ?? {}
@@ -58,17 +68,18 @@ export const packageScriptsTask: Task = {
 
 		const pm = profile.packageManager
 		const useUltracite = await hasUltracite(cwd)
+		const dlx = dlxCommand(pm)
 
 		const scriptsToAdd = useUltracite
 			? {
 					lint: 'ultracite',
 					typecheck: 'tsc --noEmit',
-					upgrade: `npx npm-check-updates -u && ${pm} install`,
+					upgrade: `${dlx} npm-check-updates -u && ${pm} install`,
 				}
 			: {
 					lint: 'biome check --write .',
 					typecheck: 'tsc --noEmit',
-					upgrade: `npx npm-check-updates -u && ${pm} install`,
+					upgrade: `${dlx} npm-check-updates -u && ${pm} install`,
 				}
 
 		pkg.scripts = { ...pkg.scripts, ...scriptsToAdd }
