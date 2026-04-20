@@ -3,7 +3,7 @@ import { dlxCommand, installDependenciesCommand } from 'nypm'
 
 export function renderAutoUpdateWorkflow(profile: ProjectProfile): string {
 	const pm = profile.packageManager
-	const installCmd = installDependenciesCommand(pm, { silent: true, ignoreWorkspace: true })
+	const installCmd = installDependenciesCommand(pm)
 	const dlx = dlxCommand(pm, 'npm-check-updates')
 	const nodeVersion = profile.framework === 'react-native' ? '20' : '20'
 

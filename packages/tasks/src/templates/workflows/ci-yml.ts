@@ -3,7 +3,7 @@ import { installDependenciesCommand, runScriptCommand } from 'nypm'
 
 export function renderCiWorkflow(profile: ProjectProfile): string {
 	const pm = profile.packageManager
-	const installCmd = installDependenciesCommand(pm, { silent: true, ignoreWorkspace: true })
+	const installCmd = installDependenciesCommand(pm)
 	const runLint = runScriptCommand(pm, 'lint')
 	const runTypecheck = runScriptCommand(pm, 'typecheck')
 

@@ -4,7 +4,6 @@ import {
 	findConfigFile,
 	readFile,
 	readPackageJson,
-	resolvePath,
 } from '@xtarterize/core'
 import { injectVitePlugin } from '@xtarterize/patchers'
 import { generateCode, loadFile } from 'magicast'

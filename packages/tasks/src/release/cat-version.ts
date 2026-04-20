@@ -31,7 +31,6 @@ export const catVersionTask: Task = {
 	applicable: () => true,
 
 	async check(cwd, _profile): Promise<TaskStatus> {
-		const { fileExists, resolvePath } = await import('@xtarterize/core')
 		const versionrcPaths = ['.versionrc', '.versionrc.json', '.versionrc.js']
 		const hasVersionrc = versionrcPaths.some((p) => fileExists(resolvePath(cwd, p)))
 
@@ -79,12 +78,11 @@ export const catVersionTask: Task = {
 		const pkg = await readPackageJson(cwd)
 		if (!pkg) return
 
-		const { fileExists: fe, resolvePath: rp } = await import('@xtarterize/core')
 		const versionrcVariants = ['.versionrc', '.versionrc.json', '.versionrc.js']
-		const existingVersionrc = versionrcVariants.find((p) => fe(rp(cwd, p)))
+		const existingVersionrc = versionrcVariants.find((p) => fileExists(resolvePath(cwd, p)))
 		const versionrcPath = existingVersionrc
-			? rp(cwd, existingVersionrc)
-			: rp(cwd, '.versionrc')
+			? resolvePath(cwd, existingVersionrc)
+			: resolvePath(cwd, '.versionrc')
 
 		const versionrcExists = existingVersionrc !== undefined
 		if (!versionrcExists) {

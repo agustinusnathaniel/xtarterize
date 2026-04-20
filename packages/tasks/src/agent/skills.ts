@@ -5,6 +5,7 @@ import type {
 	TaskStatus,
 } from '@xtarterize/core'
 import { ensureDir, fileExists, resolvePath, writeFile } from '@xtarterize/core'
+import { runScriptCommand } from 'nypm'
 
 export const skillsTask: Task = {
 	id: 'agent/skills',
@@ -59,7 +60,7 @@ export const skillsTask: Task = {
 
 function renderProjectContext(profile: ProjectProfile): string {
 	const pm = profile.packageManager
-	const runCmd = pm === 'npm' ? 'npm run' : pm
+	const runCmd = (script: string) => runScriptCommand(pm, script)
 
 	return `# Project Context
 
@@ -75,11 +76,11 @@ function renderProjectContext(profile: ProjectProfile): string {
 
 ## Commands
 - Install: \`${pm} install\`
-- Dev: \`${runCmd} dev\`
-- Build: \`${runCmd} build\`
-- Lint: \`${runCmd} lint\`
-- Typecheck: \`${runCmd} typecheck\`
-- Test: \`${runCmd} test\`
+- Dev: \`${runCmd('dev')}\`
+- Build: \`${runCmd('build')}\`
+- Lint: \`${runCmd('lint')}\`
+- Typecheck: \`${runCmd('typecheck')}\`
+- Test: \`${runCmd('test')}\`
 
 ## Conventions
 - Use Biome for linting and formatting

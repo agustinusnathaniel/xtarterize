@@ -1,8 +1,9 @@
 import type { ProjectProfile } from '@xtarterize/core'
+import { runScriptCommand } from 'nypm'
 
 export function renderAgentsMd(profile: ProjectProfile): string {
 	const pm = profile.packageManager
-	const runCmd = pm === 'npm' ? 'npm run' : pm
+	const runCmd = (script: string) => runScriptCommand(pm, script)
 
 	return `# AGENTS.md
 
@@ -13,11 +14,11 @@ ${profile.framework ? `${profile.framework.charAt(0).toUpperCase() + profile.fra
 ## Setup Commands
 
 - **Install dependencies**: ${pm} install
-- **Start development**: ${runCmd} dev
-- **Build**: ${runCmd} build
-- **Lint**: ${runCmd} lint
-- **Type check**: ${runCmd} typecheck
-- **Test**: ${runCmd} test
+- **Start development**: ${runCmd('dev')}
+- **Build**: ${runCmd('build')}
+- **Lint**: ${runCmd('lint')}
+- **Type check**: ${runCmd('typecheck')}
+- **Test**: ${runCmd('test')}
 
 ## Tech Stack
 
