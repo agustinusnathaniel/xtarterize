@@ -1,12 +1,26 @@
 import { writeFile } from 'node:fs/promises'
 import { generateCode, loadFile } from 'magicast'
 
+const CONFIG_FILE_NAMES: Record<string, string> = {
+	'vite.config.ts': 'vite.config',
+	'vite.config.js': 'vite.config',
+	'vite.config.mts': 'vite.config',
+	'vite.config.cjs': 'vite.config',
+}
+
+function getConfigLabel(configPath: string): string {
+	const basename = configPath.split('/').pop() || 'config'
+	return CONFIG_FILE_NAMES[basename] || basename
+}
+
 export async function injectVitePlugin(
 	configPath: string,
 	importPath: string,
 	importName: string,
 	pluginExpression: string,
 ): Promise<{ success: boolean; fallback?: string }> {
+	const configLabel = getConfigLabel(configPath)
+
 	try {
 		const mod = await loadFile(configPath)
 		const code = mod.$code
@@ -19,7 +33,7 @@ export async function injectVitePlugin(
 		if (!defaultExport) {
 			return {
 				success: false,
-				fallback: 'No default export found in vite.config.ts',
+				fallback: `No default export found in ${configLabel}`,
 			}
 		}
 
@@ -35,15 +49,14 @@ export async function injectVitePlugin(
 		} else {
 			return {
 				success: false,
-				fallback:
-					'Unsupported vite.config.ts structure. Manually add the plugin.',
+				fallback: `Unsupported ${configLabel} structure. Manually add the plugin.`,
 			}
 		}
 
 		if (!plugins) {
 			return {
 				success: false,
-				fallback: 'Could not locate plugins array in vite.config.ts',
+				fallback: `Could not locate plugins array in ${configLabel}`,
 			}
 		}
 
@@ -62,7 +75,7 @@ export async function injectVitePlugin(
 	} catch (error) {
 		return {
 			success: false,
-			fallback: `AST patching failed: ${error instanceof Error ? error.message : 'Unknown error'}. Add plugin manually to vite.config.ts.`,
+			fallback: `AST patching failed: ${error instanceof Error ? error.message : 'Unknown error'}. Add plugin manually to ${configLabel}.`,
 		}
 	}
 }
