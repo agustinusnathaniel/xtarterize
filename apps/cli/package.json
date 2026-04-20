@@ -6,7 +6,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "xtarterize": "./dist/index.js"
+    "xtarterize": "./dist/index.mjs"
   },
   "files": [
     "dist"
