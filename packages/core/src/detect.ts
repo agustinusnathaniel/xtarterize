@@ -1,5 +1,5 @@
 import { detectPackageManager as detectPM } from 'nypm'
-import { fileExists, resolvePath } from './utils/fs.js'
+import { fileExists, findConfigFile, resolvePath } from './utils/fs.js'
 import { readPackageJson } from './utils/pkg.js'
 
 export type Framework =
@@ -61,6 +61,9 @@ export interface ProjectProfile {
 		vscodeSettings: boolean
 		agentsMd: boolean
 		githubWorkflows: string[]
+		viteConfig: boolean
+		versionrc: boolean
+		gitignore: boolean
 	}
 }
 
@@ -243,39 +246,23 @@ async function detectExistingConfigs(
 		vscodeSettings,
 		agentsMd,
 		githubWorkflows,
+		viteConfig,
+		versionrc,
+		gitignore,
 	] = await Promise.all([
-		fileExists(resolvePath(cwd, 'biome.json')).then((v) =>
-			v ? v : fileExists(resolvePath(cwd, 'biome.jsonc')),
-		),
-		fileExists(resolvePath(cwd, 'tsconfig.json')).then((v) =>
-			v ? v : fileExists(resolvePath(cwd, 'tsconfig.base.json')),
-		),
-		fileExists(resolvePath(cwd, 'renovate.json')).then((v) =>
-			v ? v : fileExists(resolvePath(cwd, '.github', 'renovate.json')),
-		),
-		fileExists(resolvePath(cwd, 'commitlint.config.js')).then((v) =>
-			v
-				? true
-				: fileExists(resolvePath(cwd, 'commitlint.config.ts')).then((v2) =>
-						v2 ? true : v2,
-					),
-		),
-		fileExists(resolvePath(cwd, 'knip.json')).then((v) =>
-			v ? v : fileExists(resolvePath(cwd, 'knip.jsonc')),
-		),
-		fileExists(resolvePath(cwd, 'plopfile.js')).then((v) =>
-			v
-				? true
-				: fileExists(resolvePath(cwd, 'plopfile.ts')).then((v2) =>
-						v2 ? true : v2,
-					),
-		),
+		findConfigFile(cwd, 'biome', ['.json', '.jsonc']).then(Boolean),
+		findConfigFile(cwd, 'tsconfig', ['.json', '.jsonc']).then(Boolean),
+		findConfigFile(cwd, 'renovate', ['.json', '.json5']).then(Boolean),
+		findConfigFile(cwd, 'commitlint.config', ['.ts', '.js', '.mjs', '.mts', '.cts']).then(Boolean),
+		findConfigFile(cwd, 'knip', ['.ts', '.mts']).then(Boolean),
+		findConfigFile(cwd, 'plopfile', ['.ts', '.js', '.mjs']).then(Boolean),
 		fileExists(resolvePath(cwd, 'turbo.json')),
 		fileExists(resolvePath(cwd, '.vscode', 'settings.json')),
-		fileExists(resolvePath(cwd, 'AGENTS.md')).then((v) =>
-			v ? v : fileExists(resolvePath(cwd, 'CLAUDE.md')),
-		),
+		findConfigFile(cwd, 'AGENTS', ['.md']).then(Boolean).then(v => v || fileExists(resolvePath(cwd, 'CLAUDE.md'))),
 		detectGitHubWorkflows(cwd),
+		findConfigFile(cwd, 'vite.config', ['.ts', '.js', '.mts', '.cjs']).then(Boolean),
+		fileExists(resolvePath(cwd, '.versionrc')),
+		fileExists(resolvePath(cwd, '.gitignore')),
 	])
 
 	return {
@@ -289,6 +276,9 @@ async function detectExistingConfigs(
 		vscodeSettings,
 		agentsMd,
 		githubWorkflows,
+		viteConfig,
+		versionrc,
+		gitignore,
 	}
 }
 
