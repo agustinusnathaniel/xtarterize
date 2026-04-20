@@ -1,12 +1,20 @@
 import type { ProjectProfile } from '@xtarterize/core'
 
-export function renderKnipConfig(profile: ProjectProfile): string {
-	let entry = ['src/index.ts']
-
+function getEntryFiles(profile: ProjectProfile): string[] {
 	if (profile.bundler === 'vite') {
-		entry = ['src/main.tsx', 'src/main.ts']
+		return ['src/main.tsx', 'src/main.ts']
 	} else if (profile.bundler === 'nextjs') {
-		entry = ['app/**/*.{ts,tsx}', 'pages/**/*.{ts,tsx}']
+		return ['app/**/*.{ts,tsx}', 'pages/**/*.{ts,tsx}']
+	}
+	return ['src/index.ts']
+}
+
+export function renderKnipConfig(profile: ProjectProfile, format: 'json' | 'ts' = 'ts'): string {
+	const entry = getEntryFiles(profile)
+	const project = ['src/**/*.{ts,tsx,js,jsx,css,scss}']
+
+	if (format === 'json') {
+		return JSON.stringify({ entry, project }, null, 2) + '\n'
 	}
 
 	return `import type { KnipConfig } from 'knip';
