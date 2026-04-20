@@ -12,6 +12,8 @@ npx xtarterize init
 
 That's it. Your project gets Biome, TypeScript incremental builds, Renovate, commitlint, VS Code settings, GitHub Actions, and more — all tailored to your stack.
 
+> **Starting a new project?** Use [**create-xtarter-app**](https://github.com/agustinusnathaniel/create-xtarter-app) to scaffold from curated templates first, then run `xtarterize init` for additional configs.
+
 ## Commands
 
 | Command | Description |

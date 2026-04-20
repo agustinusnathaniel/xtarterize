@@ -21,12 +21,12 @@ The `@xtarterize/patchers` package provides utilities for safely modifying confi
 
 ```mermaid
 flowchart TD
-    Task[Conformance Task] --> P{Which patcher?}
-    P -->|JSON config| MJ[mergeJson<br/>defu deep merge]
-    P -->|YAML config| MY[mergeYaml<br/>defu + js-yaml]
-    P -->|Vite config| AP[injectVitePlugin<br/>magicast AST]
+    Task["Conformance Task"] --> P{"Which patcher?"}
+    P -->|"JSON config"| MJ["mergeJson<br/>defu deep merge"]
+    P -->|"YAML config"| MY["mergeYaml<br/>defu + js-yaml"]
+    P -->|"Vite config"| AP["injectVitePlugin<br/>magicast AST"]
     
-    MJ --> W[Write file]
+    MJ --> W["Write file"]
     MY --> W
     AP --> W
     

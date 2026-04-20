@@ -60,4 +60,17 @@ If you have questions or need help:
 - Review the [Tasks Guide](/guide/tasks/overview/) to see what conformance tasks are available
 - Look at the [Contributing](/contributing/architecture/overview/) section if you want to contribute to the project
 
+## Starting a New Project?
+
+If you're bootstrapping a fresh project, consider using [**create-xtarter-app**](https://github.com/agustinusnathaniel/create-xtarter-app) first. It scaffolds curated starter templates (Next.js/Vite + Chakra/Tailwind/Hero UI) in seconds, then you can run `xtarterize init` to layer on additional conformance configs.
+
+```bash
+# Step 1: Scaffold a new project from a template
+npx create-xtarter-app@latest my-app
+
+# Step 2: Apply additional production-grade configs
+cd my-app
+npx xtarterize init
+```
+
 <LinkButton href="/getting-started/installation/">Install Xtarterize →</LinkButton>

@@ -84,28 +84,28 @@ flowchart TD
     B --> G[detectVitePlus]
     
     C --> H{Framework?}
-    H -->|react-native + react| I[Ambiguous → prompt user]
-    H -->|react| J[Framework: react]
-    H -->|vue| K[Framework: vue]
-    H -->|svelte| L[Framework: svelte]
-    H -->|solid| M[Framework: solid]
-    H -->|node| N[Framework: node]
+    H -->|"react-native + react"| I["Ambiguous → prompt user"]
+    H -->|react| J["Framework: react"]
+    H -->|vue| K["Framework: vue"]
+    H -->|svelte| L["Framework: svelte"]
+    H -->|solid| M["Framework: solid"]
+    H -->|node| N["Framework: node"]
     
     D --> O{Bundler?}
-    O -->|@tanstack/start| P[TanStack Start]
-    O -->|next| Q[Next.js]
-    O -->|expo| R[Expo]
-    O -->|vite| S[Vite]
-    O -->|webpack| T[Webpack]
-    O -->|@rspack/core| U[Rspack]
-    O -->|none| V[None]
+    O -->|"@tanstack/start"| P["TanStack Start"]
+    O -->|next| Q["Next.js"]
+    O -->|expo| R["Expo"]
+    O -->|vite| S["Vite"]
+    O -->|webpack| T["Webpack"]
+    O -->|"@rspack/core"| U["Rspack"]
+    O -->|none| V["None"]
     
     E --> W{Router?}
-    W -->|nextjs bundler| X[Next Router]
-    W -->|expo bundler| Y[Expo Router]
-    W -->|@tanstack/react-router| Z[TanStack Router]
-    W -->|react-router| AA[React Router]
-    W -->|vue-router| AB[Vue Router]
+    W -->|"nextjs bundler"| X["Next Router"]
+    W -->|"expo bundler"| Y["Expo Router"]
+    W -->|"@tanstack/react-router"| Z["TanStack Router"]
+    W -->|react-router| AA["React Router"]
+    W -->|vue-router| AB["Vue Router"]
     
     style A fill:#6366f1,color:#fff
     style C fill:#22c55e,color:#fff
