@@ -31,8 +31,9 @@ export const catVersionTask: Task = {
 	applicable: () => true,
 
 	async check(cwd, _profile): Promise<TaskStatus> {
-		const versionrcPath = resolvePath(cwd, '.versionrc')
-		const exists = await fileExists(versionrcPath)
+		const { fileExists, resolvePath } = await import('@xtarterize/core')
+		const versionrcPaths = ['.versionrc', '.versionrc.json', '.versionrc.js']
+		const hasVersionrc = versionrcPaths.some((p) => fileExists(resolvePath(cwd, p)))
 
 		const pkg = await readPackageJson(cwd)
 		const hasCatVersion = pkg?.devDependencies?.['commit-and-tag-version']
@@ -40,8 +41,8 @@ export const catVersionTask: Task = {
 			'commit-and-tag-version',
 		)
 
-		if (exists && hasCatVersion && hasReleaseScript) return 'skip'
-		if (!exists && !hasCatVersion) return 'new'
+		if (hasVersionrc && hasCatVersion && hasReleaseScript) return 'skip'
+		if (!hasVersionrc && !hasCatVersion) return 'new'
 		return 'patch'
 	},
 
@@ -78,8 +79,14 @@ export const catVersionTask: Task = {
 		const pkg = await readPackageJson(cwd)
 		if (!pkg) return
 
-		const versionrcPath = resolvePath(cwd, '.versionrc')
-		const versionrcExists = await fileExists(versionrcPath)
+		const { fileExists: fe, resolvePath: rp } = await import('@xtarterize/core')
+		const versionrcVariants = ['.versionrc', '.versionrc.json', '.versionrc.js']
+		const existingVersionrc = versionrcVariants.find((p) => fe(rp(cwd, p)))
+		const versionrcPath = existingVersionrc
+			? rp(cwd, existingVersionrc)
+			: rp(cwd, '.versionrc')
+
+		const versionrcExists = existingVersionrc !== undefined
 		if (!versionrcExists) {
 			await writeFile(versionrcPath, VERSIONRC_TEMPLATE)
 		}
@@ -88,7 +95,10 @@ export const catVersionTask: Task = {
 			await addDependency(['commit-and-tag-version'], { cwd, dev: true })
 		}
 
-		pkg.scripts = { ...pkg.scripts, release: 'commit-and-tag-version' }
-		await writePackageJson(cwd, pkg)
+		const updatedPkg = await readPackageJson(cwd)
+		if (updatedPkg) {
+			updatedPkg.scripts = { ...updatedPkg.scripts, release: 'commit-and-tag-version' }
+			await writePackageJson(cwd, updatedPkg)
+		}
 	},
 }

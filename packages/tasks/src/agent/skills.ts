@@ -30,20 +30,16 @@ export const skillsTask: Task = {
 	},
 
 	async dryRun(cwd, profile): Promise<FileDiff[]> {
-		const diffs: FileDiff[] = []
-
-		const skillsDir = resolvePath(cwd, '.agents', 'skills')
-		const dirExists = await fileExists(skillsDir)
-		const before = dirExists ? '(directory exists)' : null
+		const skillPath = resolvePath(cwd, '.agents', 'skills', 'project-context.md')
+		const exists = await fileExists(skillPath)
+		if (exists) return []
 
 		const skillContent = renderProjectContext(profile)
-		diffs.push({
+		return [{
 			filepath: '.agents/skills/project-context.md',
-			before,
+			before: null,
 			after: skillContent,
-		})
-
-		return diffs
+		}]
 	},
 
 	async apply(cwd, profile): Promise<void> {

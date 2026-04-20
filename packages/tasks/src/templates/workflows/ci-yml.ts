@@ -10,6 +10,16 @@ export function renderCiWorkflow(profile: ProjectProfile): string {
 				: `${pm} install --frozen-lockfile`
 	const runCmd = pm === 'npm' ? 'npm run' : `${pm}`
 
+	const steps = [
+		'      - uses: actions/checkout@v4',
+		'      - uses: actions/setup-node@v4',
+		'        with:',
+		'          node-version: 20',
+		`      - run: ${installCmd}`,
+		`      - run: ${runCmd} lint`,
+		`      - run: ${runCmd} typecheck`,
+	]
+
 	return `name: CI
 
 on:
@@ -20,13 +30,6 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: ${installCmd}
-      - run: ${runCmd} lint
-      - run: ${runCmd} typecheck
-      - run: ${runCmd} test
+${steps.join('\n')}
 `
 }
