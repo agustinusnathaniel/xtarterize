@@ -1,40 +1,40 @@
 import { defineCommand, runMain } from 'citty'
-import { initCommand } from './commands/init.js'
-import { syncCommand } from './commands/sync.js'
-import { diffCommand } from './commands/diff.js'
-import { checkCommand } from './commands/check.js'
 import { addCommand } from './commands/add.js'
-import { restoreCommand } from './commands/restore.js'
+import { checkCommand } from './commands/check.js'
+import { diffCommand } from './commands/diff.js'
+import { initCommand } from './commands/init.js'
 import { listCommand } from './commands/list.js'
+import { restoreCommand } from './commands/restore.js'
+import { syncCommand } from './commands/sync.js'
 
 process.on('SIGINT', () => process.exit(0))
 process.on('SIGTERM', () => process.exit(0))
 
 const main = defineCommand({
-  meta: {
-    name: 'xtarterize',
-    version: '0.1.0',
-    description: 'Apply conformance configuration to JS/TS projects',
-  },
-  args: {
-    cwd: {
-      type: 'string',
-      description: 'Target directory (default: current working directory)',
-    },
-    json: {
-      type: 'boolean',
-      description: 'Output machine-readable JSON',
-    },
-  },
-  subCommands: {
-    init: initCommand,
-    sync: syncCommand,
-    diff: diffCommand,
-    check: checkCommand,
-    add: addCommand,
-    restore: restoreCommand,
-    list: listCommand,
-  },
+	meta: {
+		name: 'xtarterize',
+		version: '0.1.0',
+		description: 'Apply conformance configuration to JS/TS projects',
+	},
+	args: {
+		cwd: {
+			type: 'string',
+			description: 'Target directory (default: current working directory)',
+		},
+		json: {
+			type: 'boolean',
+			description: 'Output machine-readable JSON',
+		},
+	},
+	subCommands: {
+		init: initCommand,
+		sync: syncCommand,
+		diff: diffCommand,
+		check: checkCommand,
+		add: addCommand,
+		restore: restoreCommand,
+		list: listCommand,
+	},
 })
 
 runMain(main)
