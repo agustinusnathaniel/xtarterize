@@ -18,34 +18,12 @@ async function findBiomeConfigPath(cwd: string): Promise<{ path: string | null; 
 	return { path: found, isJsonc: found.endsWith('.jsonc') }
 }
 
-function injectExtendsIntoJsonc(content: string): string {
-	const parsed = parseJsonc(content) as Record<string, unknown>
-	const extendsList = parsed.extends as string[] | undefined
-
+function addUltraciteExtends(existing: Record<string, unknown>): Record<string, unknown> {
+	const extendsList = existing.extends as string[] | undefined
 	if (extendsList?.includes('ultracite') || extendsList?.some((e) => e.startsWith('ultracite/'))) {
-		return content
+		return existing
 	}
-
-	if (content.includes('"extends"') || content.includes("'extends'")) {
-		const extendsRegex = /("extends"\s*:\s*\[)([^\]]*)(\])/
-		const match = content.match(extendsRegex)
-		if (match) {
-			const existingItems = match[2].trim()
-			const newItems = existingItems
-				? `${existingItems}, "ultracite"`
-				: '"ultracite"'
-			return content.replace(extendsRegex, `$1${newItems}$3`)
-		}
-	}
-
-	const insertPoint = content.lastIndexOf('}')
-	if (insertPoint === -1) return content
-
-	const prefix = content.slice(0, insertPoint).trimEnd()
-	const suffix = content.slice(insertPoint)
-	const needsComma = prefix.endsWith(']') || prefix.endsWith('"') || prefix.endsWith('}') || prefix.endsWith('true') || prefix.endsWith('false') || /\d$/.test(prefix)
-	const separator = needsComma ? ',\n  ' : '  '
-	return `${prefix}${separator}"extends": ["ultracite"]\n${suffix}`
+	return { ...existing, extends: [...(extendsList ?? []), 'ultracite'] }
 }
 
 export const ultraciteTask: Task = {
@@ -76,17 +54,11 @@ export const ultraciteTask: Task = {
 		const { path: biomePath, isJsonc } = await findBiomeConfigPath(cwd)
 		const before = biomePath ? await readFile(biomePath) : null
 
-		let after: string
-		if (isJsonc && before) {
-			after = injectExtendsIntoJsonc(before)
-		} else {
-			const existing = before
-				? (parseJsonc(before) as Record<string, unknown>)
-				: {}
-			const incoming = { extends: ['ultracite'] }
-			const merged = mergeJson(existing, incoming)
-			after = JSON.stringify(merged, null, 2)
-		}
+		const existing = before
+			? (parseJsonc(before) as Record<string, unknown>)
+			: {}
+		const merged = mergeJson(existing, { extends: ['ultracite'] })
+		const after = JSON.stringify(merged, null, 2)
 
 		const filepath = isJsonc ? 'biome.jsonc' : 'biome.json'
 		return [{ filepath, before, after }]
