@@ -4,6 +4,7 @@
 	"version": "0.1.0",
 	"scripts": {
 		"build": "turbo run build",
+		"build:cli": "turbo run build --filter=!@xtarterize/docs",
 		"dev": "turbo run dev",
 		"test": "vitest",
 		"test:run": "vitest run",
