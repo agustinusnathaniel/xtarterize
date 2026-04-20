@@ -1,7 +1,7 @@
 import { spinner } from '@clack/prompts'
 import {
 	detectProject,
-	logger,
+	pc,
 	resolveTaskStatuses,
 	resolveTasks,
 	runPreflight,
@@ -27,16 +27,16 @@ export const listCommand = defineCommand({
 
 		const preflight = await runPreflight(cwd)
 		if (!preflight.valid) {
-			logger.log('')
-			logger.log(logger.red('✖ Preflight checks failed'))
-			logger.log('')
+			console.log('')
+			console.log(`${pc.red('✖')} Preflight checks failed`)
+			console.log('')
 			for (const error of preflight.errors) {
-				logger.log(logger.red(`  ✗ ${error.message}`))
+				console.log(`${pc.red(`  ✗ ${error.message}`)}`)
 				if (error.hint) {
-					logger.log(`  ${logger.dim(error.hint)}`)
+					console.log(`  ${pc.dim(error.hint)}`)
 				}
 			}
-			logger.log('')
+			console.log('')
 			process.exit(1)
 		}
 
@@ -55,8 +55,8 @@ export const listCommand = defineCommand({
 		for (const task of tasks) {
 			if (task.group !== currentGroup) {
 				currentGroup = task.group
-				logger.log('')
-				logger.log(logger.bold(currentGroup))
+				console.log('')
+				console.log(pc.bold(currentGroup))
 			}
 
 			const status = statuses.get(task.id) ?? 'new'
@@ -69,9 +69,9 @@ export const listCommand = defineCommand({
 							? '⚠'
 							: '✗'
 
-			logger.log(`  ${icon} ${task.label.padEnd(40)} ${logger.dim(task.id)}`)
+			console.log(`  ${icon} ${task.label.padEnd(40)} ${pc.dim(task.id)}`)
 		}
 
-		logger.log('')
+		console.log('')
 	},
 })

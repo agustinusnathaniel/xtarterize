@@ -2,7 +2,7 @@ import { spinner } from '@clack/prompts'
 import type { DiagnosticCheck } from '@xtarterize/core'
 import {
 	detectProject,
-	logger,
+	pc,
 	resolveTaskStatuses,
 	resolveTasks,
 	runConflictChecks,
@@ -15,11 +15,11 @@ import { defineCommand } from 'citty'
 function diagnosticIcon(status: DiagnosticCheck['status']): string {
 	switch (status) {
 		case 'pass':
-			return logger.green('✔')
+			return pc.green('✔')
 		case 'warn':
-			return logger.yellow('~')
+			return pc.yellow('~')
 		case 'fail':
-			return logger.red('✗')
+			return pc.red('✗')
 	}
 }
 
@@ -45,16 +45,16 @@ export const checkCommand = defineCommand({
 
 		const preflight = await runPreflight(cwd)
 		if (!preflight.valid) {
-			logger.log('')
-			logger.log(logger.red('✖ Preflight checks failed'))
-			logger.log('')
+			console.log('')
+			console.log(`${pc.red('✖')} Preflight checks failed`)
+			console.log('')
 			for (const error of preflight.errors) {
-				logger.log(logger.red(`  ✗ ${error.message}`))
+				console.log(`${pc.red(`  ✗ ${error.message}`)}`)
 				if (error.hint) {
-					logger.log(`  ${logger.dim(error.hint)}`)
+					console.log(`  ${pc.dim(error.hint)}`)
 				}
 			}
-			logger.log('')
+			console.log('')
 			process.exit(1)
 		}
 
@@ -71,53 +71,52 @@ export const checkCommand = defineCommand({
 		const total = tasks.length
 
 		if (!quiet) {
-			logger.log('')
-			logger.log(logger.bold('Conformance audit'))
-			logger.log('')
+			console.log('')
+			console.log(pc.bold('Conformance audit'))
+			console.log('')
 
 			for (const task of tasks) {
 				const status = statuses.get(task.id) ?? 'new'
 				const icon =
 					status === 'skip'
-						? logger.green('✔')
+						? pc.green('✔')
 						: status === 'patch'
-							? logger.yellow('~')
+							? pc.yellow('~')
 							: status === 'conflict'
-								? logger.red('⚠')
-								: logger.red('✗')
+								? pc.red('⚠')
+								: pc.red('✗')
 
 				if (status === 'skip') conformant++
 
-				logger.log(
-					`  ${icon} ${task.label.padEnd(40)} ${logger.dim(task.id)} [${status}]`,
+				console.log(
+					`  ${icon} ${task.label.padEnd(40)} ${pc.dim(task.id)} [${status}]`,
 				)
 			}
 
-			logger.log('')
-			logger.log(logger.bold(`${conformant}/${total} conformant`))
+			console.log('')
+			console.log(pc.bold(`${conformant}/${total} conformant`))
 
-			// Diagnostic checks (always run)
 			const conflictChecks = await runConflictChecks(cwd)
 			const installChecks = await runToolInstallationChecks(cwd)
 			const diagnostics = [...installChecks, ...conflictChecks]
 
 			if (diagnostics.length > 0) {
-				logger.log('')
-				logger.log(logger.bold('Diagnostics'))
-				logger.log('')
+				console.log('')
+				console.log(pc.bold('Diagnostics'))
+				console.log('')
 
 				for (const check of diagnostics) {
-					logger.log(`  ${diagnosticIcon(check.status)} ${check.message}`)
+					console.log(`  ${diagnosticIcon(check.status)} ${check.message}`)
 				}
 			}
 
-			logger.log('')
+			console.log('')
 		} else {
 			for (const task of tasks) {
 				const status = statuses.get(task.id) ?? 'new'
 				if (status === 'skip') conformant++
 			}
-			logger.log(`${conformant}/${total} conformant`)
+			console.log(`${conformant}/${total} conformant`)
 		}
 	},
 })
