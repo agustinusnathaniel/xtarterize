@@ -24,7 +24,21 @@ export default defineConfig({
 			sidebar: [
 				{
 					label: 'Getting Started',
-					autogenerate: { directory: 'getting-started' },
+					// autogenerate: { directory: 'getting-started' },
+					items: [
+						{
+							label: 'Introduction',
+							link: '/getting-started/introduction/'
+						},
+						{
+							label: 'Installation',
+							link: '/getting-started/installation/'
+						},
+						{
+							label: 'Initialization',
+							link: '/getting-started/initialization/'
+						}
+					]
 				},
 				{
 					label: 'CLI Reference',
