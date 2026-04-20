@@ -7,6 +7,7 @@ import {
 	writeFile,
 } from '@xtarterize/core'
 import { mergeJson } from '@xtarterize/patchers'
+import JSON5 from 'json5'
 import { renderVscodeExtensions } from '../templates/vscode/extensions.js'
 import { renderVscodeSettings } from '../templates/vscode/settings.js'
 
@@ -53,7 +54,7 @@ export const vscodeTask: Task = {
 		const settingsBefore = settingsExists ? await readFile(settingsPath) : null
 		let settingsAfter: string
 		if (settingsExists && settingsBefore) {
-			const existing = JSON.parse(settingsBefore)
+			const existing = JSON5.parse(settingsBefore)
 			const incoming = JSON.parse(renderVscodeSettings(profile))
 			settingsAfter = JSON.stringify(mergeJson(existing, incoming), null, 2)
 		} else {
@@ -66,7 +67,7 @@ export const vscodeTask: Task = {
 		const extensionsBefore = extensionsExists ? await readFile(extensionsPath) : null
 		let extensionsAfter: string
 		if (extensionsExists && extensionsBefore) {
-			const existing = JSON.parse(extensionsBefore)
+			const existing = JSON5.parse(extensionsBefore)
 			const incoming = JSON.parse(renderVscodeExtensions(profile))
 			extensionsAfter = JSON.stringify(mergeJson(existing, incoming), null, 2)
 		} else {

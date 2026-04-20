@@ -93,6 +93,9 @@ importers:
       diff:
         specifier: ^9.0.0
         version: 9.0.0
+      json5:
+        specifier: ^2.2.3
+        version: 2.2.3
       nypm:
         specifier: ^0.6.5
         version: 0.6.5
@@ -124,12 +127,12 @@ importers:
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
+      json5:
+        specifier: ^2.2.3
+        version: 2.2.3
       magicast:
         specifier: ^0.5.2
         version: 0.5.2
-      strip-json-comments:
-        specifier: ^5.0.3
-        version: 5.0.3
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -158,6 +161,9 @@ importers:
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
+      json5:
+        specifier: ^2.2.3
+        version: 2.2.3
       magicast:
         specifier: ^0.5.2
         version: 0.5.2
@@ -2273,6 +2279,11 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
+  json5@2.2.3:
+    resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
+    engines: {node: '>=6'}
+    hasBin: true
+
   jsonfile@4.0.0:
     resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
 
@@ -3017,10 +3028,6 @@ packages:
   strip-bom@3.0.0:
     resolution: {integrity: sha512-vavAMRXOgBVNF6nyEEmL3DBK19iRpDcoIwW+swQ+CbGiu7lju6t+JklA1MHweoWtadgt4ISVUsXLyDq34ddcwA==}
     engines: {node: '>=4'}
-
-  strip-json-comments@5.0.3:
-    resolution: {integrity: sha512-1tB5mhVo7U+ETBKNf92xT4hrQa3pm0MZ0PQvuDnWgAAGHDsfp4lPSpiS6psrSiet87wyGPh9ft6wmhOMQ0hDiw==}
-    engines: {node: '>=14.16'}
 
   style-to-js@1.1.21:
     resolution: {integrity: sha512-RjQetxJrrUJLQPHbLku6U/ocGtzyjbJMP9lCNK7Ag0CNh690nSH8woqWH9u16nMjYBAok+i7JO1NP2pOy8IsPQ==}
@@ -5773,6 +5780,8 @@ snapshots:
 
   jsesc@3.1.0: {}
 
+  json5@2.2.3: {}
+
   jsonfile@4.0.0:
     optionalDependencies:
       graceful-fs: 4.2.11
@@ -6937,8 +6946,6 @@ snapshots:
       ansi-regex: 5.0.1
 
   strip-bom@3.0.0: {}
-
-  strip-json-comments@5.0.3: {}
 
   style-to-js@1.1.21:
     dependencies:

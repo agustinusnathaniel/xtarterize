@@ -1,9 +1,8 @@
 import { defu } from 'defu'
-import stripJsonComments from 'strip-json-comments'
+import JSON5 from 'json5'
 
 export function parseJsonc(text: string): unknown {
-	const cleaned = stripJsonComments(text)
-	return JSON.parse(cleaned)
+	return JSON5.parse(text)
 }
 
 export function mergeJson(existing: object, incoming: object): object {
