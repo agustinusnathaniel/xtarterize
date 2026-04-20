@@ -17,15 +17,15 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "diff": "^8.0.2",
+    "diff": "^9.0.0",
     "nypm": "^0.6.5",
     "picocolors": "^1.1.1",
     "pkg-types": "^2.2.0"
   },
   "devDependencies": {
     "@types/diff": "^8.0.0",
-    "@types/node": "^24.1.0",
+    "@types/node": "^25.6.0",
     "tsdown": "^0.21.9",
-    "typescript": "^5.9.0"
+    "typescript": "^6.0.3"
   }
 }

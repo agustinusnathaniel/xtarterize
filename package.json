@@ -15,7 +15,7 @@
 		"docs:preview": "pnpm --filter @xtarterize/docs preview",
 		"cli:dev": "pnpm --filter @xtarterize/cli dev",
 		"cli:build": "pnpm --filter @xtarterize/cli build",
-		"up-interactive": "pnpm up -i",
+		"up-interactive": "pnpm up -i -r",
 		"up-latest": "pnpm up-interactive -L",
 		"changeset": "changeset",
 		"version-packages": "changeset version",

@@ -25,15 +25,15 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@clack/prompts": "^0.11.0",
-    "citty": "^0.1.6"
+    "@clack/prompts": "^1.2.0",
+    "citty": "^0.2.2"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
+    "@types/node": "^25.6.0",
     "@xtarterize/core": "workspace:*",
     "@xtarterize/tasks": "workspace:*",
     "tsdown": "^0.21.9",
-    "typescript": "^5.9.0"
+    "typescript": "^6.0.3"
   },
   "repository": {
     "type": "git",
