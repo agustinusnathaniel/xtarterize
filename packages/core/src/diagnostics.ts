@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process'
+import { x } from 'tinyexec'
 import { fileExists, resolvePath } from './utils/fs.js'
 import { readPackageJson } from './utils/pkg.js'
 
@@ -13,8 +13,8 @@ export async function checkToolInstalled(
 	cwd: string,
 ): Promise<boolean> {
 	try {
-		execSync(`${tool} --version`, { cwd, stdio: 'pipe', timeout: 5000 })
-		return true
+		const result = await x(tool, ['--version'], { nodeOptions: { cwd } })
+		return result.exitCode === 0
 	} catch {
 		return false
 	}
