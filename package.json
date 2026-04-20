@@ -1,26 +1,26 @@
 {
-  "name": "xtarterize",
-  "private": true,
-  "version": "0.1.0",
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "test": "vitest",
-    "test:run": "vitest run",
-    "lint": "biome lint .",
-    "check": "biome check --write .",
-    "typecheck": "turbo run typecheck",
-    "docs:dev": "pnpm --filter @xtarterize/docs dev",
-    "docs:build": "pnpm --filter @xtarterize/docs build",
-    "docs:preview": "pnpm --filter @xtarterize/docs preview",
-    "cli:dev": "pnpm --filter @xtarterize/cli dev",
-    "cli:build": "pnpm --filter @xtarterize/cli build"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.4.12",
-    "turbo": "^2.9.6",
-    "vite": "^8.0.8",
-    "vitest": "^4.1.4"
-  },
-  "packageManager": "pnpm@10.24.0"
+	"name": "xtarterize",
+	"private": true,
+	"version": "0.1.0",
+	"scripts": {
+		"build": "turbo run build",
+		"dev": "turbo run dev",
+		"test": "vitest",
+		"test:run": "vitest run",
+		"lint": "biome lint .",
+		"check": "biome check --write .",
+		"typecheck": "turbo run typecheck",
+		"docs:dev": "pnpm --filter @xtarterize/docs dev",
+		"docs:build": "pnpm --filter @xtarterize/docs build",
+		"docs:preview": "pnpm --filter @xtarterize/docs preview",
+		"cli:dev": "pnpm --filter @xtarterize/cli dev",
+		"cli:build": "pnpm --filter @xtarterize/cli build"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.12",
+		"turbo": "^2.9.6",
+		"vite": "^8.0.8",
+		"vitest": "^4.1.4"
+	},
+	"packageManager": "pnpm@10.24.0"
 }
