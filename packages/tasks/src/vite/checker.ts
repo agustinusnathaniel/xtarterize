@@ -1,6 +1,7 @@
 import type { FileDiff, Task, TaskStatus } from '@xtarterize/core'
 import {
 	fileExists,
+	findConfigFile,
 	readFile,
 	readPackageJson,
 	resolvePath,
@@ -9,6 +10,12 @@ import { injectVitePlugin } from '@xtarterize/patchers'
 import { generateCode, loadFile } from 'magicast'
 import { addDependency } from 'nypm'
 
+const VITE_CONFIG_EXTENSIONS = ['.ts', '.js', '.mts', '.mjs', '.cjs', '.cts']
+
+async function findViteConfig(cwd: string): Promise<string | null> {
+	return findConfigFile(cwd, 'vite.config', VITE_CONFIG_EXTENSIONS)
+}
+
 export const viteCheckerTask: Task = {
 	id: 'vite/checker',
 	label: 'vite-plugin-checker',
@@ -16,9 +23,8 @@ export const viteCheckerTask: Task = {
 	applicable: (profile) => profile.bundler === 'vite',
 
 	async check(cwd, _profile): Promise<TaskStatus> {
-		const configPath = resolvePath(cwd, 'vite.config.ts')
-		const exists = await fileExists(configPath)
-		if (!exists) return 'conflict'
+		const configPath = await findViteConfig(cwd)
+		if (!configPath) return 'conflict'
 
 		const content = await readFile(configPath)
 		if (content.includes('vite-plugin-checker')) return 'skip'
@@ -27,19 +33,21 @@ export const viteCheckerTask: Task = {
 	},
 
 	async dryRun(cwd, _profile): Promise<FileDiff[]> {
-		const configPath = resolvePath(cwd, 'vite.config.ts')
+		const configPath = await findViteConfig(cwd)
+		if (!configPath) return []
+
 		const before = await readFile(configPath)
 
 		const mod = await loadFile(configPath)
 		const code = mod.$code
 
 		if (code.includes('vite-plugin-checker')) {
-			return [{ filepath: 'vite.config.ts', before, after: before }]
+			return [{ filepath: 'vite.config', before, after: before }]
 		}
 
 		const defaultExport = mod.exports.default
 		if (!defaultExport || !Array.isArray(defaultExport.plugins)) {
-			return [{ filepath: 'vite.config.ts', before, after: before }]
+			return [{ filepath: 'vite.config', before, after: before }]
 		}
 
 		const plugins: any[] = defaultExport.plugins
@@ -48,7 +56,7 @@ export const viteCheckerTask: Task = {
 		const { code: after } = generateCode(mod)
 		const finalAfter = `import checker from 'vite-plugin-checker'\n${after}`
 
-		return [{ filepath: 'vite.config.ts', before, after: finalAfter }]
+		return [{ filepath: 'vite.config', before, after: finalAfter }]
 	},
 
 	async apply(cwd, _profile): Promise<void> {
@@ -57,7 +65,11 @@ export const viteCheckerTask: Task = {
 			await addDependency(['vite-plugin-checker'], { cwd, dev: true })
 		}
 
-		const configPath = resolvePath(cwd, 'vite.config.ts')
+		const configPath = await findViteConfig(cwd)
+		if (!configPath) {
+			throw new Error('No vite.config file found')
+		}
+
 		const result = await injectVitePlugin(
 			configPath,
 			'vite-plugin-checker',
