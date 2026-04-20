@@ -16,6 +16,7 @@ import { commitlintTask } from './release/commitlint.js'
 import { czgTask } from './release/czg.js'
 import { packageScriptsTask } from './scripts/package-scripts.js'
 import { incrementalTask } from './ts/incremental.js'
+import { gitignoreTsbuildinfoTask } from './ts/gitignore-tsbuildinfo.js'
 import { viteCheckerTask } from './vite/checker.js'
 import { viteVisualizerTask } from './vite/visualizer.js'
 
@@ -27,6 +28,7 @@ export {
 	ciWorkflowTask,
 	commitlintTask,
 	czgTask,
+	gitignoreTsbuildinfoTask,
 	incrementalTask,
 	knipTask,
 	packageScriptsTask,
@@ -46,6 +48,7 @@ export function getAllTasks(): Task[] {
 		biomeTask,
 		ultraciteTask,
 		incrementalTask,
+		gitignoreTsbuildinfoTask,
 		viteCheckerTask,
 		viteVisualizerTask,
 		releaseWorkflowTask,
