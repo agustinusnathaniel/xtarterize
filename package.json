@@ -14,10 +14,15 @@
 		"docs:build": "pnpm --filter @xtarterize/docs build",
 		"docs:preview": "pnpm --filter @xtarterize/docs preview",
 		"cli:dev": "pnpm --filter @xtarterize/cli dev",
-		"cli:build": "pnpm --filter @xtarterize/cli build"
+		"cli:build": "pnpm --filter @xtarterize/cli build",
+		"changeset": "changeset",
+		"version-packages": "changeset version",
+		"release": "changeset publish"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.12",
+		"@changesets/changelog-github": "^0.6.0",
+		"@changesets/cli": "^2.31.0",
 		"turbo": "^2.9.6",
 		"vite": "^8.0.8",
 		"vitest": "^4.1.4"
