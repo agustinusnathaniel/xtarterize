@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import JSON5 from 'json5'
 
 export async function ensureDir(dirPath: string): Promise<void> {
 	await fs.mkdir(dirPath, { recursive: true })
@@ -30,7 +31,7 @@ export async function readJson<T = Record<string, unknown>>(
 	filePath: string,
 ): Promise<T> {
 	const content = await fs.readFile(filePath, 'utf-8')
-	return JSON.parse(content) as T
+	return JSON5.parse(content) as T
 }
 
 export async function writeJson(

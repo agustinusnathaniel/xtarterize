@@ -21,6 +21,7 @@
     "@xtarterize/patchers": "workspace:*",
     "defu": "^6.1.4",
     "js-yaml": "^4.1.0",
+    "json5": "^2.2.3",
     "magicast": "^0.5.2",
     "nypm": "^0.6.5"
   },

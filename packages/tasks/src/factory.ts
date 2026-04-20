@@ -8,6 +8,7 @@ import {
 } from '@xtarterize/core'
 import { mergeJson, parseJsonc } from '@xtarterize/patchers'
 import { addDependency } from 'nypm'
+import JSON5 from 'json5'
 
 export interface FileTaskOptions {
 	id: string
@@ -45,7 +46,7 @@ export function createFileTask(options: FileTaskOptions): Task {
 
 			if (options.merge) {
 				const actualJson = parseJsonc(actual) as object
-				const expectedJson = JSON.parse(expected)
+				const expectedJson = JSON5.parse(expected)
 				const merged = mergeJson(actualJson, expectedJson)
 				if (JSON.stringify(actualJson) === JSON.stringify(merged)) return 'skip'
 				return 'patch'
@@ -63,7 +64,7 @@ export function createFileTask(options: FileTaskOptions): Task {
 			let after: string
 			if (options.merge && before) {
 				const existing = parseJsonc(before) as object
-				const incoming = JSON.parse(options.render(profile))
+				const incoming = JSON5.parse(options.render(profile))
 				after = JSON.stringify(mergeJson(existing, incoming), null, 2)
 			} else {
 				after = options.render(profile)
@@ -135,8 +136,8 @@ export function createJsonMergeTask(options: JsonMergeTaskOptions): Task {
 			const before = exists ? await readFile(fullPath) : null
 
 			let after: string
-			if (exists && before) {
-				const existing = JSON.parse(before)
+		if (exists && before) {
+				const existing = JSON5.parse(before)
 				const incoming = options.incoming(profile)
 				after = JSON.stringify(mergeJson(existing, incoming), null, 2)
 			} else {
