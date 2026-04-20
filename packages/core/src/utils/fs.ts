@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises'
-import path from 'node:path'
+import { dirname, resolve } from 'pathe'
 import JSON5 from 'json5'
 
 export async function ensureDir(dirPath: string): Promise<void> {
@@ -14,7 +14,7 @@ export async function writeFile(
 	filePath: string,
 	content: string,
 ): Promise<void> {
-	await fs.mkdir(path.dirname(filePath), { recursive: true })
+	await fs.mkdir(dirname(filePath), { recursive: true })
 	await fs.writeFile(filePath, content, 'utf-8')
 }
 
@@ -50,7 +50,7 @@ export async function writeJson(
 	filePath: string,
 	data: unknown,
 ): Promise<void> {
-	await fs.mkdir(path.dirname(filePath), { recursive: true })
+	await fs.mkdir(dirname(filePath), { recursive: true })
 	await fs.writeFile(filePath, `${JSON.stringify(data, null, 2)}\n`, 'utf-8')
 }
 
@@ -63,10 +63,10 @@ export async function readJsonIfExists<T = Record<string, unknown>>(
 }
 
 export async function copyFile(src: string, dest: string): Promise<void> {
-	await fs.mkdir(path.dirname(dest), { recursive: true })
+	await fs.mkdir(dirname(dest), { recursive: true })
 	await fs.cp(src, dest)
 }
 
 export function resolvePath(cwd: string, ...segments: string[]): string {
-	return path.resolve(cwd, ...segments)
+	return resolve(cwd, ...segments)
 }

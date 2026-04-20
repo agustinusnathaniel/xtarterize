@@ -1,6 +1,5 @@
-import { execSync } from 'node:child_process'
 import fs from 'node:fs/promises'
-import path from 'node:path'
+import { join, normalize } from 'pathe'
 import { fileExists, resolvePath } from './utils/fs.js'
 
 const BACKUP_DIR = '.xtarterize/backups'
@@ -20,8 +19,9 @@ export async function backupFile(cwd: string, filepath: string): Promise<void> {
 	await fs.mkdir(backupDir, { recursive: true })
 
 	const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-	const backupName = `${filepath.replace(/\//g, '__')}.${timestamp}`
-	const backupPath = path.join(backupDir, backupName)
+	const safeName = normalize(filepath).replace(/[\/\\]/g, '__')
+	const backupName = `${safeName}.${timestamp}`
+	const backupPath = join(backupDir, backupName)
 
 	await fs.cp(sourcePath, backupPath)
 

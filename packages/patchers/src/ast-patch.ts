@@ -1,4 +1,5 @@
 import { writeFile } from 'node:fs/promises'
+import { basename } from 'pathe'
 import { generateCode, loadFile } from 'magicast'
 
 const CONFIG_FILE_NAMES: Record<string, string> = {
@@ -9,8 +10,8 @@ const CONFIG_FILE_NAMES: Record<string, string> = {
 }
 
 function getConfigLabel(configPath: string): string {
-	const basename = configPath.split('/').pop() || 'config'
-	return CONFIG_FILE_NAMES[basename] || basename
+	const basenameName = basename(configPath)
+	return CONFIG_FILE_NAMES[basenameName] || basenameName
 }
 
 export async function injectVitePlugin(

@@ -9,10 +9,11 @@ import {
 } from '@xtarterize/core'
 import { mergeJson, parseJsonc } from '@xtarterize/patchers'
 import { addDependency } from 'nypm'
+import { relative } from 'pathe'
 import JSON5 from 'json5'
 
 function relativeToCwd(fullPath: string, cwd: string): string {
-	return fullPath.startsWith(cwd + '/') ? fullPath.slice(cwd.length + 1) : fullPath
+	return relative(cwd, fullPath)
 }
 
 async function resolveTaskFile(cwd: string, filepath: string, extensions?: string[]): Promise<string | null> {

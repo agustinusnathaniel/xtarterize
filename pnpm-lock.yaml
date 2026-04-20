@@ -90,6 +90,9 @@ importers:
 
   packages/core:
     dependencies:
+      consola:
+        specifier: ^3.4.2
+        version: 3.4.2
       diff:
         specifier: ^9.0.0
         version: 9.0.0
@@ -99,12 +102,18 @@ importers:
       nypm:
         specifier: ^0.6.5
         version: 0.6.5
+      pathe:
+        specifier: ^2.0.3
+        version: 2.0.3
       picocolors:
         specifier: ^1.1.1
         version: 1.1.1
       pkg-types:
         specifier: ^2.2.0
         version: 2.3.0
+      tinyexec:
+        specifier: ^1.1.1
+        version: 1.1.1
     devDependencies:
       '@types/diff':
         specifier: ^8.0.0
@@ -133,6 +142,9 @@ importers:
       magicast:
         specifier: ^0.5.2
         version: 0.5.2
+      pathe:
+        specifier: ^2.0.3
+        version: 2.0.3
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -170,6 +182,9 @@ importers:
       nypm:
         specifier: ^0.6.5
         version: 0.6.5
+      pathe:
+        specifier: ^2.0.3
+        version: 2.0.3
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -1620,6 +1635,10 @@ packages:
 
   confbox@0.2.4:
     resolution: {integrity: sha512-ysOGlgTFbN2/Y6Cg3Iye8YKulHw+R2fNXHrgSmXISQdMnomY6eNDprVdW9R5xBguEqI954+S6709UyiO7B+6OQ==}
+
+  consola@3.4.2:
+    resolution: {integrity: sha512-5IKcdX0nnYavi6G7TtOhwkYzyjfJlatbjMjuLSfE2kYT5pMDOilZ4OvMhi637CcDICTmz3wARPoyhqyX1Y+XvA==}
+    engines: {node: ^14.18.0 || >=16.10.0}
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
@@ -4978,6 +4997,8 @@ snapshots:
   confbox@0.1.8: {}
 
   confbox@0.2.4: {}
+
+  consola@3.4.2: {}
 
   convert-source-map@2.0.0: {}
 

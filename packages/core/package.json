@@ -17,11 +17,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "consola": "^3.4.2",
     "diff": "^9.0.0",
     "json5": "^2.2.3",
     "nypm": "^0.6.5",
+    "pathe": "^2.0.3",
     "picocolors": "^1.1.1",
-    "pkg-types": "^2.2.0"
+    "pkg-types": "^2.2.0",
+    "tinyexec": "^1.1.1"
   },
   "devDependencies": {
     "@types/diff": "^8.0.0",
