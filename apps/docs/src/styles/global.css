@@ -1,0 +1,53 @@
+@layer base, starlight, theme, components, utilities;
+
+@import '@astrojs/starlight-tailwind';
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import "@fontsource/lora";
+@import "@fontsource-variable/atkinson-hyperlegible-next";
+@import "@fontsource-variable/geist-mono";
+
+@theme {
+	--font-heading: "Lora", serif;
+	--font-sans: "Atkinson Hyperlegible Next Variable", sans-serif;
+	--font-mono: "Geist Mono Variable", monospace;
+
+	/* https://starlight.astro.build/guides/css-and-tailwind/#color-theme-editor */
+	/* Generated accent color palettes. */
+	--color-accent-200: #feb3a6;
+	--color-accent-600: #a60a00;
+	--color-accent-900: #640300;
+	--color-accent-950: #460b05;
+	/* Generated gray color palettes. */
+	--color-gray-100: #f9f5f5;
+	--color-gray-200: #f3ecea;
+	--color-gray-300: #c8c0be;
+	--color-gray-400: #978784;
+	--color-gray-500: #635451;
+	--color-gray-700: #423432;
+	--color-gray-800: #302321;
+	--color-gray-900: #1d1715;
+}
+
+:root {
+	--sl-font: var(--font-sans);
+	--sl-font-mono: var(--font-mono);
+	--sl-color-accent: #f97316;
+	--sl-color-accent-high: #fb923c;
+	--sl-color-accent-low: #ea580c;
+}
+
+:root[data-theme="dark"] {
+	--sl-color-accent: #fb923c;
+	--sl-color-accent-high: #fdba74;
+	--sl-color-accent-low: #f97316;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-heading);
+}
