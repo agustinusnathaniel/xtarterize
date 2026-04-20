@@ -7,5 +7,6 @@ export const renovateTask = createSimpleFileTask({
 	group: 'Dependencies',
 	applicable: (profile) => profile.hasGitHub,
 	filepath: 'renovate.json',
+	extensions: ['.json', '.json5'],
 	render: (profile) => renderRenovateJson(profile),
 })

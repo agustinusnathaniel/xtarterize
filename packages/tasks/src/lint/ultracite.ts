@@ -1,6 +1,7 @@
 import type { FileDiff, Task, TaskStatus } from '@xtarterize/core'
 import {
 	fileExists,
+	findConfigFile,
 	readFile,
 	readPackageJson,
 	resolvePath,
@@ -9,18 +10,42 @@ import {
 import { mergeJson, parseJsonc } from '@xtarterize/patchers'
 import { addDependency } from 'nypm'
 
-function findBiomeConfigPath(
-	cwd: string,
-): Promise<{ path: string | null; isJsonc: boolean }> {
-	return Promise.all([
-		fileExists(resolvePath(cwd, 'biome.json')),
-		fileExists(resolvePath(cwd, 'biome.jsonc')),
-	]).then(([hasJson, hasJsonc]) => {
-		if (hasJson) return { path: resolvePath(cwd, 'biome.json'), isJsonc: false }
-		if (hasJsonc)
-			return { path: resolvePath(cwd, 'biome.jsonc'), isJsonc: true }
-		return { path: null, isJsonc: false }
-	})
+const BIOME_EXTENSIONS = ['.json', '.jsonc']
+
+async function findBiomeConfigPath(cwd: string): Promise<{ path: string | null; isJsonc: boolean }> {
+	const found = await findConfigFile(cwd, 'biome', BIOME_EXTENSIONS)
+	if (!found) return { path: null, isJsonc: false }
+	return { path: found, isJsonc: found.endsWith('.jsonc') }
+}
+
+function injectExtendsIntoJsonc(content: string): string {
+	const parsed = parseJsonc(content) as Record<string, unknown>
+	const extendsList = parsed.extends as string[] | undefined
+
+	if (extendsList?.includes('ultracite') || extendsList?.some((e) => e.startsWith('ultracite/'))) {
+		return content
+	}
+
+	if (content.includes('"extends"') || content.includes("'extends'")) {
+		const extendsRegex = /("extends"\s*:\s*\[)([^\]]*)(\])/
+		const match = content.match(extendsRegex)
+		if (match) {
+			const existingItems = match[2].trim()
+			const newItems = existingItems
+				? `${existingItems}, "ultracite"`
+				: '"ultracite"'
+			return content.replace(extendsRegex, `$1${newItems}$3`)
+		}
+	}
+
+	const insertPoint = content.lastIndexOf('}')
+	if (insertPoint === -1) return content
+
+	const prefix = content.slice(0, insertPoint).trimEnd()
+	const suffix = content.slice(insertPoint)
+	const needsComma = prefix.endsWith(']') || prefix.endsWith('"') || prefix.endsWith('}') || prefix.endsWith('true') || prefix.endsWith('false') || /\d$/.test(prefix)
+	const separator = needsComma ? ',\n  ' : '  '
+	return `${prefix}${separator}"extends": ["ultracite"]\n${suffix}`
 }
 
 export const ultraciteTask: Task = {
@@ -50,12 +75,18 @@ export const ultraciteTask: Task = {
 	async dryRun(cwd, _profile): Promise<FileDiff[]> {
 		const { path: biomePath, isJsonc } = await findBiomeConfigPath(cwd)
 		const before = biomePath ? await readFile(biomePath) : null
-		const existing = before
-			? (parseJsonc(before) as Record<string, unknown>)
-			: {}
-		const incoming = { extends: ['ultracite'] }
-		const merged = mergeJson(existing, incoming)
-		const after = JSON.stringify(merged, null, 2)
+
+		let after: string
+		if (isJsonc && before) {
+			after = injectExtendsIntoJsonc(before)
+		} else {
+			const existing = before
+				? (parseJsonc(before) as Record<string, unknown>)
+				: {}
+			const incoming = { extends: ['ultracite'] }
+			const merged = mergeJson(existing, incoming)
+			after = JSON.stringify(merged, null, 2)
+		}
 
 		const filepath = isJsonc ? 'biome.jsonc' : 'biome.json'
 		return [{ filepath, before, after }]

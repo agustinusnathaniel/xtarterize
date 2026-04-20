@@ -6,6 +6,9 @@ export const plopTask = createSimpleFileTask({
 	label: 'Plop (code generator)',
 	group: 'Codegen',
 	applicable: () => true,
-	filepath: 'plopfile.ts',
+	filepath: 'plopfile',
+	extensions: ['.ts', '.js', '.mjs', '.mts', '.cts'],
 	render: (profile) => renderPlopfile(profile),
+	depName: 'plop',
+	installDev: true,
 })

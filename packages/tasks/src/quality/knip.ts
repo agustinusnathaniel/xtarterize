@@ -6,6 +6,7 @@ export const knipTask = createSimpleFileTask({
 	label: 'Knip (unused code detection)',
 	group: 'Quality',
 	applicable: (profile) => profile.typescript,
-	filepath: 'knip.json',
-	render: (profile) => renderKnipConfig(profile),
+	filepath: 'knip.config',
+	extensions: ['.ts', '.mts'],
+	render: (profile) => renderKnipConfig(profile, 'ts'),
 })

@@ -6,6 +6,7 @@ export const commitlintTask = createSimpleFileTask({
 	label: 'Commitlint config',
 	group: 'Release',
 	applicable: () => true,
-	filepath: 'commitlint.config.ts',
+	filepath: 'commitlint.config',
+	extensions: ['.ts', '.js', '.mjs', '.mts', '.cts'],
 	render: (profile) => renderCommitlintConfig(profile),
 })
