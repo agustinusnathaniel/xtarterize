@@ -25,7 +25,7 @@ export async function runPreflight(cwd: string): Promise<PreflightResult> {
     return { valid: false, errors }
   }
 
-  const pkg = await readPackageJson(resolvePath(cwd, 'package.json'))
+  const pkg = await readPackageJson(cwd)
   if (!pkg?.name) {
     errors.push({
       code: 'INVALID_PACKAGE_JSON',

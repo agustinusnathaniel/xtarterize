@@ -1,6 +1,6 @@
 import { defineCommand } from 'citty'
 import { spinner } from '@clack/prompts'
-import { detectProject, runPreflight } from '@xtarterize/core'
+import { detectProject, runPreflight, type FileDiff } from '@xtarterize/core'
 import { resolveTasks, resolveTaskStatuses } from '@xtarterize/core'
 import { displayDiffs } from '../ui/diff-display.js'
 import { logger } from '@xtarterize/core'
@@ -47,7 +47,7 @@ export const diffCommand = defineCommand({
     const tasks = resolveTasks(profile, allTasks)
     const statuses = await resolveTaskStatuses(tasks, cwd, profile)
 
-    const diffs: any[] = []
+    const diffs: FileDiff[] = []
     for (const task of tasks) {
       const status = statuses.get(task.id)
       if (status === 'new' || status === 'patch') {
