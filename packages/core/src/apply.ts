@@ -1,7 +1,7 @@
 import type { Task } from './_base.js'
 import { backupFile } from './backup.js'
 import type { ProjectProfile } from './detect.js'
-import * as logger from './utils/logger.js'
+import { logInfo, logSuccess, logError } from './utils/logger.js'
 
 export async function applyTasks(
 	tasks: Task[],
@@ -25,9 +25,8 @@ export async function applyTasks(
 				continue
 			}
 
-			logger.logInfo(`Applying: ${task.label} (${task.id})`)
+			logInfo(`Applying: ${task.label} (${task.id})`)
 
-			// Backup all files this task will modify before applying
 			const diffs = await task.dryRun(cwd, profile)
 			for (const diff of diffs) {
 				await backupFile(cwd, diff.filepath)
@@ -35,11 +34,11 @@ export async function applyTasks(
 
 			await task.apply(cwd, profile)
 			applied++
-			logger.logSuccess(`${task.label} applied successfully`)
+			logSuccess(`${task.label} applied successfully`)
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error)
 			errors.push(`${task.id}: ${message}`)
-			logger.logError(`Failed to apply ${task.id}: ${message}`)
+			logError(`Failed to apply ${task.id}: ${message}`)
 		}
 	}
 
