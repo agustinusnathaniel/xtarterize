@@ -1,39 +1,11 @@
-import type { FileDiff, Task, TaskStatus } from '@xtarterize/core'
-import { fileExists, readFile, resolvePath, writeFile } from '@xtarterize/core'
+import { createSimpleFileTask } from '../factory.js'
 import { renderCiWorkflow } from '../templates/workflows/ci-yml.js'
 
-export const ciWorkflowTask: Task = {
+export const ciWorkflowTask = createSimpleFileTask({
 	id: 'ci/ci',
 	label: 'GitHub CI workflow',
 	group: 'CI/CD',
 	applicable: (profile) => profile.hasGitHub,
-
-	async check(cwd, profile): Promise<TaskStatus> {
-		const workflowPath = resolvePath(cwd, '.github', 'workflows', 'ci.yml')
-		const exists = await fileExists(workflowPath)
-		if (!exists) return 'new'
-
-		const expected = renderCiWorkflow(profile)
-		const actual = await readFile(workflowPath)
-		if (actual.trim() === expected.trim()) return 'skip'
-
-		return 'conflict'
-	},
-
-	async dryRun(cwd, profile): Promise<FileDiff[]> {
-		const workflowPath = resolvePath(cwd, '.github', 'workflows', 'ci.yml')
-		const exists = await fileExists(workflowPath)
-		const before = exists ? await readFile(workflowPath) : null
-		const after = renderCiWorkflow(profile)
-
-		return [{ filepath: '.github/workflows/ci.yml', before, after }]
-	},
-
-	async apply(cwd, profile): Promise<void> {
-		const diffs = await this.dryRun(cwd, profile)
-		for (const diff of diffs) {
-			const fullPath = resolvePath(cwd, diff.filepath)
-			await writeFile(fullPath, diff.after)
-		}
-	},
-}
+	filepath: '.github/workflows/ci.yml',
+	render: (profile) => renderCiWorkflow(profile),
+})
