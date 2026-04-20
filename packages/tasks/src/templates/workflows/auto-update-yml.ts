@@ -8,6 +8,7 @@ export function renderAutoUpdateWorkflow(profile: ProjectProfile): string {
 			: pm === 'yarn'
 				? 'yarn install --frozen-lockfile'
 				: `${pm} install --frozen-lockfile`
+	const dlx = pm === 'pnpm' ? 'pnpm dlx' : pm === 'yarn' ? 'yarn dlx' : pm === 'bun' ? 'bunx' : 'npx'
 	const nodeVersion = profile.framework === 'react-native' ? '20' : '20'
 
 	return `name: Auto Update Dependencies
@@ -30,7 +31,7 @@ jobs:
         with:
           node-version: ${nodeVersion}
       - run: ${installCmd}
-      - run: npx npm-check-updates -u
+      - run: ${dlx} npm-check-updates -u
       - run: ${installCmd}
       - uses: peter-evans/create-pull-request@v6
         with:
