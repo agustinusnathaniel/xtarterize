@@ -1,14 +1,10 @@
 import type { ProjectProfile } from '@xtarterize/core'
+import { installDependenciesCommand, runScriptCommand } from 'nypm'
 
 export function renderReleaseWorkflow(profile: ProjectProfile): string {
 	const pm = profile.packageManager
-	const installCmd =
-		pm === 'npm'
-			? 'npm ci'
-			: pm === 'yarn'
-				? 'yarn install --frozen-lockfile'
-				: `${pm} install --frozen-lockfile`
-	const runCmd = pm === 'npm' ? 'npm run' : `${pm}`
+	const installCmd = installDependenciesCommand(pm, { silent: true, ignoreWorkspace: true })
+	const runTypecheck = runScriptCommand(pm, 'typecheck')
 
 	const steps = [
 		'      - uses: actions/checkout@v4',
@@ -16,7 +12,7 @@ export function renderReleaseWorkflow(profile: ProjectProfile): string {
 		'        with:',
 		'          node-version: 20',
 		`      - run: ${installCmd}`,
-		`      - run: ${runCmd} typecheck`,
+		`      - run: ${runTypecheck}`,
 	]
 
 	return `name: Release

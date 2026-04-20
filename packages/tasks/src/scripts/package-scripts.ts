@@ -1,18 +1,10 @@
-import type { FileDiff, ProjectProfile, Task, TaskStatus } from '@xtarterize/core'
+import type { FileDiff, Task, TaskStatus } from '@xtarterize/core'
 import { fileExists, readPackageJson, resolvePath, writePackageJson } from '@xtarterize/core'
+import { dlxCommand } from 'nypm'
 
 async function hasUltracite(cwd: string): Promise<boolean> {
 	const pkg = await readPackageJson(cwd)
 	return !!(pkg?.devDependencies?.ultracite || pkg?.dependencies?.ultracite)
-}
-
-function dlxCommand(pm: ProjectProfile['packageManager']): string {
-	switch (pm) {
-		case 'pnpm': return 'pnpm dlx'
-		case 'yarn': return 'yarn dlx'
-		case 'bun': return 'bunx'
-		default: return 'npx'
-	}
 }
 
 export const packageScriptsTask: Task = {
@@ -40,18 +32,18 @@ export const packageScriptsTask: Task = {
 
 		const pm = profile.packageManager
 		const useUltracite = await hasUltracite(cwd)
-		const dlx = dlxCommand(pm)
+		const dlx = dlxCommand(pm, 'npm-check-updates')
 
 		const scriptsToAdd = useUltracite
 			? {
 					lint: 'ultracite',
 					typecheck: 'tsc --noEmit',
-					upgrade: `${dlx} npm-check-updates -u && ${pm} install`,
+					upgrade: `${dlx} -u && ${pm} install`,
 				}
 			: {
 					lint: 'biome check --write .',
 					typecheck: 'tsc --noEmit',
-					upgrade: `${dlx} npm-check-updates -u && ${pm} install`,
+					upgrade: `${dlx} -u && ${pm} install`,
 				}
 
 		const existing = pkg.scripts ?? {}
@@ -68,18 +60,18 @@ export const packageScriptsTask: Task = {
 
 		const pm = profile.packageManager
 		const useUltracite = await hasUltracite(cwd)
-		const dlx = dlxCommand(pm)
+		const dlx = dlxCommand(pm, 'npm-check-updates')
 
 		const scriptsToAdd = useUltracite
 			? {
 					lint: 'ultracite',
 					typecheck: 'tsc --noEmit',
-					upgrade: `${dlx} npm-check-updates -u && ${pm} install`,
+					upgrade: `${dlx} -u && ${pm} install`,
 				}
 			: {
 					lint: 'biome check --write .',
 					typecheck: 'tsc --noEmit',
-					upgrade: `${dlx} npm-check-updates -u && ${pm} install`,
+					upgrade: `${dlx} -u && ${pm} install`,
 				}
 
 		pkg.scripts = { ...pkg.scripts, ...scriptsToAdd }
