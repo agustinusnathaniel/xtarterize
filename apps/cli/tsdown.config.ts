@@ -8,6 +8,11 @@ export default defineConfig({
   minify: true,
   treeshake: true,
   deps: {
-    alwaysBundle: ['@xtarterize/core', '@xtarterize/tasks', 'nypm'],
+    alwaysBundle: [
+      '@xtarterize/core',
+      '@xtarterize/tasks',
+      '@xtarterize/patchers',
+      'nypm',
+    ],
   },
 })
