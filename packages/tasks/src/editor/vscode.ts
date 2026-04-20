@@ -1,4 +1,4 @@
-import type { FileDiff, Task, TaskStatus } from '@xtarterize/core'
+import type { FileDiff, ProjectProfile, Task, TaskStatus } from '@xtarterize/core'
 import {
 	fileExists,
 	readFile,
@@ -7,44 +7,74 @@ import {
 	writeFile,
 } from '@xtarterize/core'
 import { mergeJson } from '@xtarterize/patchers'
+import { renderVscodeExtensions } from '../templates/vscode/extensions.js'
 import { renderVscodeSettings } from '../templates/vscode/settings.js'
 
 export const vscodeTask: Task = {
 	id: 'editor/vscode',
-	label: 'VSCode settings',
+	label: 'VSCode settings + extensions',
 	group: 'Editor',
 	applicable: () => true,
 
 	async check(cwd, profile): Promise<TaskStatus> {
-		const settingsPath = resolvePath(cwd, '.vscode', 'settings.json')
-		const exists = await fileExists(settingsPath)
-		if (!exists) return 'new'
+		const [settingsPath, extensionsPath] = [
+			resolvePath(cwd, '.vscode', 'settings.json'),
+			resolvePath(cwd, '.vscode', 'extensions.json'),
+		]
+		const [settingsExists, extensionsExists] = await Promise.all([
+			fileExists(settingsPath),
+			fileExists(extensionsPath),
+		])
 
-		const existing = await readJsonIfExists(settingsPath)
-		const incoming = JSON.parse(renderVscodeSettings(profile))
-		const merged = mergeJson(existing ?? {}, incoming)
-		const mergedStr = JSON.stringify(merged, null, 2)
-		const actual = await readFile(settingsPath)
-		if (actual.trim() === mergedStr.trim()) return 'skip'
+		if (!settingsExists && !extensionsExists) return 'new'
 
-		return 'patch'
+		let anyPatch = false
+		if (settingsExists) {
+			const existing = await readJsonIfExists(settingsPath)
+			const incoming = JSON.parse(renderVscodeSettings(profile))
+			const merged = mergeJson(existing ?? {}, incoming)
+			if (JSON.stringify(existing) !== JSON.stringify(merged)) anyPatch = true
+		}
+		if (extensionsExists) {
+			const existing = await readJsonIfExists(extensionsPath)
+			const incoming = JSON.parse(renderVscodeExtensions(profile))
+			const merged = mergeJson(existing ?? {}, incoming)
+			if (JSON.stringify(existing) !== JSON.stringify(merged)) anyPatch = true
+		}
+
+		return anyPatch ? 'patch' : 'skip'
 	},
 
 	async dryRun(cwd, profile): Promise<FileDiff[]> {
+		const diffs: FileDiff[] = []
+
 		const settingsPath = resolvePath(cwd, '.vscode', 'settings.json')
-		const exists = await fileExists(settingsPath)
-		const before = exists ? await readFile(settingsPath) : null
-
-		let after: string
-		if (exists && before) {
-			const existing = JSON.parse(before)
+		const settingsExists = await fileExists(settingsPath)
+		const settingsBefore = settingsExists ? await readFile(settingsPath) : null
+		let settingsAfter: string
+		if (settingsExists && settingsBefore) {
+			const existing = JSON.parse(settingsBefore)
 			const incoming = JSON.parse(renderVscodeSettings(profile))
-			after = JSON.stringify(mergeJson(existing, incoming), null, 2)
+			settingsAfter = JSON.stringify(mergeJson(existing, incoming), null, 2)
 		} else {
-			after = renderVscodeSettings(profile)
+			settingsAfter = renderVscodeSettings(profile)
 		}
+		diffs.push({ filepath: '.vscode/settings.json', before: settingsBefore, after: settingsAfter })
 
-		return [{ filepath: '.vscode/settings.json', before, after }]
+		const extensionsPath = resolvePath(cwd, '.vscode', 'extensions.json')
+		const extensionsExists = await fileExists(extensionsPath)
+		const extensionsBefore = extensionsExists ? await readFile(extensionsPath) : null
+		let extensionsAfter: string
+		if (extensionsExists && extensionsBefore) {
+			const existing = JSON.parse(extensionsBefore)
+			const incoming = JSON.parse(renderVscodeExtensions(profile))
+			extensionsAfter = JSON.stringify(mergeJson(existing, incoming), null, 2)
+		} else {
+			extensionsAfter = renderVscodeExtensions(profile)
+		}
+		diffs.push({ filepath: '.vscode/extensions.json', before: extensionsBefore, after: extensionsAfter })
+
+		return diffs
 	},
 
 	async apply(cwd, profile): Promise<void> {
