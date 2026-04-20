@@ -5,22 +5,26 @@
   "bin": {
     "xtarterize": "./dist/index.js"
   },
-  "files": ["dist"],
-  "engines": { "node": ">=18" },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@clack/prompts": "^0.11.0",
     "@xtarterize/core": "workspace:*",
     "@xtarterize/tasks": "workspace:*",
-    "@clack/prompts": "^0.11.0",
     "citty": "^0.1.6"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
-    "tsup": "^8.5.0",
+    "tsdown": "^0.21.9",
     "typescript": "^5.9.0"
   }
 }
