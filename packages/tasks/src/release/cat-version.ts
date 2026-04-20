@@ -1,6 +1,12 @@
-import type { Task, TaskStatus, FileDiff } from '@xtarterize/core'
-import type { ProjectProfile } from '@xtarterize/core'
-import { fileExists, readFile, writeFile, resolvePath, readPackageJson, writePackageJson } from '@xtarterize/core'
+import type { FileDiff, Task, TaskStatus } from '@xtarterize/core'
+import {
+	fileExists,
+	readFile,
+	readPackageJson,
+	resolvePath,
+	writeFile,
+	writePackageJson,
+} from '@xtarterize/core'
 import { addDependency } from 'nypm'
 
 const VERSIONRC_TEMPLATE = `{
@@ -19,59 +25,70 @@ const VERSIONRC_TEMPLATE = `{
 }`
 
 export const catVersionTask: Task = {
-  id: 'release/cat-version',
-  label: 'commit-and-tag-version',
-  group: 'Release',
-  applicable: () => true,
+	id: 'release/cat-version',
+	label: 'commit-and-tag-version',
+	group: 'Release',
+	applicable: () => true,
 
-  async check(cwd, profile): Promise<TaskStatus> {
-    const versionrcPath = resolvePath(cwd, '.versionrc')
-    const exists = await fileExists(versionrcPath)
+	async check(cwd, _profile): Promise<TaskStatus> {
+		const versionrcPath = resolvePath(cwd, '.versionrc')
+		const exists = await fileExists(versionrcPath)
 
-    const pkg = await readPackageJson(cwd)
-    const hasCatVersion = pkg?.devDependencies?.['commit-and-tag-version']
-    const hasReleaseScript = pkg?.scripts?.['release']?.includes('commit-and-tag-version')
+		const pkg = await readPackageJson(cwd)
+		const hasCatVersion = pkg?.devDependencies?.['commit-and-tag-version']
+		const hasReleaseScript = pkg?.scripts?.release?.includes(
+			'commit-and-tag-version',
+		)
 
-    if (exists && hasCatVersion && hasReleaseScript) return 'skip'
-    if (!exists && !hasCatVersion) return 'new'
-    return 'patch'
-  },
+		if (exists && hasCatVersion && hasReleaseScript) return 'skip'
+		if (!exists && !hasCatVersion) return 'new'
+		return 'patch'
+	},
 
-  async dryRun(cwd, profile): Promise<FileDiff[]> {
-    const diffs: FileDiff[] = []
+	async dryRun(cwd, _profile): Promise<FileDiff[]> {
+		const diffs: FileDiff[] = []
 
-    const versionrcPath = resolvePath(cwd, '.versionrc')
-    const versionrcExists = await fileExists(versionrcPath)
-    const versionrcBefore = versionrcExists ? await readFile(versionrcPath) : null
-    diffs.push({ filepath: '.versionrc', before: versionrcBefore, after: VERSIONRC_TEMPLATE })
+		const versionrcPath = resolvePath(cwd, '.versionrc')
+		const versionrcExists = await fileExists(versionrcPath)
+		const versionrcBefore = versionrcExists
+			? await readFile(versionrcPath)
+			: null
+		diffs.push({
+			filepath: '.versionrc',
+			before: versionrcBefore,
+			after: VERSIONRC_TEMPLATE,
+		})
 
-    const pkg = await readPackageJson(cwd)
-    if (pkg) {
-      const before = JSON.stringify(pkg, null, 2)
-      const updated = { ...pkg }
-      updated.scripts = { ...updated.scripts, release: 'commit-and-tag-version' }
-      const after = JSON.stringify(updated, null, 2)
-      diffs.push({ filepath: 'package.json', before, after })
-    }
+		const pkg = await readPackageJson(cwd)
+		if (pkg) {
+			const before = JSON.stringify(pkg, null, 2)
+			const updated = { ...pkg }
+			updated.scripts = {
+				...updated.scripts,
+				release: 'commit-and-tag-version',
+			}
+			const after = JSON.stringify(updated, null, 2)
+			diffs.push({ filepath: 'package.json', before, after })
+		}
 
-    return diffs
-  },
+		return diffs
+	},
 
-  async apply(cwd, profile): Promise<void> {
-    const pkg = await readPackageJson(cwd)
-    if (!pkg) return
+	async apply(cwd, _profile): Promise<void> {
+		const pkg = await readPackageJson(cwd)
+		if (!pkg) return
 
-    const versionrcPath = resolvePath(cwd, '.versionrc')
-    const versionrcExists = await fileExists(versionrcPath)
-    if (!versionrcExists) {
-      await writeFile(versionrcPath, VERSIONRC_TEMPLATE)
-    }
+		const versionrcPath = resolvePath(cwd, '.versionrc')
+		const versionrcExists = await fileExists(versionrcPath)
+		if (!versionrcExists) {
+			await writeFile(versionrcPath, VERSIONRC_TEMPLATE)
+		}
 
-    if (!pkg.devDependencies?.['commit-and-tag-version']) {
-      await addDependency(['commit-and-tag-version'], { cwd, dev: true })
-    }
+		if (!pkg.devDependencies?.['commit-and-tag-version']) {
+			await addDependency(['commit-and-tag-version'], { cwd, dev: true })
+		}
 
-    pkg.scripts = { ...pkg.scripts, release: 'commit-and-tag-version' }
-    await writePackageJson(cwd, pkg)
-  }
+		pkg.scripts = { ...pkg.scripts, release: 'commit-and-tag-version' }
+		await writePackageJson(cwd, pkg)
+	},
 }

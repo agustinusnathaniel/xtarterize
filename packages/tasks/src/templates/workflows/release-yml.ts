@@ -1,11 +1,16 @@
 import type { ProjectProfile } from '@xtarterize/core'
 
 export function renderReleaseWorkflow(profile: ProjectProfile): string {
-  const pm = profile.packageManager
-  const installCmd = pm === 'npm' ? 'npm ci' : pm === 'yarn' ? 'yarn install --frozen-lockfile' : `${pm} install --frozen-lockfile`
-  const runCmd = pm === 'npm' ? 'npm run' : `${pm}`
+	const pm = profile.packageManager
+	const installCmd =
+		pm === 'npm'
+			? 'npm ci'
+			: pm === 'yarn'
+				? 'yarn install --frozen-lockfile'
+				: `${pm} install --frozen-lockfile`
+	const runCmd = pm === 'npm' ? 'npm run' : `${pm}`
 
-  return `name: Release
+	return `name: Release
 
 on:
   push:

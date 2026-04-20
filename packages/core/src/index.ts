@@ -1,16 +1,55 @@
-export { backupFile, listBackups, restoreBackup, createFileBackup, restoreFileBackup, deleteFileBackup, withFileBackup } from './backup.js'
-export type { Backup } from './backup.js'
-export { detectProject, detectFramework, detectPackageManager } from './detect.js'
-export { resolveTasks, resolveTaskStatuses } from './resolve.js'
+export type { FileDiff, Task, TaskStatus } from './_base.js'
 export { applyTasks } from './apply.js'
-export { runPreflight } from './preflight.js'
-export type { PreflightResult, PreflightError } from './preflight.js'
-export { runConflictChecks, runToolInstallationChecks, checkToolInstalled } from './diagnostics.js'
+export type { Backup } from './backup.js'
+export {
+	backupFile,
+	createFileBackup,
+	deleteFileBackup,
+	listBackups,
+	restoreBackup,
+	restoreFileBackup,
+	withFileBackup,
+} from './backup.js'
+export type {
+	Bundler,
+	Framework,
+	PackageManager,
+	ProjectProfile,
+	Router,
+	Styling,
+} from './detect.js'
+export {
+	detectFramework,
+	detectPackageManager,
+	detectProject,
+} from './detect.js'
 export type { DiagnosticCheck } from './diagnostics.js'
-export { fileExists, readFile, writeFile, resolvePath, readJson, readJsonIfExists, writeJson, copyFile, ensureDir } from './utils/fs.js'
-export { readPackageJson, writePackageJson, hasDependency, getDependencyVersion, getNodeVersion } from './utils/pkg.js'
-export { generateDiff, formatDiffHeader } from './utils/diff.js'
+export {
+	checkToolInstalled,
+	runConflictChecks,
+	runToolInstallationChecks,
+} from './diagnostics.js'
+export type { PreflightError, PreflightResult } from './preflight.js'
+export { runPreflight } from './preflight.js'
+export { resolveTaskStatuses, resolveTasks } from './resolve.js'
 export type { FileDiff as CoreFileDiff } from './utils/diff.js'
+export { formatDiffHeader, generateDiff } from './utils/diff.js'
+export {
+	copyFile,
+	ensureDir,
+	fileExists,
+	readFile,
+	readJson,
+	readJsonIfExists,
+	resolvePath,
+	writeFile,
+	writeJson,
+} from './utils/fs.js'
 export * as logger from './utils/logger.js'
-export type { Task, TaskStatus, FileDiff } from './_base.js'
-export type { ProjectProfile, Framework, Bundler, Router, Styling, PackageManager } from './detect.js'
+export {
+	getDependencyVersion,
+	getNodeVersion,
+	hasDependency,
+	readPackageJson,
+	writePackageJson,
+} from './utils/pkg.js'
