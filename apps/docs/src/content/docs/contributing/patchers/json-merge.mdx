@@ -3,6 +3,8 @@ title: JSON Merge
 description: How the JSON merge patcher safely combines configuration objects.
 ---
 
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components'
+
 # JSON Merge
 
 The `mergeJson` function performs a deep merge of two JavaScript objects using the `defu` library. It's used whenever Xtarterize needs to modify JSON configuration files like `tsconfig.json`, `biome.json`, or `.vscode/settings.json`.
@@ -60,9 +62,30 @@ const merged = mergeJson(existing, incoming)
 // }
 ```
 
+## Merge Flow
+
+```mermaid
+flowchart TD
+    E[Existing config] --> M{mergeJson}
+    I[Incoming config] --> M
+    M --> P{Key exists?}
+    P -->|Yes| K[Keep existing value]
+    P -->|No| A[Add incoming value]
+    P -->|Nested object| R[Recurse merge]
+    K --> O[Merged result]
+    A --> O
+    R --> O
+    
+    style E fill:#6366f1,color:#fff
+    style I fill:#f59e0b,color:#fff
+    style O fill:#22c55e,color:#fff
+```
+
 ## Array Handling
 
-Arrays are replaced, not merged. This is `defu`'s default behavior:
+<Aside type="caution">
+  Arrays are replaced, not merged. This is `defu`'s default behavior. For cases where arrays need to be combined (like Vite plugins), use the AST patcher instead.
+</Aside>
 
 ```typescript
 const existing = { plugins: ['pluginA'] }
@@ -72,4 +95,34 @@ const merged = mergeJson(existing, incoming)
 // { plugins: ['pluginA'] } — existing wins
 ```
 
-For cases where arrays need to be combined (like Vite plugins), use the AST patcher instead.
+## Real-World Examples
+
+<Tabs>
+  <TabItem label="tsconfig.json">
+    ```typescript
+    // Existing
+    const existing = { compilerOptions: { strict: true, target: "ES2022" } }
+    // Incoming: add incremental builds
+    const incoming = { compilerOptions: { incremental: true } }
+    // Result: both preserved
+    ```
+  </TabItem>
+  <TabItem label="biome.json">
+    ```typescript
+    // Existing
+    const existing = { linter: { enabled: true } }
+    // Incoming: add formatter
+    const incoming = { formatter: { enabled: true } }
+    // Result: both sections present
+    ```
+  </TabItem>
+  <TabItem label=".vscode/settings.json">
+    ```typescript
+    // Existing
+    const existing = { "editor.formatOnSave": true }
+    // Incoming: add Biome formatter
+    const incoming = { "[typescript]": { "editor.defaultFormatter": "biomejs.biome" } }
+    // Result: both settings preserved
+    ```
+  </TabItem>
+</Tabs>

@@ -1,11 +1,12 @@
 ---
 title: Welcome to Xtarterize
-description: Get started with Xtarterize, an adaptive CLI tool that automates conformance configuration for JavaScript/TypeScript projects.
+description: An adaptive CLI tool that automates conformance configuration for JavaScript/TypeScript projects.
+template: splash
 ---
 
-# Welcome to Xtarterize
+import { LinkCard, CardGrid, LinkButton } from '@astrojs/starlight/components'
 
-Xtarterize is an intelligent CLI tool that automates the setup, enforcement, and ongoing synchronization of developer conformance configurations across JavaScript/TypeScript projects.
+**Xtarterize** is an intelligent CLI tool that automates the setup, enforcement, and ongoing synchronization of developer conformance configurations across JavaScript/TypeScript projects.
 
 ## What is Xtarterize?
 
@@ -16,6 +17,22 @@ Xtarterize helps you maintain consistent, high-quality project configurations by
 - **Non-destructive** — Never overwrites without confirmation; always previews diffs
 - **Idempotent** — Safe to run multiple times; no corruption, no duplicate entries
 - **Evolvable** — `sync` and `diff` commands keep existing projects up to date over time
+
+## How It Works
+
+```mermaid
+flowchart LR
+    A[Detect<br/>Project Stack] --> B[Resolve<br/>Applicable Tasks]
+    B --> C[Check<br/>Task Statuses]
+    C --> D[Plan<br/>Show Diffs]
+    D --> E[Apply<br/>With Backups]
+
+    style A fill:#6366f1,color:#fff
+    style B fill:#8b5cf6,color:#fff
+    style C fill:#a855f7,color:#fff
+    style D fill:#d946ef,color:#fff
+    style E fill:#22c55e,color:#fff
+```
 
 ## Quick Start
 
@@ -30,12 +47,13 @@ npx xtarterize check
 npx xtarterize diff
 ```
 
-## Next Steps
+<CardGrid>
+  <LinkCard title="Getting Started" href="/getting-started/introduction/" description="Learn the basics of Xtarterize and set up your first project." />
+  <LinkCard title="CLI Reference" href="/guide/cli/overview/" description="Complete reference for all available commands and flags." />
+  <LinkCard title="Conformance Tasks" href="/guide/tasks/overview/" description="See what conformance tasks are available and how they work." />
+  <LinkCard title="Configuration" href="/guide/config/overview/" description="Understand how Xtarterize detects and adapts to your project." />
+  <LinkCard title="Architecture" href="/contributing/architecture/overview/" description="Learn about the project structure and how packages work together." />
+  <LinkCard title="Contributing" href="/contributing/architecture/overview/" description="Get involved and help build Xtarterize." />
+</CardGrid>
 
-- Read the [Getting Started](/getting-started/introduction/) guide to learn the basics
-- Explore the [CLI Reference](/guide/cli/overview/) for all available commands and flags
-- Check out the [Tasks](/guide/tasks/overview/) guide to see what conformance tasks are available
-
-## For Contributors
-
-Want to contribute to Xtarterize? Check out the [Contributing](/contributing/architecture/overview/) section to learn about the project architecture and how to get involved.
+<LinkButton href="/getting-started/installation/">Install Xtarterize →</LinkButton>

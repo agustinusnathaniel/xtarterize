@@ -3,9 +3,87 @@ title: Conformance Tasks
 description: All available conformance tasks and what they do.
 ---
 
+import { Aside, FileTree, LinkButton } from '@astrojs/starlight/components'
+
 # Conformance Tasks
 
 Xtarterize applies conformance configuration through discrete, independently applicable tasks. Each task detects whether it's needed and only applies changes if necessary.
+
+## Task Architecture
+
+```mermaid
+classDiagram
+    class Task {
+        +string id
+        +string label
+        +string group
+        +applicable(profile) boolean
+        +check(cwd, profile) TaskStatus
+        +dryRun(cwd, profile) FileDiff[]
+        +apply(cwd, profile) void
+    }
+    class TaskStatus {
+        <<enumeration>>
+        new
+        patch
+        skip
+        conflict
+    }
+    class FileDiff {
+        +string filepath
+        +string before
+        +string after
+    }
+    class ProjectProfile {
+        +Framework framework
+        +Bundler bundler
+        +PackageManager packageManager
+        +boolean typescript
+        +boolean monorepo
+        +boolean hasGitHub
+    }
+    Task --> TaskStatus
+    Task --> FileDiff
+    Task --> ProjectProfile
+```
+
+## Task Directory Structure
+
+<FileTree>
+- packages/tasks/src/
+  - agent/
+    - agents-md.ts
+    - skills.ts
+  - ci/
+    - auto-update.ts
+    - ci.ts
+    - release.ts
+  - codegen/
+    - plop.ts
+  - deps/
+    - renovate.ts
+  - editor/
+    - vscode.ts
+    - vscode-extensions.ts
+  - lint/
+    - biome.ts
+    - ultracite.ts
+  - monorepo/
+    - turbo.ts
+  - quality/
+    - knip.ts
+  - release/
+    - cat-version.ts
+    - commitlint.ts
+    - czg.ts
+  - scripts/
+    - package-scripts.ts
+  - ts/
+    - incremental.ts
+  - vite/
+    - checker.ts
+    - visualizer.ts
+</FileTree>
 
 ## Linting & Formatting
 
@@ -89,7 +167,11 @@ Xtarterize applies conformance configuration through discrete, independently app
 
 ## Idempotency
 
-Every task is idempotent. Running `init` twice produces no changes on the second run. Each task implements:
+<Aside type="tip">
+  Every task is idempotent. Running `init` twice produces no changes on the second run.
+</Aside>
+
+Each task implements:
 
 - **`check()`** — Returns `new`, `patch`, `skip`, or `conflict` based on current state
 - **`dryRun()`** — Returns exact diffs without writing anything
@@ -112,3 +194,5 @@ interface Task {
 ```
 
 To add a new task, create a file in `packages/tasks/src/` and register it in `packages/tasks/src/index.ts`.
+
+<LinkButton href="/contributing/architecture/overview/">Learn about the architecture →</LinkButton>

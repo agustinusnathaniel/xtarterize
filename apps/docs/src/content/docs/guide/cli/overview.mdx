@@ -3,6 +3,8 @@ title: CLI Overview
 description: Complete reference for the Xtarterize command-line interface.
 ---
 
+import { Aside, Tabs, TabItem, LinkButton } from '@astrojs/starlight/components'
+
 # CLI Overview
 
 The Xtarterize CLI provides commands to detect, apply, and maintain conformance configuration for JavaScript/TypeScript projects.
@@ -23,13 +25,33 @@ The Xtarterize CLI provides commands to detect, apply, and maintain conformance 
 
 Full conformance setup. Detects your project stack, shows a plan, and applies changes.
 
-```bash
-npx xtarterize init
-npx xtarterize init --dry-run
-npx xtarterize init --yes
-npx xtarterize init --skip lint/oxlint
-npx xtarterize init --only lint/biome,ts/incremental
-```
+<Tabs>
+  <TabItem label="Basic">
+    ```bash
+    npx xtarterize init
+    ```
+  </TabItem>
+  <TabItem label="Dry run">
+    ```bash
+    npx xtarterize init --dry-run
+    ```
+  </TabItem>
+  <TabItem label="Auto-apply">
+    ```bash
+    npx xtarterize init --yes
+    ```
+  </TabItem>
+  <TabItem label="Skip tasks">
+    ```bash
+    npx xtarterize init --skip lint/oxlint
+    ```
+  </TabItem>
+  <TabItem label="Only specific">
+    ```bash
+    npx xtarterize init --only lint/biome,ts/incremental
+    ```
+  </TabItem>
+</Tabs>
 
 ## `sync`
 
@@ -40,6 +62,10 @@ npx xtarterize sync
 npx xtarterize sync --dry-run
 npx xtarterize sync --yes
 ```
+
+<Aside type="note">
+  Unlike `init`, `sync` only targets tasks with `patch` or `conflict` status. It won't re-apply already conformant configs.
+</Aside>
 
 ## `diff`
 
@@ -58,10 +84,13 @@ npx xtarterize check
 ```
 
 Output shows:
-- ✔ green = conformant (`skip`)
-- ~ yellow = needs update (`patch`)
-- ✗ red = missing entirely (`new`)
-- ⚠ orange = incompatible config (`conflict`)
+
+| Icon | Status | Meaning |
+|------|--------|---------|
+| ✔ | `skip` | Conformant — no action needed |
+| ~ | `patch` | Needs update — will be patched |
+| ✗ | `new` | Missing entirely — will be created |
+| ⚠ | `conflict` | Incompatible config — needs manual resolution |
 
 ## `add`
 
@@ -104,3 +133,26 @@ Each task reports one of four statuses:
 ## Backup System
 
 Before any file is modified, Xtarterize creates a backup in `.xtarterize/backups/`. You can restore any file using the `restore` command.
+
+<Aside type="tip">
+  Backups are stored with timestamps in `.xtarterize/backups/` and indexed in `.xtarterize/backups/.index.json`. Use `xtarterize restore <file>` to revert any change.
+</Aside>
+
+## Command Relationships
+
+```mermaid
+flowchart TD
+    A[init] -->|first run| B[check]
+    A -->|preview| C[diff]
+    B -->|find patches| D[sync]
+    D -->|preview| C
+    A -->|add one| E[add]
+    A -->|undo| F[restore]
+    B -->|view all| G[list]
+    
+    style A fill:#6366f1,color:#fff
+    style D fill:#f59e0b,color:#fff
+    style E fill:#22c55e,color:#fff
+```
+
+<LinkButton href="/guide/tasks/overview/">Explore conformance tasks →</LinkButton>

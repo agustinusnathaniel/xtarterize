@@ -3,6 +3,8 @@ title: Introduction
 description: Learn what Xtarterize is and how it automates conformance configuration for JS/TS projects.
 ---
 
+import { Steps, LinkButton } from '@astrojs/starlight/components'
+
 # Introduction
 
 Xtarterize is an adaptive CLI tool that automates the setup, enforcement, and ongoing synchronization of developer conformance configurations across JavaScript/TypeScript projects.
@@ -20,13 +22,35 @@ Xtarterize solves this by being detection-first, context-aware, non-destructive,
 
 ## How It Works
 
-Xtarterize follows a simple workflow:
+<Steps>
 
 1. **Detect** — Scans your project to build a full `ProjectProfile` (framework, bundler, styling, package manager, monorepo status, existing configs)
 2. **Resolve** — Maps the profile to applicable conformance tasks (e.g., vite tasks only for Vite projects)
 3. **Check** — Determines each task's status: `new` (file doesn't exist), `patch` (needs merging), `skip` (already conformant), or `conflict` (incompatible)
 4. **Plan** — Displays a conformance plan table for review
 5. **Apply** — Backs up files, then applies changes using deep merge or AST manipulation
+
+</Steps>
+
+```mermaid
+flowchart TD
+    A[Run xtarterize init] --> B[Preflight checks]
+    B --> C{Valid?}
+    C -->|No| D[Show errors & exit]
+    C -->|Yes| E[detectProject → ProjectProfile]
+    E --> F[resolveTasks → Applicable tasks]
+    F --> G[resolveTaskStatuses → Status map]
+    G --> H[Display plan]
+    H --> I{User confirms?}
+    I -->|No| J[Exit]
+    I -->|Yes| K[Backup files]
+    K --> L[applyTasks]
+    L --> M[Summary]
+    
+    style A fill:#6366f1,color:#fff
+    style L fill:#22c55e,color:#fff
+    style M fill:#22c55e,color:#fff
+```
 
 ## Getting Help
 
@@ -35,3 +59,5 @@ If you have questions or need help:
 - Check the [CLI Reference](/guide/cli/overview/) for all commands and flags
 - Review the [Tasks Guide](/guide/tasks/overview/) to see what conformance tasks are available
 - Look at the [Contributing](/contributing/architecture/overview/) section if you want to contribute to the project
+
+<LinkButton href="/getting-started/installation/">Install Xtarterize →</LinkButton>

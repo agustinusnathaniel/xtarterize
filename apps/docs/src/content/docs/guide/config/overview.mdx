@@ -3,6 +3,8 @@ title: Configuration
 description: How Xtarterize detects and adapts to your project.
 ---
 
+import { Aside, FileTree, Tabs, TabItem } from '@astrojs/starlight/components'
+
 # Configuration
 
 Xtarterize doesn't require a config file. It detects your project's stack automatically and applies only what's appropriate.
@@ -20,9 +22,57 @@ When you run `init`, Xtarterize scans your project to build a `ProjectProfile`:
 - **GitHub** — `.github/` directory presence
 - **Existing Configs** — Checks for `biome.json`, `tsconfig.json`, `renovate.json`, etc.
 
+## Detection Flow
+
+```mermaid
+flowchart TD
+    A[read package.json] --> B[detectFramework]
+    A --> C[detectBundler]
+    A --> D[detectStyling]
+    A --> E[detectVitePlus]
+    B --> F[detectRouter]
+    C --> F
+    
+    B --> G[detectRuntime]
+    C --> G
+    
+    A --> H[detectPackageManager]
+    A --> I[detectMonorepo]
+    A --> J[detectGitHubWorkflows]
+    A --> K[detectExistingConfigs]
+    
+    G --> L[ProjectProfile]
+    F --> L
+    D --> L
+    E --> L
+    H --> L
+    I --> L
+    J --> L
+    K --> L
+    
+    style A fill:#6366f1,color:#fff
+    style L fill:#22c55e,color:#fff
+```
+
+## Detection Sources
+
+<Tabs>
+  <TabItem label="package.json">
+    Framework, bundler, router, styling, and TypeScript are all detected from `dependencies` and `devDependencies`.
+  </TabItem>
+  <TabItem label="Lock files">
+    Package manager is detected from lock file presence: `pnpm-lock.yaml`, `yarn.lock`, `package-lock.json`, or `bun.lock`.
+  </TabItem>
+  <TabItem label="File system">
+    Monorepo status, GitHub, and existing configs are detected by checking for specific files and directories.
+  </TabItem>
+</Tabs>
+
 ## Ambiguity Resolution
 
-If both `react` and `react-native` are detected, Xtarterize prompts you to clarify which describes the project.
+<Aside type="note">
+  If both `react` and `react-native` are detected, Xtarterize prompts you to clarify which describes the project. In CI mode (`--quiet`), it defaults to `react`.
+</Aside>
 
 ## Task Gating
 
@@ -45,8 +95,35 @@ All templates adapt to the detected profile:
 
 ## Backup System
 
-Before any file is modified, Xtarterize creates a backup in `.xtarterize/backups/<filename>.<timestamp>`. An index file tracks all backups. Restore with:
+Before any file is modified, Xtarterize creates a backup in `.xtarterize/backups/`. An index file tracks all backups.
+
+<FileTree>
+- .xtarterize/
+  - backups/
+    - .index.json
+    - tsconfig.json.2024-01-15T10-30-00-000Z
+    - biome.json.2024-01-15T10-30-00-000Z
+</FileTree>
+
+Restore with:
 
 ```bash
 npx xtarterize restore tsconfig.json
+```
+
+## Backup Architecture
+
+```mermaid
+flowchart LR
+    A[File to modify] --> B[backupFile]
+    B --> C[.xtarterize/backups/]
+    C --> D[.index.json]
+    A --> E[apply changes]
+    E --> F{Need to undo?}
+    F -->|Yes| G[restoreBackup]
+    G --> C
+    F -->|No| H[Done]
+    
+    style B fill:#f59e0b,color:#fff
+    style E fill:#22c55e,color:#fff
 ```

@@ -3,51 +3,77 @@ title: Architecture Overview
 description: Understand how Xtarterize is structured and how the packages work together.
 ---
 
+import { Aside, FileTree, Tabs, TabItem, LinkButton } from '@astrojs/starlight/components'
+
 # Architecture Overview
 
 Xtarterize is organized as a monorepo using Turborepo for task orchestration and pnpm for package management.
 
 ## Package Structure
 
-```
-xtarterize/
-├── packages/
-│   ├── core/      # @xtarterize/core — Detection, task interface, utils, backup
-│   ├── patchers/  # @xtarterize/patchers — JSON/YAML merge, AST patching
-│   └── tasks/     # @xtarterize/tasks — All conformance task implementations
-├── apps/
-│   ├── cli/       # xtarterize — CLI binary (citty + @clack/prompts)
-│   └── docs/      # @xtarterize/docs — This documentation site (Astro/Starlight)
-└── test/
-    └── fixtures/  — Test fixtures for various project types
-```
+<FileTree>
+- packages/
+  - core/ — @xtarterize/core — Detection, task interface, utils, backup
+  - patchers/ — @xtarterize/patchers — JSON/YAML merge, AST patching
+  - tasks/ — @xtarterize/tasks — All conformance task implementations
+- apps/
+  - cli/ — **xtarterize** — CLI binary (citty + @clack/prompts)
+  - docs/ — @xtarterize/docs — This documentation site (Astro/Starlight)
+- test/
+  - fixtures/ — Test fixtures for various project types
+</FileTree>
 
 ## Package Dependencies
 
+```mermaid
+flowchart TD
+    CLI[xtarterize<br/>apps/cli] --> Core[@xtarterize/core]
+    CLI --> Tasks[@xtarterize/tasks]
+    Tasks --> Core
+    Tasks --> Patchers[@xtarterize/patchers]
+    
+    style CLI fill:#6366f1,color:#fff
+    style Core fill:#22c55e,color:#fff
+    style Tasks fill:#f59e0b,color:#fff
+    style Patchers fill:#a855f7,color:#fff
 ```
-xtarterize (apps/cli)
-├── @xtarterize/core
-└── @xtarterize/tasks
 
-@xtarterize/tasks
-├── @xtarterize/core
-└── @xtarterize/patchers
-
-@xtarterize/patchers
-└── (no internal workspace deps)
-
-@xtarterize/core
-└── (no internal workspace deps)
-```
+<Aside>
+  `@xtarterize/patchers` and `@xtarterize/core` have no internal workspace dependencies — they are leaf packages that can be used independently.
+</Aside>
 
 ## How It Works
 
-1. **CLI** (`apps/cli`) receives user input via citty commands
-2. **Core** (`packages/core`) detects the project stack via `detectProject()`, returning a `ProjectProfile`
-3. **Resolver** maps the profile to applicable tasks via `resolveTasks()`
-4. **Tasks** (`packages/tasks`) each implement `check()`, `dryRun()`, and `apply()`
-5. **Patchers** (`packages/patchers`) safely modify files via deep merge (`defu`) or AST manipulation (`magicast`)
-6. **Backup** system saves originals before any write
+```mermaid
+sequenceDiagram
+    participant User
+    participant CLI as CLI (citty)
+    participant Core as @xtarterize/core
+    participant Tasks as @xtarterize/tasks
+    participant Patchers as @xtarterize/patchers
+    
+    User->>CLI: xtarterize init
+    CLI->>Core: runPreflight(cwd)
+    Core-->>CLI: PreflightResult
+    CLI->>Core: detectProject(cwd)
+    Core-->>CLI: ProjectProfile
+    CLI->>Tasks: getAllTasks()
+    Tasks-->>CLI: Task[]
+    CLI->>Core: resolveTasks(profile, tasks)
+    Core-->>CLI: ApplicableTask[]
+    CLI->>Core: resolveTaskStatuses(tasks, cwd, profile)
+    Core-->>CLI: Map<taskId, TaskStatus>
+    CLI->>User: Display plan
+    User->>CLI: Confirm
+    CLI->>Core: applyTasks(tasks, cwd, profile)
+    Core->>Core: backupFile(cwd, filepath)
+    Core->>Tasks: task.apply(cwd, profile)
+    Tasks->>Patchers: mergeJson / mergeYaml / injectVitePlugin
+    Patchers-->>Tasks: Modified content
+    Tasks-->>Core: Applied
+    Core-->>CLI: { applied, skipped, errors }
+    CLI->>User: Summary
+```
 
 ## Key Design Decisions
 
@@ -57,18 +83,68 @@ xtarterize (apps/cli)
 - **Idempotency is non-negotiable** — Running twice produces no changes on second run
 - **Templates are parameterized** — All templates receive `ProjectProfile` and adapt accordingly
 
+## Core Modules
+
+```mermaid
+flowchart TD
+    Core[@xtarterize/core] --> Detect[detect.ts<br/>Project detection]
+    Core --> Resolve[resolve.ts<br/>Task resolution]
+    Core --> Apply[apply.ts<br/>Task application]
+    Core --> Backup[backup.ts<br/>File backup/restore]
+    Core --> Preflight[preflight.ts<br/>Pre-flight checks]
+    Core --> Diagnostics[diagnostics.ts<br/>Conflict detection]
+    Core --> Utils[utils/<br/>fs, diff, logger, pkg]
+    
+    style Core fill:#6366f1,color:#fff
+```
+
+## Task Categories
+
+```mermaid
+flowchart LR
+    Tasks[@xtarterize/tasks] --> Lint[lint/<br/>biome, ultracite]
+    Tasks --> TS[ts/<br/>incremental]
+    Tasks --> Vite[vite/<br/>checker, visualizer]
+    Tasks --> CI[ci/<br/>release, auto-update, ci]
+    Tasks --> Deps[deps/<br/>renovate]
+    Tasks --> Release[release/<br/>commitlint, czg, cat-version]
+    Tasks --> Quality[quality/<br/>knip]
+    Tasks --> Codegen[codegen/<br/>plop]
+    Tasks --> Monorepo[monorepo/<br/>turbo]
+    Tasks --> Editor[editor/<br/>vscode, vscode-extensions]
+    Tasks --> Agent[agent/<br/>agents-md, skills]
+    Tasks --> Scripts[scripts/<br/>package-scripts]
+    
+    style Tasks fill:#6366f1,color:#fff
+```
+
 ## Development Workflow
 
-```bash
-# Install dependencies
-pnpm install
+<Tabs>
+  <TabItem label="Setup">
+    ```bash
+    # Install dependencies
+    pnpm install
+    ```
+  </TabItem>
+  <TabItem label="Build">
+    ```bash
+    # Build all packages
+    pnpm build
+    ```
+  </TabItem>
+  <TabItem label="Test">
+    ```bash
+    # Run tests
+    pnpm test:run
+    ```
+  </TabItem>
+  <TabItem label="Develop">
+    ```bash
+    # Start development (watch mode)
+    pnpm dev
+    ```
+  </TabItem>
+</Tabs>
 
-# Build all packages
-pnpm build
-
-# Run tests
-pnpm test:run
-
-# Start development (watch mode)
-pnpm dev
-```
+<LinkButton href="/contributing/core/detect/">Explore project detection →</LinkButton>

@@ -1,8 +1,10 @@
 import starlight from '@astrojs/starlight'
+import astroMermaid from 'astro-mermaid'
 import { defineConfig } from 'astro/config'
 
 export default defineConfig({
 	integrations: [
+		astroMermaid(),
 		starlight({
 			title: 'Xtarterize',
 			description:
@@ -20,32 +22,28 @@ export default defineConfig({
 					autogenerate: { directory: 'getting-started' },
 				},
 				{
-					label: 'User Guide',
-					items: [
-						{
-							label: 'CLI Reference',
-							autogenerate: { directory: 'guide/cli' },
-						},
-						{
-							label: 'Conformance Tasks',
-							autogenerate: { directory: 'guide/tasks' },
-						},
-						{
-							label: 'Configuration',
-							autogenerate: { directory: 'guide/config' },
-						},
-					],
+					label: 'CLI Reference',
+					link: '/guide/cli/overview/',
+				},
+				{
+					label: 'Conformance Tasks',
+					link: '/guide/tasks/overview/',
+				},
+				{
+					label: 'Configuration',
+					link: '/guide/config/overview/',
 				},
 				{
 					label: 'Contributing',
+					collapsed: true,
 					items: [
 						{
 							label: 'Architecture',
-							autogenerate: { directory: 'contributing/architecture' },
+							link: '/contributing/architecture/overview/',
 						},
 						{
-							label: 'Core',
-							autogenerate: { directory: 'contributing/core' },
+							label: 'Project Detection',
+							link: '/contributing/core/detect/',
 						},
 						{
 							label: 'Patchers',

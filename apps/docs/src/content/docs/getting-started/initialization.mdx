@@ -3,6 +3,8 @@ title: Initialization
 description: Initialize conformance configuration for a project with Xtarterize.
 ---
 
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components'
+
 # Initialization
 
 ## Initialize a Project
@@ -13,13 +15,15 @@ To apply conformance configuration to a project:
 npx xtarterize init
 ```
 
-This will:
+<Steps>
 
 1. **Scan** your project directory to detect framework, bundler, package manager, monorepo status, and existing configs
 2. **Resolve** which conformance tasks are applicable for your stack
 3. **Check** each task's current status (`new`, `patch`, `skip`, or `conflict`)
 4. **Display** a conformance plan table showing what will change
 5. **Prompt** you to apply all, select specific tasks, dry-run, or quit
+
+</Steps>
 
 ## Example Output
 
@@ -52,23 +56,32 @@ This will:
 
 ## Examples
 
-```bash
-# Preview changes without applying
-npx xtarterize init --dry-run
-
-# Apply all without prompts
-npx xtarterize init --yes
-
-# Skip the plop code generator
-npx xtarterize init --skip codegen/plop
-
-# Only apply Biome
-npx xtarterize init --only lint/biome
-```
+<Tabs>
+  <TabItem label="Preview">
+    ```bash
+    npx xtarterize init --dry-run
+    ```
+  </TabItem>
+  <TabItem label="Apply all">
+    ```bash
+    npx xtarterize init --yes
+    ```
+  </TabItem>
+  <TabItem label="Skip tasks">
+    ```bash
+    npx xtarterize init --skip codegen/plop
+    ```
+  </TabItem>
+  <TabItem label="Only specific">
+    ```bash
+    npx xtarterize init --only lint/biome
+    ```
+  </TabItem>
+</Tabs>
 
 ## What Gets Applied
 
-The `init` command applies all tasks that are applicable to your detected stack. This includes:
+The `init` command applies all tasks that are applicable to your detected stack:
 
 - **Linting & Formatting** — Biome, Ultracite
 - **TypeScript** — incremental builds, strict mode
@@ -83,4 +96,32 @@ The `init` command applies all tasks that are applicable to your detected stack.
 - **Agent** — AGENTS.md, AI skills directory
 - **Scripts** — package.json scripts
 
-Each task checks if it's already applied and skips if conformant.
+<Aside>
+  Each task checks if it's already applied and skips if conformant. Running `init` twice produces no changes on the second run.
+</Aside>
+
+## Init Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant CLI as CLI
+    participant Core as @xtarterize/core
+    participant Tasks as @xtarterize/tasks
+    
+    U->>CLI: xtarterize init
+    CLI->>Core: runPreflight()
+    Core-->>CLI: valid / errors
+    CLI->>Core: detectProject()
+    Core-->>CLI: ProjectProfile
+    CLI->>Tasks: getAllTasks()
+    CLI->>Core: resolveTasks(profile)
+    Core-->>CLI: Applicable tasks
+    CLI->>Core: resolveTaskStatuses()
+    Core-->>CLI: Status map
+    CLI->>U: Display plan
+    U->>CLI: Confirm
+    CLI->>Tasks: applyTasks()
+    Tasks-->>CLI: Result
+    CLI->>U: Summary
+```

@@ -3,6 +3,8 @@ title: Patchers Overview
 description: How Xtarterize safely modifies configuration files.
 ---
 
+import { Aside, Steps } from '@astrojs/starlight/components'
+
 # Patchers Overview
 
 The `@xtarterize/patchers` package provides utilities for safely modifying configuration files without overwriting existing customizations.
@@ -14,6 +16,25 @@ The `@xtarterize/patchers` package provides utilities for safely modifying confi
 | `mergeJson` | Deep merge JSON objects using `defu` — existing keys take precedence |
 | `mergeYaml` | Deep merge YAML objects using `defu` and `js-yaml` |
 | `injectVitePlugin` | AST-based plugin injection into `vite.config.ts` using `magicast` |
+
+## Architecture
+
+```mermaid
+flowchart TD
+    Task[Conformance Task] --> P{Which patcher?}
+    P -->|JSON config| MJ[mergeJson<br/>defu deep merge]
+    P -->|YAML config| MY[mergeYaml<br/>defu + js-yaml]
+    P -->|Vite config| AP[injectVitePlugin<br/>magicast AST]
+    
+    MJ --> W[Write file]
+    MY --> W
+    AP --> W
+    
+    style Task fill:#6366f1,color:#fff
+    style MJ fill:#22c55e,color:#fff
+    style MY fill:#22c55e,color:#fff
+    style AP fill:#22c55e,color:#fff
+```
 
 ## JSON Merge
 
@@ -27,7 +48,9 @@ const merged = mergeJson(existing, incoming)
 // { compilerOptions: { strict: true, target: "ES2022", incremental: true } }
 ```
 
-The `defu` library ensures that existing user configuration is never overwritten — incoming values only fill gaps.
+<Aside type="tip">
+  The `defu` library ensures that existing user configuration is never overwritten — incoming values only fill gaps.
+</Aside>
 
 ## YAML Merge
 
@@ -69,11 +92,16 @@ if (!result.success) {
 }
 ```
 
-The AST patcher:
-1. Parses `vite.config.ts` using `magicast`
-2. Checks if the plugin is already imported (idempotent)
-3. Inserts the import at the top of the file
-4. Appends the plugin call to the `plugins` array
-5. Writes the file back
+<Steps>
 
-If the config structure is non-standard (factory functions, conditional exports), it falls back to returning manual instructions rather than corrupting the file.
+1. **Parse** — Parses `vite.config.ts` using `magicast`
+2. **Check** — Checks if the plugin is already imported (idempotent)
+3. **Insert import** — Inserts the import at the top of the file
+4. **Append plugin** — Appends the plugin call to the `plugins` array
+5. **Write** — Writes the file back
+
+</Steps>
+
+<Aside type="note">
+  If the config structure is non-standard (factory functions, conditional exports), the AST patcher falls back to returning manual instructions rather than corrupting the file.
+</Aside>

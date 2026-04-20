@@ -3,6 +3,8 @@ title: Project Detection
 description: How Xtarterize detects your project's stack and builds a ProjectProfile.
 ---
 
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components'
+
 # Project Detection
 
 The `@xtarterize/core` package provides the `detectProject()` function — the foundation of Xtarterize's context-aware behavior.
@@ -72,20 +74,70 @@ interface ProjectProfile {
 
 ## Detection Logic
 
-| Signal | Source |
-|--------|--------|
-| Framework | `package.json` dependencies (`react`, `vue`, `react-native`, etc.) |
-| Bundler | `vite` in deps, `vite.config.ts` existence, `next` in deps, etc. |
-| Router | `@tanstack/react-router`, `react-router-dom`, `vue-router` in deps |
-| Styling | `tailwindcss`, `styled-components`, `nativewind` in deps |
-| TypeScript | `tsconfig.json` existence, `typescript` in deps |
-| Package manager | Lockfile presence (`pnpm-lock.yaml`, `yarn.lock`, etc.) or `packageManager` field |
-| Monorepo | `pnpm-workspace.yaml`, `turbo.json`, `packages/` + `apps/` directories |
-| GitHub | `.github/` directory presence |
+```mermaid
+flowchart TD
+    A[package.json] --> B{Dependencies}
+    B --> C[detectFramework]
+    B --> D[detectBundler]
+    B --> E[detectRouter]
+    B --> F[detectStyling]
+    B --> G[detectVitePlus]
+    
+    C --> H{Framework?}
+    H -->|react-native + react| I[Ambiguous → prompt user]
+    H -->|react| J[Framework: react]
+    H -->|vue| K[Framework: vue]
+    H -->|svelte| L[Framework: svelte]
+    H -->|solid| M[Framework: solid]
+    H -->|node| N[Framework: node]
+    
+    D --> O{Bundler?}
+    O -->|@tanstack/start| P[TanStack Start]
+    O -->|next| Q[Next.js]
+    O -->|expo| R[Expo]
+    O -->|vite| S[Vite]
+    O -->|webpack| T[Webpack]
+    O -->|@rspack/core| U[Rspack]
+    O -->|none| V[None]
+    
+    E --> W{Router?}
+    W -->|nextjs bundler| X[Next Router]
+    W -->|expo bundler| Y[Expo Router]
+    W -->|@tanstack/react-router| Z[TanStack Router]
+    W -->|react-router| AA[React Router]
+    W -->|vue-router| AB[Vue Router]
+    
+    style A fill:#6366f1,color:#fff
+    style C fill:#22c55e,color:#fff
+    style D fill:#22c55e,color:#fff
+```
+
+## Detection Sources
+
+<Tabs>
+  <TabItem label="Dependencies">
+    | Signal | Source |
+    |--------|--------|
+    | Framework | `package.json` dependencies (`react`, `vue`, `react-native`, etc.) |
+    | Bundler | `vite`, `next`, `expo`, `webpack`, `@rspack/core` in deps |
+    | Router | `@tanstack/react-router`, `react-router-dom`, `vue-router` in deps |
+    | Styling | `tailwindcss`, `styled-components`, `nativewind` in deps |
+  </TabItem>
+  <TabItem label="Filesystem">
+    | Signal | Source |
+    |--------|--------|
+    | TypeScript | `tsconfig.json` existence, `typescript` in deps |
+    | Package manager | Lockfile presence (`pnpm-lock.yaml`, `yarn.lock`, etc.) |
+    | Monorepo | `pnpm-workspace.yaml`, `turbo.json`, `packages/` + `apps/` dirs |
+    | GitHub | `.github/` directory presence |
+  </TabItem>
+</Tabs>
 
 ## Ambiguity Handling
 
-When both `react` and `react-native` are present in dependencies, `detectProject()` returns `framework: null`. The CLI layer then prompts the user to clarify which describes the project.
+<Aside type="note">
+  When both `react` and `react-native` are present in dependencies, `detectProject()` returns `framework: null`. The CLI layer then prompts the user to clarify which describes the project. In `--quiet` mode, it defaults to `react`.
+</Aside>
 
 ## Example
 
