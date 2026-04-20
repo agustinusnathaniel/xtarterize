@@ -1,5 +1,10 @@
 import type { FileDiff, Task, TaskStatus } from '@xtarterize/core'
-import { readPackageJson, writePackageJson } from '@xtarterize/core'
+import { fileExists, readPackageJson, resolvePath, writePackageJson } from '@xtarterize/core'
+
+async function hasUltracite(cwd: string): Promise<boolean> {
+	const pkg = await readPackageJson(cwd)
+	return !!(pkg?.devDependencies?.ultracite || pkg?.dependencies?.ultracite)
+}
 
 export const packageScriptsTask: Task = {
 	id: 'scripts/package-scripts',
@@ -12,7 +17,7 @@ export const packageScriptsTask: Task = {
 		if (!pkg) return 'conflict'
 
 		const scripts = pkg.scripts ?? {}
-		const requiredScripts = ['lint', 'format', 'typecheck']
+		const requiredScripts = ['lint', 'typecheck']
 		const missing = requiredScripts.filter((s) => !scripts[s])
 
 		if (missing.length === 0) return 'skip'
@@ -25,13 +30,19 @@ export const packageScriptsTask: Task = {
 		if (!pkg) return []
 
 		const pm = profile.packageManager
-		const scriptsToAdd: Record<string, string> = {
-			lint: 'biome lint .',
-			format: 'biome format --write .',
-			check: 'biome check --write .',
-			typecheck: 'tsc --noEmit',
-			upgrade: `npx npm-check-updates -u && ${pm} install`,
-		}
+		const useUltracite = await hasUltracite(cwd)
+
+		const scriptsToAdd = useUltracite
+			? {
+					lint: 'ultracite',
+					typecheck: 'tsc --noEmit',
+					upgrade: `npx npm-check-updates -u && ${pm} install`,
+				}
+			: {
+					lint: 'biome check --write .',
+					typecheck: 'tsc --noEmit',
+					upgrade: `npx npm-check-updates -u && ${pm} install`,
+				}
 
 		const existing = pkg.scripts ?? {}
 		const merged = { ...existing, ...scriptsToAdd }
@@ -46,13 +57,19 @@ export const packageScriptsTask: Task = {
 		if (!pkg) return
 
 		const pm = profile.packageManager
-		const scriptsToAdd: Record<string, string> = {
-			lint: 'biome lint .',
-			format: 'biome format --write .',
-			check: 'biome check --write .',
-			typecheck: 'tsc --noEmit',
-			upgrade: `npx npm-check-updates -u && ${pm} install`,
-		}
+		const useUltracite = await hasUltracite(cwd)
+
+		const scriptsToAdd = useUltracite
+			? {
+					lint: 'ultracite',
+					typecheck: 'tsc --noEmit',
+					upgrade: `npx npm-check-updates -u && ${pm} install`,
+				}
+			: {
+					lint: 'biome check --write .',
+					typecheck: 'tsc --noEmit',
+					upgrade: `npx npm-check-updates -u && ${pm} install`,
+				}
 
 		pkg.scripts = { ...pkg.scripts, ...scriptsToAdd }
 		await writePackageJson(cwd, pkg)
