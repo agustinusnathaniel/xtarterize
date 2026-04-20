@@ -82,6 +82,8 @@ sequenceDiagram
 - **Dry-run is exact** — `dryRun()` output is bit-for-bit identical to what `apply()` writes
 - **Idempotency is non-negotiable** — Running twice produces no changes on second run
 - **Templates are parameterized** — All templates receive `ProjectProfile` and adapt accordingly
+- **Factory-based task creation** — Most tasks use `createSimpleFileTask`, `createJsonMergeTask`, or `createFileTask` to eliminate boilerplate
+- **Shared command orchestration** — `init` and `sync` share a `runCommand()` helper in the CLI layer
 
 ## Core Modules
 
@@ -93,7 +95,7 @@ flowchart TD
     Core --> Backup["backup.ts<br/>File backup/restore"]
     Core --> Preflight["preflight.ts<br/>Pre-flight checks"]
     Core --> Diagnostics["diagnostics.ts<br/>Conflict detection"]
-    Core --> Utils["utils/<br/>fs, diff, logger, pkg"]
+    Core --> Utils["utils/<br/>fs, diff, logger (picocolors), pkg (pkg-types)"]
     
     style Core fill:#6366f1,color:#fff
 ```
@@ -111,9 +113,10 @@ flowchart LR
     Tasks --> Quality["quality/<br/>knip"]
     Tasks --> Codegen["codegen/<br/>plop"]
     Tasks --> Monorepo["monorepo/<br/>turbo"]
-    Tasks --> Editor["editor/<br/>vscode, vscode-extensions"]
+    Tasks --> Editor["editor/<br/>vscode (settings + extensions)"]
     Tasks --> Agent["agent/<br/>agents-md, skills"]
     Tasks --> Scripts["scripts/<br/>package-scripts"]
+    Tasks --> Factory["factory.ts<br/>task creation helpers"]
     
     style Tasks fill:#6366f1,color:#fff
 ```

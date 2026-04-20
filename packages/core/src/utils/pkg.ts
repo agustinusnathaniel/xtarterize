@@ -1,46 +1,26 @@
-import { fileExists, readJson, resolvePath } from './fs.js'
+import { readPackageJSON, writePackageJSON } from 'pkg-types'
+import { fileExists, resolvePath } from './fs.js'
 
-export interface PackageJson {
-	name: string
-	version?: string
-	private?: boolean
-	type?: string
-	dependencies?: Record<string, string>
-	devDependencies?: Record<string, string>
-	scripts?: Record<string, string>
-	engines?: Record<string, string>
-	packageManager?: string
-}
-
-export async function readPackageJson(
-	cwd: string,
-): Promise<PackageJson | null> {
+export async function readPackageJson(cwd: string) {
 	const pkgPath = resolvePath(cwd, 'package.json')
 	const exists = await fileExists(pkgPath)
 	if (!exists) return null
-	return readJson<PackageJson>(pkgPath)
+	return readPackageJSON(pkgPath)
 }
 
-export async function writePackageJson(
-	cwd: string,
-	pkg: PackageJson,
-): Promise<void> {
-	const { writeJson, resolvePath } = await import('./fs.js')
-	await writeJson(resolvePath(cwd, 'package.json'), pkg)
+export async function writePackageJson(cwd: string, pkg: unknown): Promise<void> {
+	await writePackageJSON(resolvePath(cwd, 'package.json'), pkg as any)
 }
 
-export function hasDependency(pkg: PackageJson, name: string): boolean {
+export function hasDependency(pkg: { dependencies?: Record<string, string>; devDependencies?: Record<string, string> }, name: string): boolean {
 	return !!(pkg.dependencies?.[name] || pkg.devDependencies?.[name])
 }
 
-export function getDependencyVersion(
-	pkg: PackageJson,
-	name: string,
-): string | undefined {
+export function getDependencyVersion(pkg: { dependencies?: Record<string, string>; devDependencies?: Record<string, string> }, name: string): string | undefined {
 	return pkg.dependencies?.[name] ?? pkg.devDependencies?.[name]
 }
 
-export function getNodeVersion(pkg: PackageJson): string {
+export function getNodeVersion(pkg: { engines?: Record<string, string> }): string {
 	if (pkg.engines?.node) return pkg.engines.node
 	return '20'
 }

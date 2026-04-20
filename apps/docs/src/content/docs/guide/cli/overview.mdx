@@ -132,7 +132,7 @@ Each task reports one of four statuses:
 
 ## Backup System
 
-Before any file is modified, Xtarterize creates a backup in `.xtarterize/backups/`. You can restore any file using the `restore` command.
+Before any file is modified, Xtarterize creates a timestamped backup in `.xtarterize/backups/`. You can restore any file using the `restore` command.
 
 <Aside type="tip">
   Backups are stored with timestamps in `.xtarterize/backups/` and indexed in `.xtarterize/backups/.index.json`. Use `xtarterize restore <file>` to revert any change.

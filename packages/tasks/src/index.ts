@@ -7,7 +7,6 @@ import { releaseWorkflowTask } from './ci/release.js'
 import { plopTask } from './codegen/plop.js'
 import { renovateTask } from './deps/renovate.js'
 import { vscodeTask } from './editor/vscode.js'
-import { vscodeExtensionsTask } from './editor/vscode-extensions.js'
 import { biomeTask } from './lint/biome.js'
 import { ultraciteTask } from './lint/ultracite.js'
 import { turboTask } from './monorepo/turbo.js'
@@ -39,7 +38,6 @@ export {
 	ultraciteTask,
 	viteCheckerTask,
 	viteVisualizerTask,
-	vscodeExtensionsTask,
 	vscodeTask,
 }
 
@@ -61,7 +59,6 @@ export function getAllTasks(): Task[] {
 		plopTask,
 		turboTask,
 		vscodeTask,
-		vscodeExtensionsTask,
 		agentsMdTask,
 		skillsTask,
 		packageScriptsTask,

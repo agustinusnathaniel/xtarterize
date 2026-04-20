@@ -1,5 +1,5 @@
 import { confirm, isCancel, spinner } from '@clack/prompts'
-import { detectProject, logger, runPreflight } from '@xtarterize/core'
+import { detectProject, pc, runPreflight, logError, logInfo, logSuccess } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 import { defineCommand } from 'citty'
 import { displayDiffs } from '../ui/diff-display.js'
@@ -22,11 +22,11 @@ export const addCommand = defineCommand({
 	async run({ args }) {
 		const taskId = args.taskId
 		if (!taskId) {
-			logger.logError('Task ID required. Usage: xtarterize add <task-id>')
-			logger.logInfo('Available tasks:')
+			logError('Task ID required. Usage: xtarterize add <task-id>')
+			logInfo('Available tasks:')
 			const allTasks = getAllTasks()
 			allTasks.forEach((t) => {
-				logger.log(`  ${t.id}`)
+				console.log(`  ${t.id}`)
 			})
 			return
 		}
@@ -37,16 +37,16 @@ export const addCommand = defineCommand({
 
 		const preflight = await runPreflight(cwd)
 		if (!preflight.valid) {
-			logger.log('')
-			logger.log(logger.red('✖ Preflight checks failed'))
-			logger.log('')
+			console.log('')
+			console.log(`${pc.red('✖')} Preflight checks failed`)
+			console.log('')
 			for (const error of preflight.errors) {
-				logger.log(logger.red(`  ✗ ${error.message}`))
+				console.log(`${pc.red(`  ✗ ${error.message}`)}`)
 				if (error.hint) {
-					logger.log(`  ${logger.dim(error.hint)}`)
+					console.log(`  ${pc.dim(error.hint)}`)
 				}
 			}
-			logger.log('')
+			console.log('')
 			process.exit(1)
 		}
 
@@ -60,24 +60,24 @@ export const addCommand = defineCommand({
 		const task = allTasks.find((t) => t.id === taskId)
 
 		if (!task) {
-			logger.logError(`Task "${taskId}" not found`)
-			logger.logInfo('Available tasks:')
+			logError(`Task "${taskId}" not found`)
+			logInfo('Available tasks:')
 			allTasks.forEach((t) => {
-				logger.log(`  ${t.id}`)
+				console.log(`  ${t.id}`)
 			})
 			return
 		}
 
 		if (!task.applicable(profile)) {
-			logger.logWarn(`Task "${taskId}" is not applicable for this project`)
+			logInfo(`Task "${taskId}" is not applicable for this project`)
 			return
 		}
 
 		const status = await task.check(cwd, profile)
-		if (!quiet) logger.log(`Status: ${status}`)
+		if (!quiet) console.log(`Status: ${status}`)
 
 		if (status === 'skip') {
-			logger.logSuccess('Already conformant')
+			logSuccess('Already conformant')
 			return
 		}
 
@@ -90,6 +90,6 @@ export const addCommand = defineCommand({
 		}
 
 		await task.apply(cwd, profile)
-		logger.logSuccess(`${task.id} applied successfully`)
+		logSuccess(`${task.id} applied successfully`)
 	},
 })

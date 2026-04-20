@@ -1,14 +1,14 @@
 import type { Task, TaskStatus } from '@xtarterize/core'
-import { logger } from '@xtarterize/core'
+import { pc } from '@xtarterize/core'
 
 export function displayPlan(
 	tasks: Task[],
 	statuses: Map<string, TaskStatus>,
 	title = 'Conformance plan',
 ): void {
-	logger.log('')
-	logger.log(logger.bold(title))
-	logger.log('')
+	console.log('')
+	console.log(pc.bold(title))
+	console.log('')
 
 	for (const task of tasks) {
 		const status = statuses.get(task.id) ?? 'new'
@@ -18,10 +18,10 @@ export function displayPlan(
 		const idCol = task.id.padEnd(25)
 		const labelCol = task.label.padEnd(40)
 
-		logger.log(`  ${colorFn(statusLabel)} ${labelCol} ${logger.dim(idCol)}`)
+		console.log(`  ${colorFn(statusLabel)} ${labelCol} ${pc.dim(idCol)}`)
 	}
 
-	logger.log('')
+	console.log('')
 }
 
 function getStatusLabel(status: string, task: Task): string {
@@ -42,13 +42,13 @@ function getStatusLabel(status: string, task: Task): string {
 function getStatusColor(status: string): (text: string) => string {
 	switch (status) {
 		case 'new':
-			return logger.green
+			return pc.green
 		case 'patch':
-			return logger.yellow
+			return pc.yellow
 		case 'skip':
-			return logger.dim
+			return pc.dim
 		case 'conflict':
-			return logger.red
+			return pc.red
 		default:
 			return (t: string) => t
 	}

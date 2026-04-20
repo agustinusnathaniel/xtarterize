@@ -2,10 +2,11 @@ import { spinner } from '@clack/prompts'
 import {
 	detectProject,
 	type FileDiff,
-	logger,
+	pc,
 	resolveTaskStatuses,
 	resolveTasks,
 	runPreflight,
+	logSuccess,
 } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 import { defineCommand } from 'citty'
@@ -29,16 +30,16 @@ export const diffCommand = defineCommand({
 
 		const preflight = await runPreflight(cwd)
 		if (!preflight.valid) {
-			logger.log('')
-			logger.log(logger.red('✖ Preflight checks failed'))
-			logger.log('')
+			console.log('')
+			console.log(`${pc.red('✖')} Preflight checks failed`)
+			console.log('')
 			for (const error of preflight.errors) {
-				logger.log(logger.red(`  ✗ ${error.message}`))
+				console.log(`${pc.red(`  ✗ ${error.message}`)}`)
 				if (error.hint) {
-					logger.log(`  ${logger.dim(error.hint)}`)
+					console.log(`  ${pc.dim(error.hint)}`)
 				}
 			}
-			logger.log('')
+			console.log('')
 			process.exit(1)
 		}
 
@@ -62,7 +63,7 @@ export const diffCommand = defineCommand({
 		}
 
 		if (diffs.length === 0) {
-			logger.logSuccess('No pending changes')
+			logSuccess('No pending changes')
 			return
 		}
 

@@ -3,12 +3,8 @@ export { applyTasks } from './apply.js'
 export type { Backup } from './backup.js'
 export {
 	backupFile,
-	createFileBackup,
-	deleteFileBackup,
 	listBackups,
 	restoreBackup,
-	restoreFileBackup,
-	withFileBackup,
 } from './backup.js'
 export type {
 	Bundler,
@@ -45,7 +41,14 @@ export {
 	writeFile,
 	writeJson,
 } from './utils/fs.js'
-export * as logger from './utils/logger.js'
+export {
+	log,
+	logError,
+	logInfo,
+	logSuccess,
+	logWarn,
+	pc,
+} from './utils/logger.js'
 export {
 	getDependencyVersion,
 	getNodeVersion,

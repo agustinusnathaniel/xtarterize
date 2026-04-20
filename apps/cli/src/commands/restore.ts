@@ -1,5 +1,5 @@
 import { isCancel, select, spinner } from '@clack/prompts'
-import { listBackups, logger, restoreBackup } from '@xtarterize/core'
+import { listBackups, pc, restoreBackup, logSuccess, logError } from '@xtarterize/core'
 import { defineCommand } from 'citty'
 
 export const restoreCommand = defineCommand({
@@ -17,9 +17,7 @@ export const restoreCommand = defineCommand({
 		const cwd = process.cwd()
 		const filepath = args.filepath
 		if (!filepath) {
-			logger.logError(
-				'File path required. Usage: xtarterize restore <filepath>',
-			)
+			logError('File path required. Usage: xtarterize restore <filepath>')
 			return
 		}
 
@@ -30,13 +28,13 @@ export const restoreCommand = defineCommand({
 		s.stop('Backups loaded')
 
 		if (backups.length === 0) {
-			logger.logError(`No backups found for ${filepath}`)
+			logError(`No backups found for ${filepath}`)
 			return
 		}
 
 		if (backups.length === 1) {
 			await restoreBackup(cwd, backups[0])
-			logger.logSuccess(`Restored ${filepath} from backup`)
+			logSuccess(`Restored ${filepath} from backup`)
 			return
 		}
 
@@ -51,6 +49,6 @@ export const restoreCommand = defineCommand({
 		if (isCancel(selected)) return
 
 		await restoreBackup(cwd, selected)
-		logger.logSuccess(`Restored ${filepath} from backup`)
+		logSuccess(`Restored ${filepath} from backup`)
 	},
 })
