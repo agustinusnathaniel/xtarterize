@@ -1,11 +1,16 @@
 import type { ProjectProfile } from '@xtarterize/core'
 
 export function renderAutoUpdateWorkflow(profile: ProjectProfile): string {
-  const pm = profile.packageManager
-  const installCmd = pm === 'npm' ? 'npm ci' : pm === 'yarn' ? 'yarn install --frozen-lockfile' : `${pm} install --frozen-lockfile`
-  const nodeVersion = profile.framework === 'react-native' ? '20' : '20'
+	const pm = profile.packageManager
+	const installCmd =
+		pm === 'npm'
+			? 'npm ci'
+			: pm === 'yarn'
+				? 'yarn install --frozen-lockfile'
+				: `${pm} install --frozen-lockfile`
+	const nodeVersion = profile.framework === 'react-native' ? '20' : '20'
 
-  return `name: Auto Update Dependencies
+	return `name: Auto Update Dependencies
 
 on:
   schedule:

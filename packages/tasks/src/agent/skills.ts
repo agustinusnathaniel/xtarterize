@@ -1,53 +1,71 @@
-import type { Task, TaskStatus, FileDiff } from '@xtarterize/core'
-import type { ProjectProfile } from '@xtarterize/core'
-import { fileExists, writeFile, resolvePath, ensureDir } from '@xtarterize/core'
+import type {
+	FileDiff,
+	ProjectProfile,
+	Task,
+	TaskStatus,
+} from '@xtarterize/core'
+import { ensureDir, fileExists, resolvePath, writeFile } from '@xtarterize/core'
 
 export const skillsTask: Task = {
-  id: 'agent/skills',
-  label: 'AI Skills directory',
-  group: 'Agent',
-  applicable: (profile) => profile.typescript,
+	id: 'agent/skills',
+	label: 'AI Skills directory',
+	group: 'Agent',
+	applicable: (profile) => profile.typescript,
 
-  async check(cwd, profile): Promise<TaskStatus> {
-    const skillsDir = resolvePath(cwd, '.agents', 'skills')
-    const exists = await fileExists(skillsDir)
-    if (!exists) return 'new'
+	async check(cwd, _profile): Promise<TaskStatus> {
+		const skillsDir = resolvePath(cwd, '.agents', 'skills')
+		const exists = await fileExists(skillsDir)
+		if (!exists) return 'new'
 
-    const skillFile = resolvePath(cwd, '.agents', 'skills', 'project-context.md')
-    const skillExists = await fileExists(skillFile)
-    if (!skillExists) return 'patch'
+		const skillFile = resolvePath(
+			cwd,
+			'.agents',
+			'skills',
+			'project-context.md',
+		)
+		const skillExists = await fileExists(skillFile)
+		if (!skillExists) return 'patch'
 
-    return 'skip'
-  },
+		return 'skip'
+	},
 
-  async dryRun(cwd, profile): Promise<FileDiff[]> {
-    const diffs: FileDiff[] = []
+	async dryRun(cwd, profile): Promise<FileDiff[]> {
+		const diffs: FileDiff[] = []
 
-    const skillsDir = resolvePath(cwd, '.agents', 'skills')
-    const dirExists = await fileExists(skillsDir)
-    const before = dirExists ? '(directory exists)' : null
+		const skillsDir = resolvePath(cwd, '.agents', 'skills')
+		const dirExists = await fileExists(skillsDir)
+		const before = dirExists ? '(directory exists)' : null
 
-    const skillContent = renderProjectContext(profile)
-    diffs.push({ filepath: '.agents/skills/project-context.md', before, after: skillContent })
+		const skillContent = renderProjectContext(profile)
+		diffs.push({
+			filepath: '.agents/skills/project-context.md',
+			before,
+			after: skillContent,
+		})
 
-    return diffs
-  },
+		return diffs
+	},
 
-  async apply(cwd, profile): Promise<void> {
-    const skillsDir = resolvePath(cwd, '.agents', 'skills')
-    await ensureDir(skillsDir)
+	async apply(cwd, profile): Promise<void> {
+		const skillsDir = resolvePath(cwd, '.agents', 'skills')
+		await ensureDir(skillsDir)
 
-    const skillPath = resolvePath(cwd, '.agents', 'skills', 'project-context.md')
-    const content = renderProjectContext(profile)
-    await writeFile(skillPath, content)
-  }
+		const skillPath = resolvePath(
+			cwd,
+			'.agents',
+			'skills',
+			'project-context.md',
+		)
+		const content = renderProjectContext(profile)
+		await writeFile(skillPath, content)
+	},
 }
 
 function renderProjectContext(profile: ProjectProfile): string {
-  const pm = profile.packageManager
-  const runCmd = pm === 'npm' ? 'npm run' : pm
+	const pm = profile.packageManager
+	const runCmd = pm === 'npm' ? 'npm run' : pm
 
-  return `# Project Context
+	return `# Project Context
 
 ## Tech Stack
 - **Framework**: ${profile.framework ?? 'none'}

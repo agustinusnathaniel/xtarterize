@@ -1,10 +1,10 @@
 import type { ProjectProfile } from '@xtarterize/core'
 
 export function renderAgentsMd(profile: ProjectProfile): string {
-  const pm = profile.packageManager
-  const runCmd = pm === 'npm' ? 'npm run' : pm
-  
-  return `# AGENTS.md
+	const pm = profile.packageManager
+	const runCmd = pm === 'npm' ? 'npm run' : pm
+
+	return `# AGENTS.md
 
 ## Project Overview
 
