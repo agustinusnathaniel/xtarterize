@@ -1,17 +1,15 @@
 ---
 title: Configuration
-description: How Xtarterize detects and adapts to your project.
+description: How xtarterize detects and adapts to your project.
 ---
 
 import { Aside, FileTree, Tabs, TabItem } from '@astrojs/starlight/components'
 
-# Configuration
-
-Xtarterize doesn't require a config file. It detects your project's stack automatically and applies only what's appropriate.
+xtarterize doesn't require a config file. It detects your project's stack automatically and applies only what's appropriate.
 
 ## Detection
 
-When you run `init`, Xtarterize scans your project to build a `ProjectProfile`:
+When you run `init`, xtarterize scans your project to build a `ProjectProfile`:
 
 - **Framework** — React, Vue, Svelte, Solid, React Native, or Node (from `package.json` deps)
 - **Bundler** — Vite, Next.js, TanStack Start, Expo, Webpack, or none
@@ -71,7 +69,7 @@ flowchart TD
 ## Ambiguity Resolution
 
 <Aside type="note">
-  If both `react` and `react-native` are detected, Xtarterize prompts you to clarify which describes the project. In CI mode (`--quiet`), it defaults to `react`.
+  If both `react` and `react-native` are detected, xtarterize prompts you to clarify which describes the project. In CI mode (`--quiet`), it defaults to `react`.
 </Aside>
 
 ## Task Gating
@@ -95,7 +93,7 @@ All templates adapt to the detected profile:
 
 ## Backup System
 
-Before any file is modified, Xtarterize creates a timestamped backup in `.xtarterize/backups/`. An index file tracks all backups for easy restoration.
+Before any file is modified, xtarterize creates a timestamped backup in `.xtarterize/backups/`. An index file tracks all backups for easy restoration.
 
 <FileTree>
 - .xtarterize/

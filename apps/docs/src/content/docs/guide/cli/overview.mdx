@@ -1,13 +1,11 @@
 ---
 title: CLI Overview
-description: Complete reference for the Xtarterize command-line interface.
+description: Complete reference for the xtarterize command-line interface.
 ---
 
 import { Aside, Tabs, TabItem, LinkButton } from '@astrojs/starlight/components'
 
-# CLI Overview
-
-The Xtarterize CLI provides commands to detect, apply, and maintain conformance configuration for JavaScript/TypeScript projects.
+The xtarterize CLI provides commands to detect, apply, and maintain conformance configuration for JavaScript/TypeScript projects.
 
 ## Available Commands
 
@@ -132,7 +130,7 @@ Each task reports one of four statuses:
 
 ## Backup System
 
-Before any file is modified, Xtarterize creates a timestamped backup in `.xtarterize/backups/`. You can restore any file using the `restore` command.
+Before any file is modified, xtarterize creates a timestamped backup in `.xtarterize/backups/`. You can restore any file using the `restore` command.
 
 <Aside type="tip">
   Backups are stored with timestamps in `.xtarterize/backups/` and indexed in `.xtarterize/backups/.index.json`. Use `xtarterize restore <file>` to revert any change.
