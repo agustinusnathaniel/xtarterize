@@ -1,4 +1,5 @@
 import { diffLines } from 'diff'
+import pc from 'picocolors'
 
 export interface FileDiff {
 	filepath: string
@@ -12,12 +13,12 @@ export function generateDiff(before: string | null, after: string): string {
 
 	for (const change of changes) {
 		const prefix = change.added ? '+ ' : change.removed ? '- ' : '  '
-		const color = change.added ? '\x1b[32m' : change.removed ? '\x1b[31m' : ''
-		const reset = '\x1b[0m'
+		const color = change.added ? pc.green : change.removed ? pc.red : String
+		const reset = change.added || change.removed ? pc.reset : String
 
 		for (const line of change.value.split('\n')) {
 			if (line === '' && change.value.endsWith('\n')) continue
-			lines.push(`${color}${prefix}${line}${reset}`)
+			lines.push(color(`${prefix}${line}`))
 		}
 	}
 
