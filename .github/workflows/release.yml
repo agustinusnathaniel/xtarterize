@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - ".changeset/**"
+      - "**/CHANGELOG.md"
+      - "**/package.json"
+      - ".github/workflows/release.yml"
   pull_request:
     types:
       - opened
@@ -18,6 +23,10 @@ on:
           - major
           - minor
           - patch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
