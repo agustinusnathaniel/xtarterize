@@ -1,5 +1,5 @@
-import { createFileTask } from '../factory.js'
-import { renderAgentsMd } from '../templates/agents-md.js'
+import { createFileTask } from '@/factory.js'
+import { renderAgentsMd } from '@/templates/agents-md.js'
 
 export const agentsMdTask = createFileTask({
 	id: 'agent/agents-md',

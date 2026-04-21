@@ -1,5 +1,5 @@
-import { createSimpleFileTask } from '../factory.js'
-import { renderReleaseWorkflow } from '../templates/workflows/release-yml.js'
+import { createSimpleFileTask } from '@/factory.js'
+import { renderReleaseWorkflow } from '@/templates/workflows/release-yml.js'
 
 export const releaseWorkflowTask = createSimpleFileTask({
 	id: 'ci/release',

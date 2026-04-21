@@ -1,6 +1,6 @@
-import { createMultiFileJsonMergeTask } from '../factory.js'
-import { renderVscodeExtensions } from '../templates/vscode/extensions.js'
-import { renderVscodeSettings } from '../templates/vscode/settings.js'
+import { createMultiFileJsonMergeTask } from '@/factory.js'
+import { renderVscodeExtensions } from '@/templates/vscode/extensions.js'
+import { renderVscodeSettings } from '@/templates/vscode/settings.js'
 
 export const vscodeTask = createMultiFileJsonMergeTask({
 	id: 'editor/vscode',

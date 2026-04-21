@@ -1,5 +1,5 @@
-import type { Task, TaskStatus } from './_base.js'
-import type { ProjectProfile } from './detect.js'
+import type { Task, TaskStatus } from '@/_base.js'
+import type { ProjectProfile } from '@/detect.js'
 
 export function resolveTasks(
 	profile: ProjectProfile,

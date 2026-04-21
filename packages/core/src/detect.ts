@@ -1,6 +1,6 @@
 import { detectPackageManager as detectPM } from 'nypm'
-import { fileExists, findConfigFile, resolvePath } from './utils/fs.js'
-import { readPackageJson } from './utils/pkg.js'
+import { fileExists, findConfigFile, resolvePath } from '@/utils/fs.js'
+import { readPackageJson } from '@/utils/pkg.js'
 
 export type Framework =
 	| 'react'

@@ -1,4 +1,4 @@
-import { createPackageJsonTask } from '../factory.js'
+import { createPackageJsonTask } from '@/factory.js'
 import { dlxCommand } from 'nypm'
 import { readPackageJson } from '@xtarterize/core'
 

@@ -1,5 +1,5 @@
-import { fileExists, resolvePath } from './utils/fs.js'
-import { readPackageJson } from './utils/pkg.js'
+import { fileExists, resolvePath } from '@/utils/fs.js'
+import { readPackageJson } from '@/utils/pkg.js'
 
 export interface PreflightError {
 	code: string

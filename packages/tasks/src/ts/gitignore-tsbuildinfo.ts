@@ -1,4 +1,4 @@
-import { createFileTask } from '../factory.js'
+import { createFileTask } from '@/factory.js'
 
 const ENTRIES = ['*.tsbuildinfo', '.tsbuildinfo/']
 

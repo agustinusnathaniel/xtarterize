@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 import { join, normalize } from 'pathe'
-import { fileExists, resolvePath } from './utils/fs.js'
+import { fileExists, resolvePath } from '@/utils/fs.js'
 
 const BACKUP_DIR = '.xtarterize/backups'
 

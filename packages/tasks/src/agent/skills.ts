@@ -1,5 +1,5 @@
-import { createSimpleFileTask } from '../factory.js'
-import { renderProjectContext } from '../templates/project-context.js'
+import { createSimpleFileTask } from '@/factory.js'
+import { renderProjectContext } from '@/templates/project-context.js'
 
 export const skillsTask = createSimpleFileTask({
 	id: 'agent/skills',

@@ -1,5 +1,5 @@
 import { defineCommand } from 'citty'
-import { runCommand } from './run-command.js'
+import { runCommand } from '@/commands/run-command.js'
 
 export const syncCommand = defineCommand({
 	meta: {

@@ -1,7 +1,7 @@
-import type { Task } from './_base.js'
-import { backupFile } from './backup.js'
-import type { ProjectProfile } from './detect.js'
-import { logInfo, logSuccess, logError } from './utils/logger.js'
+import type { Task } from '@/_base.js'
+import { backupFile } from '@/backup.js'
+import type { ProjectProfile } from '@/detect.js'
+import { logInfo, logSuccess, logError } from '@/utils/logger.js'
 
 export async function applyTasks(
 	tasks: Task[],

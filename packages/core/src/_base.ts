@@ -1,4 +1,4 @@
-import type { ProjectProfile } from './detect.js'
+import type { ProjectProfile } from '@/detect.js'
 
 export type TaskStatus = 'new' | 'patch' | 'skip' | 'conflict'
 

@@ -13,9 +13,9 @@ import {
 	readPackageJson,
 } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
-import { displayDiffs } from '../ui/diff-display.js'
-import { displayPlan } from '../ui/plan-display.js'
-import { selectTasks } from '../ui/select-menu.js'
+import { displayDiffs } from '@/ui/diff-display.js'
+import { displayPlan } from '@/ui/plan-display.js'
+import { selectTasks } from '@/ui/select-menu.js'
 
 interface CommandArgs {
 	dryRun?: boolean

@@ -1,5 +1,5 @@
 import { readPackageJSON, writePackageJSON } from 'pkg-types'
-import { fileExists, resolvePath } from './fs.js'
+import { fileExists, resolvePath } from '@/utils/fs.js'
 
 export async function readPackageJson(cwd: string) {
 	const pkgPath = resolvePath(cwd, 'package.json')

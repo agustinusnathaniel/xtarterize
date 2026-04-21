@@ -1,5 +1,5 @@
-import { createSimpleFileTask } from '../factory.js'
-import { renderKnipConfig } from '../templates/knip-config.js'
+import { createSimpleFileTask } from '@/factory.js'
+import { renderKnipConfig } from '@/templates/knip-config.js'
 
 export const knipTask = createSimpleFileTask({
 	id: 'quality/knip',

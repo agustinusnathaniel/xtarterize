@@ -1,5 +1,5 @@
 import { readPackageJson } from '@xtarterize/core'
-import { createJsonMergeTask } from '../factory.js'
+import { createJsonMergeTask } from '@/factory.js'
 
 interface TurboTaskConfig {
 	dependsOn?: string[]

@@ -1,11 +1,11 @@
 import { defineCommand, runMain } from 'citty'
-import { addCommand } from './commands/add.js'
-import { checkCommand } from './commands/check.js'
-import { diffCommand } from './commands/diff.js'
-import { initCommand } from './commands/init.js'
-import { listCommand } from './commands/list.js'
-import { restoreCommand } from './commands/restore.js'
-import { syncCommand } from './commands/sync.js'
+import { addCommand } from '@/commands/add.js'
+import { checkCommand } from '@/commands/check.js'
+import { diffCommand } from '@/commands/diff.js'
+import { initCommand } from '@/commands/init.js'
+import { listCommand } from '@/commands/list.js'
+import { restoreCommand } from '@/commands/restore.js'
+import { syncCommand } from '@/commands/sync.js'
 
 process.on('SIGINT', () => process.exit(0))
 process.on('SIGTERM', () => process.exit(0))

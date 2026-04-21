@@ -1,6 +1,6 @@
 import { defineCommand } from 'citty'
 import { pc, logInfo } from '@xtarterize/core'
-import { runCommand } from './run-command.js'
+import { runCommand } from '@/commands/run-command.js'
 
 export const initCommand = defineCommand({
 	meta: {

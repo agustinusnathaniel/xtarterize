@@ -1,5 +1,5 @@
-import { createSimpleFileTask } from '../factory.js'
-import { renderCommitlintConfig } from '../templates/commitlint-config.js'
+import { createSimpleFileTask } from '@/factory.js'
+import { renderCommitlintConfig } from '@/templates/commitlint-config.js'
 
 export const commitlintTask = createSimpleFileTask({
 	id: 'release/commitlint',

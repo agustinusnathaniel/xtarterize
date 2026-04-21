@@ -1,5 +1,5 @@
-import { createSimpleFileTask } from '../factory.js'
-import { renderRenovateJson } from '../templates/renovate-json.js'
+import { createSimpleFileTask } from '@/factory.js'
+import { renderRenovateJson } from '@/templates/renovate-json.js'
 
 export const renovateTask = createSimpleFileTask({
 	id: 'deps/renovate',

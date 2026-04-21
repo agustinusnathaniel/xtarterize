@@ -1,5 +1,5 @@
-import { createSimpleFileTask } from '../factory.js'
-import { renderPlopfile } from '../templates/plopfile.js'
+import { createSimpleFileTask } from '@/factory.js'
+import { renderPlopfile } from '@/templates/plopfile.js'
 
 export const plopTask = createSimpleFileTask({
 	id: 'codegen/plop',

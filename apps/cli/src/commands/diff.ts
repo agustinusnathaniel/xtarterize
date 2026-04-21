@@ -10,7 +10,7 @@ import {
 } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 import { defineCommand } from 'citty'
-import { displayDiffs } from '../ui/diff-display.js'
+import { displayDiffs } from '@/ui/diff-display.js'
 
 export const diffCommand = defineCommand({
 	meta: {

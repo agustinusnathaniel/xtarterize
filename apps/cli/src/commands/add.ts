@@ -2,7 +2,7 @@ import { confirm, isCancel, spinner } from '@clack/prompts'
 import { detectProject, pc, runPreflight, logError, logInfo, logSuccess } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 import { defineCommand } from 'citty'
-import { displayDiffs } from '../ui/diff-display.js'
+import { displayDiffs } from '@/ui/diff-display.js'
 
 export const addCommand = defineCommand({
 	meta: {
