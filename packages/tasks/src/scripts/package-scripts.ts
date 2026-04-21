@@ -1,23 +1,31 @@
-import type { FileDiff, Task, TaskStatus } from '@xtarterize/core'
-import { fileExists, readPackageJson, resolvePath, writePackageJson } from '@xtarterize/core'
+import { createPackageJsonTask } from '../factory.js'
 import { dlxCommand } from 'nypm'
+import { readPackageJson } from '@xtarterize/core'
 
 async function hasUltracite(cwd: string): Promise<boolean> {
 	const pkg = await readPackageJson(cwd)
 	return !!(pkg?.devDependencies?.ultracite || pkg?.dependencies?.ultracite)
 }
 
-export const packageScriptsTask: Task = {
+export const packageScriptsTask = createPackageJsonTask({
 	id: 'scripts/package-scripts',
 	label: 'package.json scripts',
 	group: 'Scripts',
 	applicable: () => true,
+	getScripts: async (cwd, profile) => {
+		const pm = profile.packageManager
+		const useUltracite = await hasUltracite(cwd)
+		const dlx = dlxCommand(pm, 'npm-check-updates')
 
-	async check(cwd, _profile): Promise<TaskStatus> {
-		const pkg = await readPackageJson(cwd)
-		if (!pkg) return 'conflict'
-
-		const scripts = pkg.scripts ?? {}
+		const lint = useUltracite ? 'ultracite' : 'biome check --write .'
+		return [
+			{ script: 'lint', value: lint },
+			{ script: 'typecheck', value: 'tsc --noEmit' },
+			{ script: 'upgrade', value: `${dlx} -u && ${pm} install` },
+		]
+	},
+	checkFn: async (cwd, _profile, pkg) => {
+		const scripts = (pkg as Record<string, Record<string, string>>).scripts ?? {}
 		const requiredScripts = ['lint', 'typecheck']
 		const missing = requiredScripts.filter((s) => !scripts[s])
 
@@ -25,56 +33,4 @@ export const packageScriptsTask: Task = {
 		if (missing.length < requiredScripts.length) return 'patch'
 		return 'new'
 	},
-
-	async dryRun(cwd, profile): Promise<FileDiff[]> {
-		const pkg = await readPackageJson(cwd)
-		if (!pkg) return []
-
-		const pm = profile.packageManager
-		const useUltracite = await hasUltracite(cwd)
-		const dlx = dlxCommand(pm, 'npm-check-updates')
-
-		const scriptsToAdd = useUltracite
-			? {
-					lint: 'ultracite',
-					typecheck: 'tsc --noEmit',
-					upgrade: `${dlx} -u && ${pm} install`,
-				}
-			: {
-					lint: 'biome check --write .',
-					typecheck: 'tsc --noEmit',
-					upgrade: `${dlx} -u && ${pm} install`,
-				}
-
-		const existing = pkg.scripts ?? {}
-		const merged = { ...existing, ...scriptsToAdd }
-		const after = JSON.stringify({ ...pkg, scripts: merged }, null, 2)
-		const before = JSON.stringify(pkg, null, 2)
-
-		return [{ filepath: 'package.json', before, after }]
-	},
-
-	async apply(cwd, profile): Promise<void> {
-		const pkg = await readPackageJson(cwd)
-		if (!pkg) return
-
-		const pm = profile.packageManager
-		const useUltracite = await hasUltracite(cwd)
-		const dlx = dlxCommand(pm, 'npm-check-updates')
-
-		const scriptsToAdd = useUltracite
-			? {
-					lint: 'ultracite',
-					typecheck: 'tsc --noEmit',
-					upgrade: `${dlx} -u && ${pm} install`,
-				}
-			: {
-					lint: 'biome check --write .',
-					typecheck: 'tsc --noEmit',
-					upgrade: `${dlx} -u && ${pm} install`,
-				}
-
-		pkg.scripts = { ...pkg.scripts, ...scriptsToAdd }
-		await writePackageJson(cwd, pkg)
-	},
-}
+})
