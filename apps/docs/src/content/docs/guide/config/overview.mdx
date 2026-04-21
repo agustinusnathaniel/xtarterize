@@ -18,7 +18,7 @@ When you run `init`, xtarterize scans your project to build a `ProjectProfile`:
 - **Package Manager** — pnpm, npm, yarn, or bun (from lockfiles or `packageManager` field)
 - **Monorepo** — Detected via `pnpm-workspace.yaml`, `turbo.json`, `packages/` + `apps/` dirs
 - **GitHub** — `.github/` directory presence
-- **Existing Configs** — Checks for `biome.json`, `tsconfig.json`, `renovate.json`, etc.
+- **Existing Configs** — Checks for `biome.json`, `tsconfig.json`, `renovate.json`, `vite.config.*`, `.versionrc`, `.gitignore`, etc.
 
 ## Detection Flow
 

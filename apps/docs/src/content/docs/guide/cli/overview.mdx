@@ -7,6 +7,15 @@ import { Aside, Tabs, TabItem, LinkButton } from '@astrojs/starlight/components'
 
 The xtarterize CLI provides commands to detect, apply, and maintain conformance configuration for JavaScript/TypeScript projects.
 
+## Global Options
+
+| Option | Description |
+|--------|-------------|
+| `--cwd <path>` | Target directory (default: current working directory) |
+| `--json` | Output machine-readable JSON |
+| `--help` | Show help for a command |
+| `--version` | Show version number |
+
 ## Available Commands
 
 | Command | Description |
@@ -22,6 +31,16 @@ The xtarterize CLI provides commands to detect, apply, and maintain conformance 
 ## `init`
 
 Full conformance setup. Detects your project stack, shows a plan, and applies changes.
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Preview all changes without applying |
+| `--yes` | Skip all confirmations, apply all changes automatically |
+| `--skip <task-id>` | Exclude a specific task (comma-separated) |
+| `--only <task-id>` | Apply only a specific task (comma-separated) |
+| `--quiet` | Suppress interactive prompts and verbose output |
 
 <Tabs>
   <TabItem label="Basic">
@@ -55,6 +74,16 @@ Full conformance setup. Detects your project stack, shows a plan, and applies ch
 
 Update existing project configs to match the latest conformance templates. Only shows tasks with `patch` or `conflict` status.
 
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Preview changes without applying |
+| `--yes` | Skip all confirmations, apply all updates automatically |
+| `--skip <task-id>` | Exclude a specific task (comma-separated) |
+| `--only <task-id>` | Apply only a specific task (comma-separated) |
+| `--quiet` | Suppress interactive prompts and verbose output |
+
 ```bash
 npx xtarterize sync
 npx xtarterize sync --dry-run
@@ -67,7 +96,13 @@ npx xtarterize sync --yes
 
 ## `diff`
 
-Show what `sync` would change, without applying anything. Read-only.
+Show pending changes for all tasks with `new` or `patch` status, without applying anything. Read-only.
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--quiet` | Suppress verbose output |
 
 ```bash
 npx xtarterize diff
@@ -75,10 +110,18 @@ npx xtarterize diff
 
 ## `check`
 
-Audit which tasks are conformant and which need attention.
+Audit which tasks are conformant and which need attention. Also runs diagnostics for conflicting tools and missing installations.
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--verbose` | Show tool installation and conflict checks |
+| `--quiet` | Suppress verbose output |
 
 ```bash
 npx xtarterize check
+npx xtarterize check --verbose
 ```
 
 Output shows:
@@ -90,9 +133,20 @@ Output shows:
 | ✗ | `new` | Missing entirely — will be created |
 | ⚠ | `conflict` | Incompatible config — needs manual resolution |
 
+In verbose mode, `check` also displays diagnostics for:
+- **Conflicting tools** — Biome + ESLint/Prettier detected together
+- **Legacy configs** — ESLint flat config migration recommendations
+- **Tool installations** — Tools in package.json but not installed locally
+
 ## `add`
 
 Apply a single conformance task.
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--quiet` | Suppress interactive prompts |
 
 ```bash
 npx xtarterize add lint/biome
@@ -102,7 +156,7 @@ npx xtarterize add codegen/plop
 
 ## `restore`
 
-Restore a file from a previous backup.
+Restore a file from a previous backup. If multiple backups exist, you'll be prompted to select one.
 
 ```bash
 npx xtarterize restore tsconfig.json
@@ -112,6 +166,12 @@ npx xtarterize restore biome.json
 ## `list`
 
 List all registered tasks grouped by category, with current status.
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--quiet` | Suppress verbose output |
 
 ```bash
 npx xtarterize list

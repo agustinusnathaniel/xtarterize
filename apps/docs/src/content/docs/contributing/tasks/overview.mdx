@@ -93,6 +93,7 @@ classDiagram
     - package-scripts.ts
   - ts/
     - incremental.ts
+    - gitignore-tsbuildinfo.ts
   - vite/
     - checker.ts
     - visualizer.ts
@@ -107,7 +108,7 @@ Most tasks are created through factory functions in `factory.ts` that eliminate 
 - **`createJsonMergeTask`** — For tasks that deep-merge JSON configs (tsconfig, biome, turbo)
 - **`createMultiFileJsonMergeTask`** — For tasks that merge multiple JSON files (VSCode settings + extensions)
 - **`createVitePluginTask`** — For injecting plugins into vite.config.ts (checker, visualizer)
-- **`createPackageJsonTask`** — For tasks that add scripts, deps, and config files to package.json (czg, commit-and-tag-version, package scripts)
+- **`createPackageJsonTask`** — For tasks that add scripts, deps, and extra files via package.json (czg, commit-and-tag-version, package scripts)
 
 This reduces most tasks from 40-80 lines to 10-15 lines of declarative configuration.
 

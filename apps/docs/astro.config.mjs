@@ -66,6 +66,10 @@ export default defineConfig({
 							link: '/contributing/core/detect/',
 						},
 						{
+							label: 'Preflight & Diagnostics',
+							link: '/contributing/core/preflight/',
+						},
+						{
 							label: 'Patchers',
 							autogenerate: { directory: 'contributing/patchers' },
 						},

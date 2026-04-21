@@ -104,6 +104,7 @@ flowchart TD
 flowchart LR
     Tasks["@xtarterize/tasks"] --> Lint["lint/<br/>biome"]
     Tasks --> TS["ts/<br/>incremental"]
+    Tasks --> Gitignore["gitignore/<br/>tsbuildinfo"]
     Tasks --> Vite["vite/<br/>checker, visualizer"]
     Tasks --> CI["ci/<br/>release, auto-update, ci"]
     Tasks --> Deps["deps/<br/>renovate"]

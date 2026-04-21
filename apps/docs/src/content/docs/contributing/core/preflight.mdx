@@ -1,0 +1,125 @@
+---
+title: Preflight & Diagnostics
+description: How xtarterize validates projects before making changes and audits for issues.
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components'
+
+Before any conformance changes are applied, xtarterize runs a series of validation checks. After changes, it can also diagnose potential issues with your project's tooling setup.
+
+## Preflight Checks
+
+Every command that modifies or inspects your project (`init`, `sync`, `diff`, `check`, `add`, `list`) runs preflight checks first via `runPreflight(cwd)`.
+
+### Validations
+
+| Check | Requirement | Error Code |
+|-------|-------------|------------|
+| `package.json` exists | Project root must contain a `package.json` | `MISSING_PACKAGE_JSON` |
+| `name` field present | `package.json` must have a `"name"` field | `INVALID_PACKAGE_JSON` |
+| Git repository | `.git` directory must exist | `MISSING_GIT` |
+
+### Behavior
+
+If preflight checks fail, the CLI exits with code `1` and displays all errors with hints:
+
+```
+✖ Preflight checks failed
+
+  ✗ No package.json found
+    Run xtarterize init from the root of a JS/TS project.
+
+  ✗ No .git directory found
+    Initialize a git repository with "git init" before running xtarterize.
+```
+
+<Aside type="note">
+  Preflight errors are non-destructive — no files are modified if checks fail.
+</Aside>
+
+## Diagnostics
+
+The `check` command with `--verbose` flag runs additional diagnostics to surface potential issues:
+
+### Conflict Checks
+
+Detects incompatible or redundant tooling configurations:
+
+| Check | Condition | Status |
+|-------|-----------|--------|
+| Biome + ESLint | Both `@biomejs/biome` and `eslint` in dependencies | `warn` |
+| Biome + Prettier | Both `@biomejs/biome` and `prettier` in dependencies | `warn` |
+| Legacy ESLint config | `.eslintrc.*` file exists | `warn` |
+| No conflicts | None of the above | `pass` |
+
+### Tool Installation Checks
+
+Verifies that tools listed in `package.json` are actually installed:
+
+| Tool | Dependency | Command Checked |
+|------|------------|-----------------|
+| Biome | `@biomejs/biome` | `biome --version` |
+| ESLint | `eslint` | `eslint --version` |
+| TypeScript | `typescript` | `tsc --version` |
+| Commitlint | `@commitlint/cli` | `commitlint --version` |
+| Knip | `knip` | `knip --version` |
+
+### Diagnostic Output
+
+```
+Diagnostics
+
+  ✔ Biome installation — Biome is installed
+  ~ ESLint installation — ESLint is in package.json but not installed (run install)
+  ~ Conflicting tools — Both Biome and ESLint are configured. Consider using one as primary.
+```
+
+## API Reference
+
+### `runPreflight(cwd)`
+
+```typescript
+import { runPreflight } from '@xtarterize/core'
+
+const result = await runPreflight('/path/to/project')
+
+if (!result.valid) {
+  for (const error of result.errors) {
+    console.log(error.code)    // 'MISSING_PACKAGE_JSON'
+    console.log(error.message) // 'No package.json found'
+    console.log(error.hint)    // 'Run xtarterize init from...'
+  }
+}
+```
+
+### `runConflictChecks(cwd)`
+
+```typescript
+import { runConflictChecks } from '@xtarterize/core'
+
+const checks = await runConflictChecks('/path/to/project')
+
+for (const check of checks) {
+  console.log(check.name)    // 'Conflicting tools'
+  console.log(check.status)  // 'warn' | 'pass' | 'fail'
+  console.log(check.message) // 'Both Biome and ESLint are configured...'
+}
+```
+
+### `runToolInstallationChecks(cwd)`
+
+```typescript
+import { runToolInstallationChecks } from '@xtarterize/core'
+
+const checks = await runToolInstallationChecks('/path/to/project')
+
+for (const check of checks) {
+  console.log(check.name)    // 'Biome installation'
+  console.log(check.status)  // 'pass' | 'warn' | 'fail'
+  console.log(check.message) // 'Biome is installed'
+}
+```
+
+## CI Mode
+
+In CI environments (`CI=true` or `CI=1`), the `--quiet` flag is automatically enabled for all commands, suppressing interactive prompts and verbose output.

@@ -51,6 +51,7 @@ npx xtarterize init
 | `--yes` | Skip all confirmations, apply all changes automatically |
 | `--skip <task-id>` | Exclude a specific task (comma-separated) |
 | `--only <task-id>` | Apply only a specific task (comma-separated) |
+| `--quiet` | Suppress interactive prompts and verbose output |
 
 ## Examples
 
@@ -82,7 +83,7 @@ npx xtarterize init
 The `init` command applies all tasks that are applicable to your detected stack:
 
 - **Linting & Formatting** — Biome (lint + format)
-- **TypeScript** — incremental builds
+- **TypeScript** — incremental builds, `.gitignore` tsbuildinfo entries
 - **Vite Plugins** — type checker, bundle visualizer
 - **CI/CD** — GitHub workflows for release, CI, auto-updates
 - **Dependencies** — Renovate config
