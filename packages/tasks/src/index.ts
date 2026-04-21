@@ -8,7 +8,6 @@ import { plopTask } from './codegen/plop.js'
 import { renovateTask } from './deps/renovate.js'
 import { vscodeTask } from './editor/vscode.js'
 import { biomeTask } from './lint/biome.js'
-import { ultraciteTask } from './lint/ultracite.js'
 import { turboTask } from './monorepo/turbo.js'
 import { knipTask } from './quality/knip.js'
 import { catVersionTask } from './release/cat-version.js'
@@ -37,7 +36,6 @@ export {
 	renovateTask,
 	skillsTask,
 	turboTask,
-	ultraciteTask,
 	viteCheckerTask,
 	viteVisualizerTask,
 	vscodeTask,
@@ -46,7 +44,6 @@ export {
 export function getAllTasks(): Task[] {
 	return [
 		biomeTask,
-		ultraciteTask,
 		incrementalTask,
 		gitignoreTsbuildinfoTask,
 		viteCheckerTask,

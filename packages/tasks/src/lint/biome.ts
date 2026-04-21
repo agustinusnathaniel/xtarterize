@@ -1,5 +1,13 @@
+import { readJsonIfExists } from '@xtarterize/core'
+import { mergeJson, parseJsonc } from '@xtarterize/patchers'
 import { createJsonMergeTask } from '../factory.js'
 import { renderBiomeJson } from '../templates/biome-json.js'
+
+async function hasUltracite(cwd: string): Promise<boolean> {
+	const { readPackageJson } = await import('@xtarterize/core')
+	const pkg = await readPackageJson(cwd)
+	return !!(pkg?.devDependencies?.ultracite || pkg?.dependencies?.ultracite)
+}
 
 export const biomeTask = createJsonMergeTask({
 	id: 'lint/biome',
@@ -8,7 +16,30 @@ export const biomeTask = createJsonMergeTask({
 	applicable: () => true,
 	filepath: 'biome.json',
 	extensions: ['.json', '.jsonc'],
-	incoming: (profile) => JSON.parse(renderBiomeJson(profile)),
+	incoming: (_cwd, profile) => JSON.parse(renderBiomeJson(profile)),
 	depName: '@biomejs/biome',
 	installDev: true,
+	async checkFn(cwd, profile, fullPath, content) {
+		if (!fullPath || !content) return 'new'
+
+		const parsed = parseJsonc(content) as Record<string, unknown>
+		const extendsList = parsed.extends as string[] | undefined
+		const hasUltraciteExtends = extendsList?.includes('ultracite') || extendsList?.some((e) => e.startsWith('ultracite/'))
+
+		if (hasUltraciteExtends && await hasUltracite(cwd)) {
+			return 'skip'
+		}
+
+		const { readPackageJson } = await import('@xtarterize/core')
+		const pkg = await readPackageJson(cwd)
+		if (!pkg?.devDependencies?.['@biomejs/biome'] && !pkg?.dependencies?.['@biomejs/biome']) {
+			return 'patch'
+		}
+
+		const actual = await readJsonIfExists(fullPath)
+		const expected = JSON.parse(renderBiomeJson(profile))
+		const merged = mergeJson(actual ?? {}, expected)
+		if (JSON.stringify(actual) === JSON.stringify(merged)) return 'skip'
+		return 'patch'
+	},
 })
