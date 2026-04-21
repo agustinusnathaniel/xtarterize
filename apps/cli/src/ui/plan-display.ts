@@ -21,6 +21,12 @@ export function displayPlan(
 		console.log(`  ${colorFn(statusLabel)} ${labelCol} ${pc.dim(idCol)}`)
 	}
 
+	const hasBiomeNew = tasks.some((t) => t.id === 'lint/biome' && statuses.get(t.id) === 'new')
+	if (hasBiomeNew) {
+		console.log(`  ${pc.dim('→ For stricter, opinionated linting, consider running')} ${pc.cyan('npx ultracite init')} ${pc.dim('instead.')}`)
+		console.log('')
+	}
+
 	console.log('')
 }
 

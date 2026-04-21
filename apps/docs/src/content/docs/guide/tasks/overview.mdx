@@ -12,7 +12,10 @@ xtarterize applies conformance configuration through discrete, independently app
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
 | `lint/biome` | Install Biome, write `biome.json` | Always (TS/JS projects) |
-| `lint/ultracite` | Apply Ultracite's opinionated Biome config layer | When Biome is configured |
+
+<Aside type="tip">
+  For stricter, opinionated linting, run <code>npx ultracite init</code> after <code>xtarterize init</code>. The <code>package.json</code> lint scripts will auto-detect Ultracite.
+</Aside>
 
 ## TypeScript
 

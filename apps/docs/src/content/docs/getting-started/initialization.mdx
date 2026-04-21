@@ -81,7 +81,7 @@ npx xtarterize init
 
 The `init` command applies all tasks that are applicable to your detected stack:
 
-- **Linting & Formatting** — Biome, Ultracite
+- **Linting & Formatting** — Biome (lint + format)
 - **TypeScript** — incremental builds
 - **Vite Plugins** — type checker, bundle visualizer
 - **CI/CD** — GitHub workflows for release, CI, auto-updates
@@ -97,6 +97,18 @@ The `init` command applies all tasks that are applicable to your detected stack:
 <Aside>
   Each task checks if it's already applied and skips if conformant. Running `init` twice produces no changes on the second run.
 </Aside>
+
+## Ultracite
+
+xtarterize sets up Biome with sensible defaults. If you want stricter, more opinionated linting, we recommend [Ultracite](https://www.ultracite.ai/) — a Biome preset with stricter rules for code quality.
+
+After running `xtarterize init`, you can optionally run:
+
+```bash
+npx ultracite init
+```
+
+This will replace the default `biome.json` with Ultracite's stricter configuration. The `package.json` lint scripts will automatically detect Ultracite and use `ultracite` instead of `biome check`.
 
 ## Init Flow
 

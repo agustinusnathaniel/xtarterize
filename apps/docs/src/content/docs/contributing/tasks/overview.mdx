@@ -81,7 +81,6 @@ classDiagram
   - factory.ts
   - lint/
     - biome.ts
-    - ultracite.ts
   - monorepo/
     - turbo.ts
   - quality/
@@ -103,9 +102,12 @@ classDiagram
 
 Most tasks are created through factory functions in `factory.ts` that eliminate boilerplate:
 
-- **`createSimpleFileTask`** — For tasks that write a single file (CI workflows, renovate, commitlint, knip, plop, agents-md)
-- **`createJsonMergeTask`** — For tasks that deep-merge JSON configs (tsconfig, vscode settings, biome, turbo)
-- **`createFileTask`** — For tasks with custom check logic (ultracite, vite plugins)
+- **`createSimpleFileTask`** — For tasks that write a single new file (CI workflows, renovate, commitlint, knip, plop, AI skills)
+- **`createFileTask`** — For text files with custom check/merge logic (AGENTS.md, .gitignore entries)
+- **`createJsonMergeTask`** — For tasks that deep-merge JSON configs (tsconfig, biome, turbo)
+- **`createMultiFileJsonMergeTask`** — For tasks that merge multiple JSON files (VSCode settings + extensions)
+- **`createVitePluginTask`** — For injecting plugins into vite.config.ts (checker, visualizer)
+- **`createPackageJsonTask`** — For tasks that add scripts, deps, and config files to package.json (czg, commit-and-tag-version, package scripts)
 
 This reduces most tasks from 40-80 lines to 10-15 lines of declarative configuration.
 
