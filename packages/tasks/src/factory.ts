@@ -19,6 +19,12 @@ function relativeToCwd(fullPath: string, cwd: string): string {
 	return relative(cwd, fullPath)
 }
 
+function getDefaultFilepath(filepath: string, extensions?: string[]): string {
+	if (!extensions || extensions.length === 0) return filepath
+	const hasExt = extensions.some((ext) => filepath.endsWith(ext))
+	return hasExt ? filepath : `${filepath}${extensions[0]}`
+}
+
 async function resolveTaskFile(cwd: string, filepath: string, extensions?: string[]): Promise<string | null> {
 	if (extensions) {
 		const base = filepath.replace(/\.[^.]+$/, '')
@@ -85,7 +91,9 @@ export function createFileTask(options: FileTaskOptions): Task {
 
 			const exists = fullPath !== null && await fileExists(fullPath)
 			const before = exists ? await readFile(fullPath) : null
-			const filepath = exists ? relativeToCwd(fullPath, cwd) : options.filepath
+			const filepath = exists
+				? relativeToCwd(fullPath, cwd)
+				: getDefaultFilepath(options.filepath, options.extensions)
 
 			const after = options.render(profile, before)
 
@@ -169,7 +177,9 @@ export function createJsonMergeTask(options: JsonMergeTaskOptions): Task {
 
 			const exists = fullPath !== null && await fileExists(fullPath)
 			const before = exists ? await readFile(fullPath) : null
-			const filepath = exists ? relativeToCwd(fullPath, cwd) : options.filepath
+			const filepath = exists
+				? relativeToCwd(fullPath, cwd)
+				: getDefaultFilepath(options.filepath, options.extensions)
 
 			let after: string
 			if (exists && before) {
@@ -248,7 +258,9 @@ export function createSimpleFileTask(options: SimpleFileTaskOptions): Task {
 
 			const exists = fullPath !== null && await fileExists(fullPath)
 			const before = exists ? await readFile(fullPath) : null
-			const filepath = exists ? relativeToCwd(fullPath, cwd) : options.filepath
+			const filepath = exists
+				? relativeToCwd(fullPath, cwd)
+				: getDefaultFilepath(options.filepath, options.extensions)
 			const after = options.render(profile)
 
 			return [{ filepath, before, after }]
@@ -310,7 +322,7 @@ export function createVitePluginTask(options: VitePluginTaskOptions): Task {
 		},
 
 		async dryRun(cwd, _profile): Promise<FileDiff[]> {
-			const { generateCode, loadFile } = await import('magicast')
+			const { generateCode, loadFile, parseExpression } = await import('magicast')
 
 			const configPath = await findConfigFile(cwd, 'vite.config', VITE_CONFIG_EXTENSIONS)
 			if (!configPath) return []
@@ -328,7 +340,7 @@ export function createVitePluginTask(options: VitePluginTaskOptions): Task {
 			}
 
 			const plugins: any[] = defaultExport.plugins
-			plugins.push(options.pluginCall)
+			plugins.push(parseExpression(options.pluginCall))
 
 			const { code: after } = generateCode(mod)
 			const importDecl = options.importStyle === 'named'

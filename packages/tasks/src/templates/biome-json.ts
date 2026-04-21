@@ -2,7 +2,7 @@ import type { ProjectProfile } from '@xtarterize/core'
 
 export function renderBiomeJson(_profile: ProjectProfile): string {
 	const config = {
-		$schema: 'https://biomejs.dev/schemas/2.3.8/schema.json',
+		$schema: './node_modules/@biomejs/biome/configuration_schema.json',
 		vcs: { enabled: true, clientKind: 'git', useIgnoreFile: true },
 		files: {
 			ignoreUnknown: false,

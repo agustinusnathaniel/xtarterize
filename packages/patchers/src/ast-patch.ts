@@ -1,6 +1,6 @@
 import { writeFile } from 'node:fs/promises'
+import { generateCode, loadFile, parseExpression } from 'magicast'
 import { basename } from 'pathe'
-import { generateCode, loadFile } from 'magicast'
 
 const CONFIG_FILE_NAMES: Record<string, string> = {
 	'vite.config.ts': 'vite.config',
@@ -38,7 +38,7 @@ export async function injectVitePlugin(
 			}
 		}
 
-		let plugins: any[] | undefined
+		let plugins: any[]
 
 		if (Array.isArray(defaultExport.plugins)) {
 			plugins = defaultExport.plugins
@@ -47,6 +47,14 @@ export async function injectVitePlugin(
 				success: false,
 				fallback: 'Function-style vite config not supported by AST patching',
 			}
+		} else if (typeof defaultExport === 'object' && defaultExport !== null) {
+			const configObj = defaultExport.$args?.[0] ?? defaultExport
+			if (Array.isArray(configObj.plugins)) {
+				plugins = configObj.plugins
+			} else {
+				configObj.plugins = []
+				plugins = configObj.plugins
+			}
 		} else {
 			return {
 				success: false,
@@ -54,20 +62,13 @@ export async function injectVitePlugin(
 			}
 		}
 
-		if (!plugins) {
-			return {
-				success: false,
-				fallback: `Could not locate plugins array in ${configLabel}`,
-			}
-		}
-
-		mod.imports.$add({
+		mod.imports.$prepend({
 			from: importPath,
 			imported: importName === '{ visualizer }' ? 'visualizer' : 'default',
 			local: importName === '{ visualizer }' ? 'visualizer' : importName,
 		})
 
-		plugins.push(pluginExpression)
+		plugins.push(parseExpression(pluginExpression))
 
 		const { code: generatedCode } = generateCode(mod)
 		await writeFile(configPath, generatedCode)
