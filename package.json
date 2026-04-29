@@ -27,7 +27,7 @@
 		"@changesets/changelog-github": "^0.6.0",
 		"@changesets/cli": "^2.31.0",
 		"turbo": "^2.9.6",
-		"vite": "^8.0.9",
+		"vite": "^8.0.10",
 		"vitest": "^4.1.4"
 	},
 	"packageManager": "pnpm@10.24.0"
