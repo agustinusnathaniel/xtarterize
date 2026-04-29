@@ -1,5 +1,6 @@
 import type { Task, TaskStatus } from '@xtarterize/core'
 import { pc } from '@xtarterize/core'
+import Table from 'cli-table3'
 
 export function displayPlan(
 	tasks: Task[],
@@ -10,32 +11,55 @@ export function displayPlan(
 	console.log(pc.bold(title))
 	console.log('')
 
+	const table = new Table({
+		head: [pc.bold('Status'), pc.bold('Task'), pc.bold('ID'), pc.bold('Group')],
+		style: { head: [], border: [] },
+		chars: {
+			top: '─',
+			'top-mid': '┬',
+			'top-left': '┌',
+			'top-right': '┐',
+			bottom: '─',
+			'bottom-mid': '┴',
+			'bottom-left': '└',
+			'bottom-right': '┘',
+			left: '│',
+			'left-mid': '├',
+			mid: '─',
+			'mid-mid': '┼',
+			right: '│',
+			'right-mid': '┤',
+			middle: '│',
+		},
+	})
+
 	for (const task of tasks) {
 		const status = statuses.get(task.id) ?? 'new'
-		const statusLabel = getStatusLabel(status, task)
 		const colorFn = getStatusColor(status)
-
-		const idCol = task.id.padEnd(25)
-		const labelCol = task.label.padEnd(40)
-
-		console.log(`  ${colorFn(statusLabel)} ${labelCol} ${pc.dim(idCol)}`)
+		table.push([
+			colorFn(getStatusLabel(status)),
+			task.label,
+			pc.dim(task.id),
+			pc.dim(task.group),
+		])
 	}
 
+	console.log(table.toString())
 	console.log('')
 }
 
-function getStatusLabel(status: string, task: Task): string {
+function getStatusLabel(status: string): string {
 	switch (status) {
 		case 'new':
-			return '[new]'
+			return 'new'
 		case 'patch':
-			return '[patch]'
+			return 'patch'
 		case 'skip':
-			return `[skip — ${task.id}]`
+			return 'skip'
 		case 'conflict':
-			return '[conflict]'
+			return 'conflict'
 		default:
-			return `[${status}]`
+			return status
 	}
 }
 
