@@ -1,17 +1,19 @@
 import type { Task } from '@/_base.js'
 import { backupFile } from '@/backup.js'
 import type { ProjectProfile } from '@/detect.js'
-import { logInfo, logSuccess, logError } from '@/utils/logger.js'
+import { logError, logInfo, logSuccess } from '@/utils/logger.js'
 
 export async function applyTasks(
 	tasks: Task[],
 	cwd: string,
 	profile: ProjectProfile,
 	selectedIds?: string[],
+	options: { includeConflicts?: boolean } = {},
 ): Promise<{ applied: number; skipped: number; errors: string[] }> {
 	const toApply = selectedIds
 		? tasks.filter((t) => selectedIds.includes(t.id))
 		: tasks
+	const includeConflicts = options.includeConflicts ?? selectedIds !== undefined
 
 	let applied = 0
 	let skipped = 0
@@ -26,6 +28,11 @@ export async function applyTasks(
 			const status = await task.check(cwd, profile)
 			if (status === 'skip') {
 				skipped++
+				continue
+			}
+			if (status === 'conflict' && !includeConflicts) {
+				skipped++
+				logInfo(`Skipping conflict: ${task.label} (${task.id})`)
 				continue
 			}
 			tasksToRun.push(task)

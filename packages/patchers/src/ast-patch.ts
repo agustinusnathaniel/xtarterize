@@ -38,10 +38,10 @@ export async function injectVitePlugin(
 			}
 		}
 
-		let plugins: any[]
+		let plugins: unknown[]
 
 		if (Array.isArray(defaultExport.plugins)) {
-			plugins = defaultExport.plugins
+			plugins = defaultExport.plugins as unknown[]
 		} else if (typeof defaultExport === 'function') {
 			return {
 				success: false,

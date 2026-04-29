@@ -1,4 +1,9 @@
-import type { FileDiff, ProjectProfile, Task, TaskStatus } from '@xtarterize/core'
+import type {
+	FileDiff,
+	ProjectProfile,
+	Task,
+	TaskStatus,
+} from '@xtarterize/core'
 import {
 	ensureDir,
 	fileExists,
@@ -11,12 +16,32 @@ import {
 	writePackageJson,
 } from '@xtarterize/core'
 import { injectVitePlugin, mergeJson, parseJsonc } from '@xtarterize/patchers'
+import JSON5 from 'json5'
 import { addDependency } from 'nypm'
 import { relative } from 'pathe'
-import JSON5 from 'json5'
 
 function relativeToCwd(fullPath: string, cwd: string): string {
 	return relative(cwd, fullPath)
+}
+
+export function deepEqual(a: unknown, b: unknown): boolean {
+	if (a === b) return true
+	if (typeof a !== typeof b) return false
+	if (typeof a !== 'object' || a === null || b === null) return false
+	if (Array.isArray(a) !== Array.isArray(b)) return false
+	if (Array.isArray(a) && Array.isArray(b)) {
+		if (a.length !== b.length) return false
+		return a.every((v, i) => deepEqual(v, b[i]))
+	}
+	const aKeys = Object.keys(a as object)
+	const bKeys = Object.keys(b as object)
+	if (aKeys.length !== bKeys.length) return false
+	return aKeys.every((k) =>
+		deepEqual(
+			(a as Record<string, unknown>)[k],
+			(b as Record<string, unknown>)[k],
+		),
+	)
 }
 
 function getDefaultFilepath(filepath: string, extensions?: string[]): string {
@@ -25,7 +50,11 @@ function getDefaultFilepath(filepath: string, extensions?: string[]): string {
 	return hasExt ? filepath : `${filepath}${extensions[0]}`
 }
 
-async function resolveTaskFile(cwd: string, filepath: string, extensions?: string[]): Promise<string | null> {
+async function resolveTaskFile(
+	cwd: string,
+	filepath: string,
+	extensions?: string[],
+): Promise<string | null> {
 	if (extensions) {
 		const base = filepath.replace(/\.[^.]+$/, '')
 		return findConfigFile(cwd, base, extensions)
@@ -48,7 +77,12 @@ export interface FileTaskOptions {
 	depInstallName?: string
 	installDev?: boolean
 	ensureParentDir?: boolean
-	checkFn?: (cwd: string, profile: ProjectProfile, fullPath: string | null, content: string | null) => Promise<TaskStatus>
+	checkFn?: (
+		cwd: string,
+		profile: ProjectProfile,
+		fullPath: string | null,
+		content: string | null,
+	) => Promise<TaskStatus>
 }
 
 export function createFileTask(options: FileTaskOptions): Task {
@@ -59,7 +93,11 @@ export function createFileTask(options: FileTaskOptions): Task {
 		applicable: options.applicable,
 
 		async check(cwd, profile): Promise<TaskStatus> {
-			const fullPath = await resolveTaskFile(cwd, options.filepath, options.extensions)
+			const fullPath = await resolveTaskFile(
+				cwd,
+				options.filepath,
+				options.extensions,
+			)
 
 			if (!fullPath) return 'new'
 
@@ -87,9 +125,13 @@ export function createFileTask(options: FileTaskOptions): Task {
 		},
 
 		async dryRun(cwd, profile): Promise<FileDiff[]> {
-			const fullPath = await resolveTaskFile(cwd, options.filepath, options.extensions)
+			const fullPath = await resolveTaskFile(
+				cwd,
+				options.filepath,
+				options.extensions,
+			)
 
-			const exists = fullPath !== null && await fileExists(fullPath)
+			const exists = fullPath !== null && (await fileExists(fullPath))
 			const before = exists ? await readFile(fullPath) : null
 			const filepath = exists
 				? relativeToCwd(fullPath, cwd)
@@ -103,9 +145,14 @@ export function createFileTask(options: FileTaskOptions): Task {
 		async apply(cwd, profile): Promise<void> {
 			if (options.depName) {
 				const pkg = await readPackageJson(cwd)
-				const hasDep = pkg?.devDependencies?.[options.depName] || pkg?.dependencies?.[options.depName]
+				const hasDep =
+					pkg?.devDependencies?.[options.depName] ||
+					pkg?.dependencies?.[options.depName]
 				if (!hasDep) {
-					await addDependency([options.depInstallName ?? options.depName], { cwd, dev: options.installDev ?? true })
+					await addDependency([options.depInstallName ?? options.depName], {
+						cwd,
+						dev: options.installDev ?? true,
+					})
 				}
 			}
 
@@ -135,7 +182,12 @@ export interface JsonMergeTaskOptions {
 	incoming: (cwd: string, profile: ProjectProfile) => object | Promise<object>
 	depName?: string
 	installDev?: boolean
-	checkFn?: (cwd: string, profile: ProjectProfile, fullPath: string | null, content: string | null) => Promise<TaskStatus>
+	checkFn?: (
+		cwd: string,
+		profile: ProjectProfile,
+		fullPath: string | null,
+		content: string | null,
+	) => Promise<TaskStatus>
 }
 
 export function createJsonMergeTask(options: JsonMergeTaskOptions): Task {
@@ -146,7 +198,11 @@ export function createJsonMergeTask(options: JsonMergeTaskOptions): Task {
 		applicable: options.applicable,
 
 		async check(cwd, profile): Promise<TaskStatus> {
-			const fullPath = await resolveTaskFile(cwd, options.filepath, options.extensions)
+			const fullPath = await resolveTaskFile(
+				cwd,
+				options.filepath,
+				options.extensions,
+			)
 
 			if (!fullPath) return 'new'
 
@@ -160,7 +216,10 @@ export function createJsonMergeTask(options: JsonMergeTaskOptions): Task {
 
 			const pkg = await readPackageJson(cwd)
 			if (options.depName) {
-				if (!pkg?.devDependencies?.[options.depName] && !pkg?.dependencies?.[options.depName]) {
+				if (
+					!pkg?.devDependencies?.[options.depName] &&
+					!pkg?.dependencies?.[options.depName]
+				) {
 					return 'patch'
 				}
 			}
@@ -168,14 +227,18 @@ export function createJsonMergeTask(options: JsonMergeTaskOptions): Task {
 			const actual = await readJsonIfExists(fullPath)
 			const expected = await options.incoming(cwd, profile)
 			const merged = mergeJson(actual ?? {}, expected)
-			if (JSON.stringify(actual) === JSON.stringify(merged)) return 'skip'
+			if (deepEqual(actual, merged)) return 'skip'
 			return 'patch'
 		},
 
 		async dryRun(cwd, profile): Promise<FileDiff[]> {
-			const fullPath = await resolveTaskFile(cwd, options.filepath, options.extensions)
+			const fullPath = await resolveTaskFile(
+				cwd,
+				options.filepath,
+				options.extensions,
+			)
 
-			const exists = fullPath !== null && await fileExists(fullPath)
+			const exists = fullPath !== null && (await fileExists(fullPath))
 			const before = exists ? await readFile(fullPath) : null
 			const filepath = exists
 				? relativeToCwd(fullPath, cwd)
@@ -196,9 +259,14 @@ export function createJsonMergeTask(options: JsonMergeTaskOptions): Task {
 		async apply(cwd, profile): Promise<void> {
 			if (options.depName) {
 				const pkg = await readPackageJson(cwd)
-				const hasDep = pkg?.devDependencies?.[options.depName] || pkg?.dependencies?.[options.depName]
+				const hasDep =
+					pkg?.devDependencies?.[options.depName] ||
+					pkg?.dependencies?.[options.depName]
 				if (!hasDep) {
-					await addDependency([options.depName], { cwd, dev: options.installDev ?? true })
+					await addDependency([options.depName], {
+						cwd,
+						dev: options.installDev ?? true,
+					})
 				}
 			}
 
@@ -224,7 +292,12 @@ export interface SimpleFileTaskOptions {
 	depName?: string
 	installDev?: boolean
 	ensureParentDir?: boolean
-	checkFn?: (cwd: string, profile: ProjectProfile, fullPath: string | null, content: string | null) => Promise<TaskStatus>
+	checkFn?: (
+		cwd: string,
+		profile: ProjectProfile,
+		fullPath: string | null,
+		content: string | null,
+	) => Promise<TaskStatus>
 }
 
 export function createSimpleFileTask(options: SimpleFileTaskOptions): Task {
@@ -235,7 +308,11 @@ export function createSimpleFileTask(options: SimpleFileTaskOptions): Task {
 		applicable: options.applicable,
 
 		async check(cwd, profile): Promise<TaskStatus> {
-			const fullPath = await resolveTaskFile(cwd, options.filepath, options.extensions)
+			const fullPath = await resolveTaskFile(
+				cwd,
+				options.filepath,
+				options.extensions,
+			)
 
 			if (!fullPath) return 'new'
 
@@ -254,9 +331,13 @@ export function createSimpleFileTask(options: SimpleFileTaskOptions): Task {
 		},
 
 		async dryRun(cwd, profile): Promise<FileDiff[]> {
-			const fullPath = await resolveTaskFile(cwd, options.filepath, options.extensions)
+			const fullPath = await resolveTaskFile(
+				cwd,
+				options.filepath,
+				options.extensions,
+			)
 
-			const exists = fullPath !== null && await fileExists(fullPath)
+			const exists = fullPath !== null && (await fileExists(fullPath))
 			const before = exists ? await readFile(fullPath) : null
 			const filepath = exists
 				? relativeToCwd(fullPath, cwd)
@@ -269,9 +350,14 @@ export function createSimpleFileTask(options: SimpleFileTaskOptions): Task {
 		async apply(cwd, profile): Promise<void> {
 			if (options.depName) {
 				const pkg = await readPackageJson(cwd)
-				const hasDep = pkg?.devDependencies?.[options.depName] || pkg?.dependencies?.[options.depName]
+				const hasDep =
+					pkg?.devDependencies?.[options.depName] ||
+					pkg?.dependencies?.[options.depName]
 				if (!hasDep) {
-					await addDependency([options.depName], { cwd, dev: options.installDev ?? true })
+					await addDependency([options.depName], {
+						cwd,
+						dev: options.installDev ?? true,
+					})
 				}
 			}
 
@@ -313,7 +399,11 @@ export function createVitePluginTask(options: VitePluginTaskOptions): Task {
 		applicable: options.applicable,
 
 		async check(cwd, _profile): Promise<TaskStatus> {
-			const configPath = await findConfigFile(cwd, 'vite.config', VITE_CONFIG_EXTENSIONS)
+			const configPath = await findConfigFile(
+				cwd,
+				'vite.config',
+				VITE_CONFIG_EXTENSIONS,
+			)
 			if (!configPath) return 'conflict'
 
 			const content = await readFile(configPath)
@@ -322,9 +412,15 @@ export function createVitePluginTask(options: VitePluginTaskOptions): Task {
 		},
 
 		async dryRun(cwd, _profile): Promise<FileDiff[]> {
-			const { generateCode, loadFile, parseExpression } = await import('magicast')
+			const { generateCode, loadFile, parseExpression } = await import(
+				'magicast'
+			)
 
-			const configPath = await findConfigFile(cwd, 'vite.config', VITE_CONFIG_EXTENSIONS)
+			const configPath = await findConfigFile(
+				cwd,
+				'vite.config',
+				VITE_CONFIG_EXTENSIONS,
+			)
 			if (!configPath) return []
 
 			const before = await readFile(configPath)
@@ -339,13 +435,14 @@ export function createVitePluginTask(options: VitePluginTaskOptions): Task {
 				return [{ filepath: 'vite.config', before, after: before }]
 			}
 
-			const plugins: any[] = defaultExport.plugins
+			const plugins: unknown[] = defaultExport.plugins as unknown[]
 			plugins.push(parseExpression(options.pluginCall))
 
 			const { code: after } = generateCode(mod)
-			const importDecl = options.importStyle === 'named'
-				? `import { ${options.importName} } from '${options.depName}'\n`
-				: `import ${options.importName} from '${options.depName}'\n`
+			const importDecl =
+				options.importStyle === 'named'
+					? `import { ${options.importName} } from '${options.depName}'\n`
+					: `import ${options.importName} from '${options.depName}'\n`
 			const finalAfter = `${importDecl}${after}`
 
 			return [{ filepath: 'vite.config', before, after: finalAfter }]
@@ -353,18 +450,26 @@ export function createVitePluginTask(options: VitePluginTaskOptions): Task {
 
 		async apply(cwd, _profile): Promise<void> {
 			const pkg = await readPackageJson(cwd)
-			if (!pkg?.devDependencies?.[options.depName] && !pkg?.dependencies?.[options.depName]) {
+			if (
+				!pkg?.devDependencies?.[options.depName] &&
+				!pkg?.dependencies?.[options.depName]
+			) {
 				await addDependency([options.depName], { cwd, dev: true })
 			}
 
-			const configPath = await findConfigFile(cwd, 'vite.config', VITE_CONFIG_EXTENSIONS)
+			const configPath = await findConfigFile(
+				cwd,
+				'vite.config',
+				VITE_CONFIG_EXTENSIONS,
+			)
 			if (!configPath) {
 				throw new Error(`No vite.config file found for ${options.id}`)
 			}
 
-			const importSpecifier = options.importStyle === 'named'
-				? `{ ${options.importName} }`
-				: options.importName
+			const importSpecifier =
+				options.importStyle === 'named'
+					? `{ ${options.importName} }`
+					: options.importName
 
 			const result = await injectVitePlugin(
 				configPath,
@@ -374,7 +479,9 @@ export function createVitePluginTask(options: VitePluginTaskOptions): Task {
 			)
 
 			if (!result.success) {
-				throw new Error(result.fallback ?? `Failed to inject ${options.depName}`)
+				throw new Error(
+					result.fallback ?? `Failed to inject ${options.depName}`,
+				)
 			}
 		},
 	}
@@ -393,16 +500,49 @@ export interface PackageJsonTaskOptions {
 	group: string
 	applicable: (profile: ProjectProfile) => boolean
 	scripts?: PackageJsonScriptEntry[]
-	getScripts?: (cwd: string, profile: ProjectProfile) => Promise<PackageJsonScriptEntry[]>
+	getScripts?: (
+		cwd: string,
+		profile: ProjectProfile,
+	) => Promise<PackageJsonScriptEntry[]>
 	depName?: string
 	installDev?: boolean
-	files?: { filepath: string; render: (cwd: string, profile: ProjectProfile) => Promise<string> | string }[]
-	checkFn?: (cwd: string, profile: ProjectProfile, pkg: Record<string, unknown>) => Promise<TaskStatus>
+	files?: {
+		filepath: string
+		render: (cwd: string, profile: ProjectProfile) => Promise<string> | string
+	}[]
+	checkFn?: (
+		cwd: string,
+		profile: ProjectProfile,
+		pkg: Record<string, unknown>,
+	) => Promise<TaskStatus>
 }
 
-async function resolveScripts(options: PackageJsonTaskOptions, cwd: string, profile: ProjectProfile): Promise<PackageJsonScriptEntry[]> {
+async function resolveScripts(
+	options: PackageJsonTaskOptions,
+	cwd: string,
+	profile: ProjectProfile,
+): Promise<PackageJsonScriptEntry[]> {
 	if (options.getScripts) return options.getScripts(cwd, profile)
 	return options.scripts ?? []
+}
+
+type PackageScriptsMap = Record<string, string | undefined>
+
+function hasOwnScript(scripts: PackageScriptsMap, script: string): boolean {
+	return Object.hasOwn(scripts, script)
+}
+
+function mergePackageScripts(
+	current: PackageScriptsMap | undefined,
+	scripts: PackageJsonScriptEntry[],
+): PackageScriptsMap {
+	const next = { ...current }
+	for (const s of scripts) {
+		if (!hasOwnScript(next, s.script)) {
+			next[s.script] = s.value
+		}
+	}
+	return next
 }
 
 export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
@@ -422,9 +562,19 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 
 			const scripts = await resolveScripts(options, cwd, profile)
 			const scriptsMap = pkg.scripts ?? {}
-			const missingScripts = scripts.filter((s) => scriptsMap[s.script] !== s.value)
+			const missingScripts = scripts.filter(
+				(s) => !hasOwnScript(scriptsMap, s.script),
+			)
+			const conflictingScripts = scripts.filter(
+				(s) =>
+					hasOwnScript(scriptsMap, s.script) &&
+					scriptsMap[s.script] !== s.value,
+			)
 
-			const hasDep = !options.depName || pkg.devDependencies?.[options.depName] || pkg.dependencies?.[options.depName]
+			const hasDep =
+				!options.depName ||
+				pkg.devDependencies?.[options.depName] ||
+				pkg.dependencies?.[options.depName]
 
 			const extraFiles = options.files ?? []
 			const missingFiles: string[] = []
@@ -434,10 +584,19 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 				if (!exists) missingFiles.push(f.filepath)
 			}
 
-			if (missingScripts.length === 0 && hasDep && missingFiles.length === 0) return 'skip'
-			if (missingScripts.length === 0 && hasDep && missingFiles.length > 0) return 'patch'
-			if (!hasDep && missingScripts.length === 0 && missingFiles.length === 0) return 'patch'
-			if (missingScripts.length === scripts.length && !hasDep && missingFiles.length === extraFiles.length) return 'new'
+			if (conflictingScripts.length > 0) return 'conflict'
+			if (missingScripts.length === 0 && hasDep && missingFiles.length === 0)
+				return 'skip'
+			if (missingScripts.length === 0 && hasDep && missingFiles.length > 0)
+				return 'patch'
+			if (!hasDep && missingScripts.length === 0 && missingFiles.length === 0)
+				return 'patch'
+			if (
+				missingScripts.length === scripts.length &&
+				(!options.depName || !hasDep) &&
+				missingFiles.length === extraFiles.length
+			)
+				return 'new'
 			return 'patch'
 		},
 
@@ -447,20 +606,20 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 			for (const f of options.files ?? []) {
 				const fullPath = resolvePath(cwd, f.filepath)
 				const exists = await fileExists(fullPath)
-				const before = exists ? await readFile(fullPath) : null
-				const after = await f.render(cwd, profile)
-				diffs.push({ filepath: f.filepath, before, after })
+				if (exists) continue
+				diffs.push({
+					filepath: f.filepath,
+					before: null,
+					after: await f.render(cwd, profile),
+				})
 			}
 
 			const pkg = await readPackageJson(cwd)
 			if (pkg) {
 				const before = JSON.stringify(pkg, null, 2)
 				const updated = { ...pkg }
-				updated.scripts = { ...updated.scripts }
 				const scripts = await resolveScripts(options, cwd, profile)
-				for (const s of scripts) {
-					updated.scripts[s.script] = s.value
-				}
+				updated.scripts = mergePackageScripts(updated.scripts, scripts)
 				const after = JSON.stringify(updated, null, 2)
 				diffs.push({ filepath: 'package.json', before, after })
 			}
@@ -471,8 +630,14 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 		async apply(cwd, profile): Promise<void> {
 			if (options.depName) {
 				const pkg = await readPackageJson(cwd)
-				if (!pkg?.devDependencies?.[options.depName] && !pkg?.dependencies?.[options.depName]) {
-					await addDependency([options.depName], { cwd, dev: options.installDev ?? true })
+				if (
+					!pkg?.devDependencies?.[options.depName] &&
+					!pkg?.dependencies?.[options.depName]
+				) {
+					await addDependency([options.depName], {
+						cwd,
+						dev: options.installDev ?? true,
+					})
 				}
 			}
 
@@ -486,11 +651,8 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 
 			const pkg = await readPackageJson(cwd)
 			if (pkg) {
-				pkg.scripts = { ...pkg.scripts }
 				const scripts = await resolveScripts(options, cwd, profile)
-				for (const s of scripts) {
-					pkg.scripts[s.script] = s.value
-				}
+				pkg.scripts = mergePackageScripts(pkg.scripts, scripts)
 				await writePackageJson(cwd, pkg)
 			}
 		},
@@ -503,6 +665,7 @@ export interface MultiFileJsonMergeEntry {
 	filepath: string
 	extensions?: string[]
 	incoming: (profile: ProjectProfile) => object | Promise<object>
+	merge?: (existing: object, incoming: object) => object
 }
 
 export interface MultiFileJsonMergeTaskOptions {
@@ -513,7 +676,9 @@ export interface MultiFileJsonMergeTaskOptions {
 	files: MultiFileJsonMergeEntry[]
 }
 
-export function createMultiFileJsonMergeTask(options: MultiFileJsonMergeTaskOptions): Task {
+export function createMultiFileJsonMergeTask(
+	options: MultiFileJsonMergeTaskOptions,
+): Task {
 	return {
 		id: options.id,
 		label: options.label,
@@ -535,8 +700,9 @@ export function createMultiFileJsonMergeTask(options: MultiFileJsonMergeTaskOpti
 				}
 				const actual = await readJsonIfExists(fullPath)
 				const expected = await f.incoming(profile)
-				const merged = mergeJson(actual ?? {}, expected)
-				if (JSON.stringify(actual) !== JSON.stringify(merged)) {
+				const doMerge = f.merge ?? mergeJson
+				const merged = doMerge(actual ?? {}, expected)
+				if (!deepEqual(actual, merged)) {
 					status = 'patch'
 				}
 			}
@@ -547,7 +713,7 @@ export function createMultiFileJsonMergeTask(options: MultiFileJsonMergeTaskOpti
 			const diffs: FileDiff[] = []
 			for (const f of options.files) {
 				const fullPath = await resolveTaskFile(cwd, f.filepath, f.extensions)
-				const exists = fullPath !== null && await fileExists(fullPath)
+				const exists = fullPath !== null && (await fileExists(fullPath))
 				const before = exists ? await readFile(fullPath) : null
 				const filepath = exists ? relative(cwd, fullPath) : f.filepath
 
@@ -555,7 +721,8 @@ export function createMultiFileJsonMergeTask(options: MultiFileJsonMergeTaskOpti
 				if (exists && before) {
 					const existing = JSON5.parse(before)
 					const incoming = await f.incoming(profile)
-					after = JSON.stringify(mergeJson(existing, incoming), null, 2)
+					const doMerge = f.merge ?? mergeJson
+					after = JSON.stringify(doMerge(existing, incoming), null, 2)
 				} else {
 					after = JSON.stringify(await f.incoming(profile), null, 2)
 				}

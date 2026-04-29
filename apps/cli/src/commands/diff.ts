@@ -2,11 +2,11 @@ import { spinner } from '@clack/prompts'
 import {
 	detectProject,
 	type FileDiff,
+	logSuccess,
 	pc,
 	resolveTaskStatuses,
 	resolveTasks,
 	runPreflight,
-	logSuccess,
 } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 import { defineCommand } from 'citty'

@@ -14,7 +14,7 @@ export function generateDiff(before: string | null, after: string): string {
 	for (const change of changes) {
 		const prefix = change.added ? '+ ' : change.removed ? '- ' : '  '
 		const color = change.added ? pc.green : change.removed ? pc.red : String
-		const reset = change.added || change.removed ? pc.reset : String
+		const _reset = change.added || change.removed ? pc.reset : String
 
 		for (const line of change.value.split('\n')) {
 			if (line === '' && change.value.endsWith('\n')) continue
