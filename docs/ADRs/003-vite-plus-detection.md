@@ -10,7 +10,6 @@ Detect Vite+ usage (`vite-plus` or `vp` in dependencies) and expose it as `viteP
 ### What we do NOT do
 
 - Do NOT gate Biome for Vite+ projects — many Vite+ projects use Biome alongside or instead of Oxlint
-- Do NOT gate Ultracite for Vite+ projects — same reasoning
 - Do NOT gate vite-plugin-checker for Vite+ projects — type checking needs are project-specific
 - Do NOT force `vp` commands in package.json scripts or CI workflows — the project owner chooses their tooling
 
@@ -29,7 +28,7 @@ The correct approach is: detect, expose, let individual tasks decide if they nee
 ## Alternatives Considered
 
 ### Gate linting tasks for Vite+ projects
-- Would incorrectly skip Biome/Ultracite for projects that want them
+- Would incorrectly skip Biome for projects that want it
 - Makes xtarterize opinionated about tooling choices that belong to the project owner
 
 ### Force `vp` commands in scripts

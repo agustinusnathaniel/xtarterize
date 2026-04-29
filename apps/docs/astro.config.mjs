@@ -1,7 +1,7 @@
 import starlight from '@astrojs/starlight'
-import astroMermaid from 'astro-mermaid'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
+import astroMermaid from 'astro-mermaid'
 
 export default defineConfig({
 	site: 'https://xtarterize.sznm.dev',
@@ -29,17 +29,17 @@ export default defineConfig({
 					items: [
 						{
 							label: 'Introduction',
-							link: '/getting-started/introduction/'
+							link: '/getting-started/introduction/',
 						},
 						{
 							label: 'Installation',
-							link: '/getting-started/installation/'
+							link: '/getting-started/installation/',
 						},
 						{
 							label: 'Initialization',
-							link: '/getting-started/initialization/'
-						}
-					]
+							link: '/getting-started/initialization/',
+						},
+					],
 				},
 				{
 					label: 'CLI Reference',

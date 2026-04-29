@@ -1,18 +1,21 @@
 {
-  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
-  "changelog": [
-    "@changesets/changelog-github",
-    { "repo": "agustinusnathaniel/xtarterize" }
-  ],
-  "commit": false,
-  "fixed": [
-    ["@xtarterize/core", "@xtarterize/patchers", "@xtarterize/tasks", "xtarterize"]
-  ],
-  "linked": [],
-  "access": "public",
-  "baseBranch": "main",
-  "updateInternalDependencies": "patch",
-  "ignore": [
-    "@xtarterize/docs"
-  ]
+	"$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+	"changelog": [
+		"@changesets/changelog-github",
+		{ "repo": "agustinusnathaniel/xtarterize" }
+	],
+	"commit": false,
+	"fixed": [
+		[
+			"@xtarterize/core",
+			"@xtarterize/patchers",
+			"@xtarterize/tasks",
+			"xtarterize"
+		]
+	],
+	"linked": [],
+	"access": "public",
+	"baseBranch": "main",
+	"updateInternalDependencies": "patch",
+	"ignore": ["@xtarterize/docs"]
 }

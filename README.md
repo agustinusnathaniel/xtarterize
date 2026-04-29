@@ -44,7 +44,7 @@ That's it. Your project gets Biome, TypeScript incremental builds, Renovate, com
 
 ## Task Categories
 
-- **Linting** — Biome, Ultracite
+- **Linting** — Biome
 - **TypeScript** — Incremental builds, strict mode
 - **Vite Plugins** — vite-plugin-checker, rollup-plugin-visualizer
 - **CI/CD** — GitHub Actions (CI, release, auto-update)

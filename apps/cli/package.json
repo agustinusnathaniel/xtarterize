@@ -1,54 +1,54 @@
 {
-  "name": "xtarterize",
-  "version": "1.0.1",
-  "description": "Automated project setup and configuration scaffolding",
-  "author": "agustinusnathaniel",
-  "license": "MIT",
-  "type": "module",
-  "bin": {
-    "xtarterize": "./dist/index.mjs"
-  },
-  "files": [
-    "dist"
-  ],
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
-    "typecheck": "tsc --noEmit",
-    "prepublishOnly": "pnpm build"
-  },
-  "dependencies": {
-    "@clack/prompts": "^1.2.0",
-    "citty": "^0.2.2"
-  },
-  "devDependencies": {
-    "@types/node": "^25.6.0",
-    "@xtarterize/core": "workspace:*",
-    "@xtarterize/tasks": "workspace:*",
-    "tsdown": "^0.21.9",
-    "typescript": "^6.0.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/agustinusnathaniel/xtarterize"
-  },
-  "homepage": "https://xtarterize.sznm.dev",
-  "bugs": {
-    "url": "https://github.com/agustinusnathaniel/xtarterize/issues"
-  },
-  "keywords": [
-    "scaffold",
-    "starter",
-    "template",
-    "cli",
-    "project-setup",
-    "boilerplate"
-  ]
+	"name": "xtarterize",
+	"version": "1.0.1",
+	"description": "Automated project setup and configuration scaffolding",
+	"author": "agustinusnathaniel",
+	"license": "MIT",
+	"type": "module",
+	"bin": {
+		"xtarterize": "./dist/index.mjs"
+	},
+	"files": [
+		"dist"
+	],
+	"publishConfig": {
+		"access": "public",
+		"provenance": true
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"typecheck": "tsc --noEmit",
+		"prepublishOnly": "pnpm build"
+	},
+	"dependencies": {
+		"@clack/prompts": "^1.2.0",
+		"citty": "^0.2.2"
+	},
+	"devDependencies": {
+		"@types/node": "^25.6.0",
+		"@xtarterize/core": "workspace:*",
+		"@xtarterize/tasks": "workspace:*",
+		"tsdown": "^0.21.9",
+		"typescript": "^6.0.3"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/agustinusnathaniel/xtarterize"
+	},
+	"homepage": "https://xtarterize.sznm.dev",
+	"bugs": {
+		"url": "https://github.com/agustinusnathaniel/xtarterize/issues"
+	},
+	"keywords": [
+		"scaffold",
+		"starter",
+		"template",
+		"cli",
+		"project-setup",
+		"boilerplate"
+	]
 }
