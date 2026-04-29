@@ -181,6 +181,7 @@ body .hero .sl-link-button {
 	font-size: 0.9rem;
 	line-height: 1.8;
 	min-height: 200px;
+	overflow-x: auto;
 }
 
 .terminal-line {
