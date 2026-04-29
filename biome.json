@@ -1,7 +1,13 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
 	"files": {
-		"includes": ["**", "!**/dist", "!**/.turbo", "!**/node_modules", "!**/.astro"]
+		"includes": [
+			"**",
+			"!**/dist",
+			"!**/.turbo",
+			"!**/node_modules",
+			"!**/.astro"
+		]
 	},
 	"linter": {
 		"enabled": true,
@@ -14,6 +20,11 @@
 	},
 	"formatter": {
 		"enabled": true
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
 	},
 	"javascript": {
 		"formatter": {

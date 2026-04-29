@@ -9,12 +9,15 @@ function getEntryFiles(profile: ProjectProfile): string[] {
 	return ['src/index.ts']
 }
 
-export function renderKnipConfig(profile: ProjectProfile, format: 'json' | 'ts' = 'ts'): string {
+export function renderKnipConfig(
+	profile: ProjectProfile,
+	format: 'json' | 'ts' = 'ts',
+): string {
 	const entry = getEntryFiles(profile)
 	const project = ['src/**/*.{ts,tsx,js,jsx,css,scss}']
 
 	if (format === 'json') {
-		return JSON.stringify({ entry, project }, null, 2) + '\n'
+		return `${JSON.stringify({ entry, project }, null, 2)}\n`
 	}
 
 	return `import type { KnipConfig } from 'knip';

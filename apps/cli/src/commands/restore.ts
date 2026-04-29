@@ -1,5 +1,10 @@
 import { isCancel, select, spinner } from '@clack/prompts'
-import { listBackups, pc, restoreBackup, logSuccess, logError } from '@xtarterize/core'
+import {
+	listBackups,
+	logError,
+	logSuccess,
+	restoreBackup,
+} from '@xtarterize/core'
 import { defineCommand } from 'citty'
 
 export const restoreCommand = defineCommand({

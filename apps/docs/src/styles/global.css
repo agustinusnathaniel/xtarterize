@@ -1,8 +1,8 @@
 @layer base, starlight, theme, components, utilities;
 
-@import '@astrojs/starlight-tailwind';
-@import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/utilities.css' layer(utilities);
+@import "@astrojs/starlight-tailwind";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
 @import "@fontsource/lora";
 @import "@fontsource-variable/atkinson-hyperlegible-next";
 @import "@fontsource-variable/geist-mono";
@@ -65,7 +65,7 @@ h6 {
 
 /* Radial glow behind hero */
 .hero::before {
-	content: '';
+	content: "";
 	position: absolute;
 	top: -40%;
 	left: 50%;
@@ -83,36 +83,43 @@ h6 {
 }
 
 /* Hero title - larger, bolder, sans-serif */
-.hero h1 {
-	font-size: clamp(2.5rem, 6vw, 4rem) !important;
-	font-weight: 800 !important;
-	line-height: 1.1 !important;
-	letter-spacing: -0.03em !important;
-	font-family: var(--font-sans) !important;
+body .hero h1 {
+	font-size: clamp(2.5rem, 6vw, 4rem);
+	font-weight: 800;
+	line-height: 1.1;
+	letter-spacing: -0.03em;
+	font-family: var(--font-sans);
 	margin-bottom: 1.5rem;
 }
 
 /* Gradient text for "JavaScript & TypeScript" */
-.hero h1 {
-	background: linear-gradient(135deg, var(--sl-color-white) 0%, var(--sl-color-white) 45%, var(--sl-color-accent) 50%, #fbbf24 75%, var(--sl-color-accent-high) 100%);
+body .hero h1 {
+	background: linear-gradient(
+		135deg,
+		var(--sl-color-white) 0%,
+		var(--sl-color-white) 45%,
+		var(--sl-color-accent) 50%,
+		#fbbf24 75%,
+		var(--sl-color-accent-high) 100%
+	);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
 }
 
 /* Hero tagline - Starlight uses .tagline div, not <p> */
-.hero .tagline {
-	font-size: clamp(1.1rem, 2vw, 1.35rem) !important;
-	color: var(--sl-color-gray-2) !important;
+body .hero .tagline {
+	font-size: clamp(1.1rem, 2vw, 1.35rem);
+	color: var(--sl-color-gray-2);
 	max-width: 640px;
-	margin: 0 auto 2rem !important;
-	line-height: 1.6 !important;
+	margin: 0 auto 2rem;
+	line-height: 1.6;
 }
 
 /* Hero action buttons */
-.hero .sl-link-button {
-	font-size: 1.125rem !important;
-	padding: 0.75rem 1.75rem !important;
+body .hero .sl-link-button {
+	font-size: 1.125rem;
+	padding: 0.75rem 1.75rem;
 }
 
 /* Hero image area (if used) */
@@ -130,7 +137,9 @@ h6 {
 	border-radius: 12px;
 	overflow: hidden;
 	border: 1px solid var(--sl-color-gray-5);
-	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+	box-shadow:
+		0 20px 60px rgba(0, 0, 0, 0.3),
+		0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
 .terminal-header {
@@ -148,9 +157,15 @@ h6 {
 	border-radius: 50%;
 }
 
-.terminal-dot.red { background: #ff5f57; }
-.terminal-dot.yellow { background: #ffbd2e; }
-.terminal-dot.green { background: #28c840; }
+.terminal-dot.red {
+	background: #ff5f57;
+}
+.terminal-dot.yellow {
+	background: #ffbd2e;
+}
+.terminal-dot.green {
+	background: #28c840;
+}
 
 .terminal-title {
 	margin-left: auto;
@@ -201,8 +216,13 @@ h6 {
 }
 
 @keyframes blink {
-	0%, 100% { opacity: 1; }
-	50% { opacity: 0; }
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
+	}
 }
 
 /* ============================================
@@ -223,7 +243,10 @@ h6 {
 	border-radius: 12px;
 	border: 1px solid var(--sl-color-gray-5);
 	background: var(--sl-color-gray-6, rgba(0, 0, 0, 0.02));
-	transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+	transition:
+		transform 0.2s ease,
+		box-shadow 0.2s ease,
+		border-color 0.2s ease;
 	height: 100%;
 }
 
