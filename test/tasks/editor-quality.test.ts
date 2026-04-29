@@ -1,7 +1,15 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { detectProject } from '@xtarterize/core'
-import { knipTask, vscodeTask, agentsMdTask, skillsTask, turboTask } from '@xtarterize/tasks'
+import {
+	agentsMdTask,
+	knipTask,
+	skillsTask,
+	turboTask,
+	vscodeTask,
+} from '@xtarterize/tasks'
 import { describe, expect, it } from 'vitest'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -52,6 +60,94 @@ describe('vscodeTask', () => {
 		expect(diffs.some((d) => d.filepath.includes('settings.json'))).toBe(true)
 		expect(diffs.some((d) => d.filepath.includes('extensions.json'))).toBe(true)
 	})
+
+	it('includes practical framework and styling settings', async () => {
+		const profile = await detectProject(
+			path.join(fixtures, 'react-vite-tailwind'),
+		)
+		const diffs = await vscodeTask.dryRun(
+			path.join(fixtures, 'react-vite-tailwind'),
+			profile,
+		)
+		const settings = JSON.parse(
+			diffs.find((d) => d.filepath.includes('settings.json'))?.after ?? '{}',
+		)
+		const extensions = JSON.parse(
+			diffs.find((d) => d.filepath.includes('extensions.json'))?.after ?? '{}',
+		)
+
+		expect(settings['typescript.updateImportsOnFileMove.enabled']).toBe(
+			'always',
+		)
+		expect(settings['tailwindCSS.experimental.classRegex']).toBeDefined()
+		expect(extensions.recommendations).toContain('bradlc.vscode-tailwindcss')
+	})
+
+	it('additively merges extensions into existing list', async () => {
+		const tmpDir = await fs.mkdtemp(
+			path.join(os.tmpdir(), 'xtarterize-vsc-ext-'),
+		)
+		await fs.mkdir(path.join(tmpDir, '.vscode'))
+		await fs.writeFile(
+			path.join(tmpDir, '.vscode', 'extensions.json'),
+			JSON.stringify({
+				recommendations: ['my-custom-extension', 'biomejs.biome'],
+			}),
+		)
+		await fs.writeFile(
+			path.join(tmpDir, 'package.json'),
+			JSON.stringify({
+				name: 'vsc-test',
+				devDependencies: {
+					typescript: '^5.3.0',
+					'@biomejs/biome': '^1.0.0',
+				},
+			}),
+		)
+
+		const profile = await detectProject(tmpDir)
+		const diffs = await vscodeTask.dryRun(tmpDir, profile)
+		const extDiff = diffs.find((d) => d.filepath.includes('extensions.json'))
+		const result = JSON.parse(extDiff?.after ?? '{}')
+
+		expect(result.recommendations).toContain('my-custom-extension')
+		expect(result.recommendations).toContain('biomejs.biome')
+		expect(result.recommendations).toContain('ms-vscode.vscode-typescript-next')
+
+		await fs.rm(tmpDir, { recursive: true })
+	})
+
+	it('skips when settings and extensions already match', async () => {
+		const tmpDir = await fs.mkdtemp(
+			path.join(os.tmpdir(), 'xtarterize-vsc-skip-'),
+		)
+		await fs.mkdir(path.join(tmpDir, '.vscode'))
+
+		const profile = await detectProject(tmpDir)
+		const settingsDiffs = await vscodeTask.dryRun(tmpDir, profile)
+		const settingsAfter = JSON.parse(
+			settingsDiffs.find((d) => d.filepath.includes('settings.json'))?.after ??
+				'{}',
+		)
+		const extAfter = JSON.parse(
+			settingsDiffs.find((d) => d.filepath.includes('extensions.json'))
+				?.after ?? '{}',
+		)
+
+		await fs.writeFile(
+			path.join(tmpDir, '.vscode', 'settings.json'),
+			JSON.stringify(settingsAfter),
+		)
+		await fs.writeFile(
+			path.join(tmpDir, '.vscode', 'extensions.json'),
+			JSON.stringify(extAfter),
+		)
+
+		const status = await vscodeTask.check(tmpDir, profile)
+		expect(status).toBe('skip')
+
+		await fs.rm(tmpDir, { recursive: true })
+	})
 })
 
 describe('agentsMdTask', () => {
@@ -71,6 +167,20 @@ describe('agentsMdTask', () => {
 			profile,
 		)
 		expect(status).toBe('new')
+	})
+
+	it('renders framework guidance', async () => {
+		const profile = await detectProject(
+			path.join(fixtures, 'react-vite-tailwind'),
+		)
+		const [diff] = await agentsMdTask.dryRun(
+			path.join(fixtures, 'react-vite-tailwind'),
+			profile,
+		)
+
+		expect(diff.after).toContain('## Framework Guidance')
+		expect(diff.after).toContain('Keep components small')
+		expect(diff.after).toContain('Keep package scripts additive')
 	})
 })
 
