@@ -1,7 +1,9 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { detectProject } from '@xtarterize/core'
-import { commitlintTask, czgTask, catVersionTask } from '@xtarterize/tasks'
+import { catVersionTask, commitlintTask, czgTask } from '@xtarterize/tasks'
 import { describe, expect, it } from 'vitest'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -101,5 +103,36 @@ describe('catVersionTask', () => {
 		)
 		const versionrcDiff = diffs.find((d) => d.filepath === '.versionrc')
 		expect(versionrcDiff).toBeDefined()
+	})
+
+	it('reports release script conflicts without overwriting them', async () => {
+		const tmpDir = await fs.mkdtemp(
+			path.join(os.tmpdir(), 'xtarterize-release-'),
+		)
+		await fs.writeFile(
+			path.join(tmpDir, 'package.json'),
+			JSON.stringify(
+				{
+					name: 'release-conflict',
+					type: 'module',
+					scripts: {
+						release: 'custom-release',
+					},
+					devDependencies: {
+						typescript: '^5.3.0',
+					},
+				},
+				null,
+				2,
+			),
+		)
+
+		const profile = await detectProject(tmpDir)
+		const status = await catVersionTask.check(tmpDir, profile)
+		const diffs = await catVersionTask.dryRun(tmpDir, profile)
+		const pkgDiff = diffs.find((d) => d.filepath === 'package.json')
+
+		expect(status).toBe('conflict')
+		expect(pkgDiff?.after).toContain('"release": "custom-release"')
 	})
 })

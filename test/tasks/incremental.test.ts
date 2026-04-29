@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { detectProject } from '@xtarterize/core'
-import { incrementalTask } from '@xtarterize/tasks'
+import { getAllTasks, incrementalTask } from '@xtarterize/tasks'
 import { describe, expect, it } from 'vitest'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -36,5 +36,17 @@ describe('incrementalTask', () => {
 		)
 		expect(diffs.length).toBe(1)
 		expect(diffs[0].after).toContain('incremental')
+	})
+})
+
+describe('TypeScript task coverage', () => {
+	it('registers PRD TypeScript tasks without Ultracite', () => {
+		const taskIds = getAllTasks().map((task) => task.id)
+
+		expect(taskIds).toContain('ts/strict')
+		expect(taskIds).toContain('ts/paths')
+		expect(taskIds).toContain('ts/incremental')
+		expect(taskIds).toContain('gitignore/tsbuildinfo')
+		expect(taskIds).not.toContain('lint/ultracite')
 	})
 })

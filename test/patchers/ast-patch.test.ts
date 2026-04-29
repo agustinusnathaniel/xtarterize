@@ -1,9 +1,9 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { injectVitePlugin } from '@xtarterize/patchers'
 import { describe, expect, it } from 'vitest'
-import fs from 'node:fs/promises'
-import os from 'node:os'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
