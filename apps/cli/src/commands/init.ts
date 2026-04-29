@@ -1,5 +1,4 @@
 import { defineCommand } from 'citty'
-import { pc, logInfo } from '@xtarterize/core'
 import { runCommand } from '@/commands/run-command.js'
 
 export const initCommand = defineCommand({
@@ -33,11 +32,7 @@ export const initCommand = defineCommand({
 		await runCommand(process.cwd(), args, {
 			actionableStatuses: ['new', 'patch', 'conflict'],
 			emptyMessage: 'Project is already fully conformant!',
-			confirmMessage: 'Apply all changes? (yes/no)',
+			confirmMessage: 'How would you like to proceed?',
 		})
-		if (!args.dryRun) {
-			console.log('')
-			logInfo(`${pc.bold('Tip:')} For stricter, opinionated linting, run ${pc.cyan('npx ultracite init')} after this.`)
-		}
 	},
 })

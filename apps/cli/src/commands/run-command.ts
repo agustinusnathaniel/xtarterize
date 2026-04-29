@@ -1,16 +1,16 @@
-import { confirm, isCancel, select, spinner } from '@clack/prompts'
-import type { FileDiff, ProjectProfile, Task, TaskStatus } from '@xtarterize/core'
+import { isCancel, select, spinner } from '@clack/prompts'
+import type { FileDiff, TaskStatus } from '@xtarterize/core'
 import {
 	applyTasks,
 	detectProject,
+	logError,
+	logInfo,
+	logSuccess,
 	pc,
+	readPackageJson,
 	resolveTaskStatuses,
 	resolveTasks,
 	runPreflight,
-	logSuccess,
-	logError,
-	logInfo,
-	readPackageJson,
 } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 import { displayDiffs } from '@/ui/diff-display.js'
@@ -138,8 +138,14 @@ export async function runCommand(
 		return
 	}
 
-	const action = await confirm({
+	const action = await select({
 		message: options.confirmMessage,
+		options: [
+			{ value: 'apply-all', label: 'Apply all' },
+			{ value: 'select', label: 'Select tasks' },
+			{ value: 'dry-run', label: 'Dry run' },
+			{ value: 'quit', label: 'Quit' },
+		],
 	})
 
 	if (isCancel(action)) {
@@ -147,7 +153,22 @@ export async function runCommand(
 		return
 	}
 
-	if (!action) {
+	if (action === 'quit') {
+		logInfo('Cancelled')
+		return
+	}
+
+	if (action === 'dry-run') {
+		const diffs: FileDiff[] = []
+		for (const task of actionableTasks) {
+			const taskDiffs = await task.dryRun(cwd, profile)
+			diffs.push(...taskDiffs)
+		}
+		displayDiffs(diffs)
+		return
+	}
+
+	if (action === 'select') {
 		const selected = await selectTasks(actionableTasks, statuses)
 		if (selected.length === 0) {
 			logInfo('No tasks selected')
@@ -166,7 +187,8 @@ export async function runCommand(
 		return
 	}
 
-	const result = await applyTasks(actionableTasks, cwd, profile)
+	const selectedIds = actionableTasks.map((task) => task.id)
+	const result = await applyTasks(actionableTasks, cwd, profile, selectedIds)
 	console.log('')
 	logSuccess(`Applied ${result.applied} tasks`)
 	if (result.errors.length > 0) {
@@ -174,7 +196,9 @@ export async function runCommand(
 	}
 }
 
-async function resolveAmbiguousFramework(): Promise<'react' | 'react-native' | 'node'> {
+async function resolveAmbiguousFramework(): Promise<
+	'react' | 'react-native' | 'node'
+> {
 	const choice = await select({
 		message:
 			'Detected both React and React Native dependencies. Which best describes this project?',

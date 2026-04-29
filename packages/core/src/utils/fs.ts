@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
-import { dirname, resolve } from 'pathe'
 import JSON5 from 'json5'
+import { dirname, resolve } from 'pathe'
 
 export async function ensureDir(dirPath: string): Promise<void> {
 	await fs.mkdir(dirPath, { recursive: true })

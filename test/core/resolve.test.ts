@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { resolveTasks, resolveTaskStatuses } from '@xtarterize/core'
+import { resolveTaskStatuses, resolveTasks } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 import { describe, expect, it } from 'vitest'
 
@@ -38,7 +38,11 @@ describe('resolveTaskStatuses', () => {
 		)
 		const allTasks = getAllTasks()
 		const tasks = resolveTasks(profile, allTasks)
-		const statuses = await resolveTaskStatuses(tasks, path.join(fixtures, 'react-vite-tailwind'), profile)
+		const statuses = await resolveTaskStatuses(
+			tasks,
+			path.join(fixtures, 'react-vite-tailwind'),
+			profile,
+		)
 
 		for (const task of tasks) {
 			expect(statuses.has(task.id)).toBe(true)

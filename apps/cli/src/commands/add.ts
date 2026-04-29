@@ -1,5 +1,13 @@
 import { confirm, isCancel, spinner } from '@clack/prompts'
-import { detectProject, pc, runPreflight, logError, logInfo, logSuccess } from '@xtarterize/core'
+import {
+	applyTasks,
+	detectProject,
+	logError,
+	logInfo,
+	logSuccess,
+	pc,
+	runPreflight,
+} from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 import { defineCommand } from 'citty'
 import { displayDiffs } from '@/ui/diff-display.js'
@@ -89,7 +97,14 @@ export const addCommand = defineCommand({
 			if (isCancel(proceed) || !proceed) return
 		}
 
-		await task.apply(cwd, profile)
+		const result = await applyTasks([task], cwd, profile, [task.id])
+		if (result.errors.length > 0) {
+			logError(`${result.errors.length} errors`)
+			for (const error of result.errors) {
+				logError(`  - ${error}`)
+			}
+			return
+		}
 		logSuccess(`${task.id} applied successfully`)
 	},
 })

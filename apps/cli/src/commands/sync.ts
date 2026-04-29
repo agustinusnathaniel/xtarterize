@@ -32,7 +32,7 @@ export const syncCommand = defineCommand({
 		await runCommand(process.cwd(), args, {
 			actionableStatuses: ['patch', 'conflict'],
 			emptyMessage: 'No updates available',
-			confirmMessage: 'Apply all updates? (yes/no)',
+			confirmMessage: 'How would you like to proceed?',
 		})
 	},
 })

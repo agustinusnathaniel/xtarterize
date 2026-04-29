@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { detectProject } from '@xtarterize/core'
@@ -116,5 +118,43 @@ describe('detectProject', () => {
 		expect(profile.typescript).toBe(false)
 		expect(profile.vitePlus).toBe(false)
 		expect(profile.hasGit).toBe(false)
+	})
+
+	it('detects bundlers from config files when dependencies are absent', async () => {
+		const cases = [
+			['vite.config.mjs', 'vite'],
+			['next.config.mjs', 'nextjs'],
+			['webpack.config.cjs', 'webpack'],
+			['rspack.config.ts', 'rspack'],
+		] as const
+
+		for (const [configFile, expectedBundler] of cases) {
+			const tmpDir = await fs.mkdtemp(
+				path.join(os.tmpdir(), `xtarterize-${expectedBundler}-`),
+			)
+			await fs.writeFile(
+				path.join(tmpDir, 'package.json'),
+				JSON.stringify({ dependencies: {} }),
+			)
+			await fs.writeFile(path.join(tmpDir, configFile), 'export default {}\n')
+
+			const profile = await detectProject(tmpDir)
+			expect(profile.bundler).toBe(expectedBundler)
+		}
+	})
+
+	it('keeps dependency bundler detection ahead of config files', async () => {
+		const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'xtarterize-deps-'))
+		await fs.writeFile(
+			path.join(tmpDir, 'package.json'),
+			JSON.stringify({ dependencies: { vite: '^5.0.0' } }),
+		)
+		await fs.writeFile(
+			path.join(tmpDir, 'next.config.js'),
+			'export default {}\n',
+		)
+
+		const profile = await detectProject(tmpDir)
+		expect(profile.bundler).toBe('vite')
 	})
 })

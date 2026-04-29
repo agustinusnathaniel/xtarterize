@@ -16,7 +16,9 @@ describe('runPreflight', () => {
 	})
 
 	it('fails when package.json is missing', async () => {
-		const result = await runPreflight(path.join(fixtures, 'monorepo-turbo', 'apps'))
+		const result = await runPreflight(
+			path.join(fixtures, 'monorepo-turbo', 'apps'),
+		)
 		expect(result.valid).toBe(false)
 		expect(result.errors[0].code).toBe('MISSING_PACKAGE_JSON')
 	})
@@ -28,7 +30,9 @@ describe('runPreflight', () => {
 	})
 
 	it('fails when package.json has no name', async () => {
-		const result = await runPreflight(path.join(fixtures, 'react-vite-no-styling'))
+		const result = await runPreflight(
+			path.join(fixtures, 'react-vite-no-styling'),
+		)
 		// react-vite-no-styling has a name, so this should pass git check but...
 		// Actually it has no .git, so it will fail on git
 		expect(result.errors.some((e) => e.code === 'MISSING_GIT')).toBe(true)

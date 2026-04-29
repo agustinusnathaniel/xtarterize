@@ -122,13 +122,40 @@ function detectFrameworkVersion(
 	return cleaned || null
 }
 
-function detectBundler(deps: Record<string, string>, _cwd: string): Bundler {
+async function hasBundlerConfig(
+	cwd: string,
+	baseName: string,
+): Promise<boolean> {
+	return Boolean(
+		await findConfigFile(cwd, baseName, [
+			'.ts',
+			'.js',
+			'.mts',
+			'.mjs',
+			'.cts',
+			'.cjs',
+		]),
+	)
+}
+
+async function detectBundler(
+	deps: Record<string, string>,
+	cwd: string,
+): Promise<Bundler> {
 	if (deps['@tanstack/start']) return 'tanstack-start'
 	if (deps.next) return 'nextjs'
 	if (deps.expo) return 'expo'
 	if (deps.vite) return 'vite'
 	if (deps.webpack) return 'webpack'
 	if (deps['@rspack/core']) return 'rspack'
+	if (await hasBundlerConfig(cwd, 'next.config')) return 'nextjs'
+	if (await hasBundlerConfig(cwd, 'vite.config')) return 'vite'
+	if (
+		(await hasBundlerConfig(cwd, 'webpack.config')) ||
+		(await hasBundlerConfig(cwd, 'rspack.config'))
+	) {
+		return (await hasBundlerConfig(cwd, 'rspack.config')) ? 'rspack' : 'webpack'
+	}
 	return 'none'
 }
 
@@ -253,14 +280,22 @@ async function detectExistingConfigs(
 		findConfigFile(cwd, 'biome', ['.json', '.jsonc']).then(Boolean),
 		findConfigFile(cwd, 'tsconfig', ['.json', '.jsonc']).then(Boolean),
 		findConfigFile(cwd, 'renovate', ['.json', '.json5']).then(Boolean),
-		findConfigFile(cwd, 'commitlint.config', ['.ts', '.js', '.mjs', '.mts', '.cts']).then(Boolean),
+		findConfigFile(cwd, 'commitlint.config', [
+			'.ts',
+			'.js',
+			'.mjs',
+			'.mts',
+			'.cts',
+		]).then(Boolean),
 		findConfigFile(cwd, 'knip', ['.ts', '.mts']).then(Boolean),
 		findConfigFile(cwd, 'plopfile', ['.ts', '.js', '.mjs']).then(Boolean),
 		fileExists(resolvePath(cwd, 'turbo.json')),
 		fileExists(resolvePath(cwd, '.vscode', 'settings.json')),
-		findConfigFile(cwd, 'AGENTS', ['.md']).then(Boolean).then(v => v || fileExists(resolvePath(cwd, 'CLAUDE.md'))),
+		findConfigFile(cwd, 'AGENTS', ['.md'])
+			.then(Boolean)
+			.then((v) => v || fileExists(resolvePath(cwd, 'CLAUDE.md'))),
 		detectGitHubWorkflows(cwd),
-		findConfigFile(cwd, 'vite.config', ['.ts', '.js', '.mts', '.cjs']).then(Boolean),
+		hasBundlerConfig(cwd, 'vite.config'),
 		fileExists(resolvePath(cwd, '.versionrc')),
 		fileExists(resolvePath(cwd, '.gitignore')),
 	])
@@ -322,7 +357,7 @@ export async function detectProject(cwd: string): Promise<ProjectProfile> {
 	}
 
 	const framework = detectFramework(allDeps)
-	const bundler = detectBundler(allDeps, cwd)
+	const bundler = await detectBundler(allDeps, cwd)
 	const router = detectRouter(allDeps, bundler)
 	const styling = detectStyling(allDeps)
 	const runtime = detectRuntime(framework, bundler)
