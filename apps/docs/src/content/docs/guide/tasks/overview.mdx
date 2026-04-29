@@ -109,6 +109,20 @@ When `.vscode/extensions.json` already exists, xtarterize **adds** its recommend
 |---------|-------------|-----------------|
 | `agent/agents-md` | Write [`AGENTS.md`](https://docs.opencode.ai/agents) with framework-specific AI agent instructions | Always |
 | `agent/skills` | Scaffold [`.agents/skills/`](https://docs.opencode.ai/skills) directory with project context | TypeScript detected |
+| `agent/skills-install` | Install relevant [agent skills](https://skills.sh) via `npx skills@latest add` for your stack | TypeScript detected |
+
+### Skills Install
+
+The `agent/skills-install` task automatically installs [agent skills](https://skills.sh) from the open ecosystem based on your detected stack. It reads your existing `skills-lock.json` and local skill directories to avoid reinstalling already-present skills.
+
+| Stack | Skills Installed |
+|-------|-----------------|
+| **React** (including Next.js) | `vercel-react-best-practices`, `vercel-composition-patterns` |
+| **Next.js** | `next-best-practices`, `next-cache-components`, `next-upgrade` |
+| **Web Frontend** (all browser/edge projects) | `frontend-design`, `web-design-guidelines` |
+| **Expo / React Native** | `expo-tailwind-setup`, `expo-cicd-workflows`, `expo-deployment`, `expo-dev-client`, `building-native-ui`, `native-data-fetching`, `expo-module` |
+| **Shadcn UI** | `shadcn` |
+| **Ultracite** | `ultracite` |
 
 ## Scripts
 

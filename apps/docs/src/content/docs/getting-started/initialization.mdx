@@ -92,7 +92,7 @@ The `init` command applies all tasks that are applicable to your detected stack:
 - **Codegen** — [Plop](https://plopjs.com/) ([`plopfile.ts`](https://plopjs.com/documentation/#getting-started) scaffolds)
 - **Monorepo** — [Turborepo](https://turbo.build/repo/docs/reference/configuration) ([`turbo.json`](https://turbo.build/repo/docs/reference/configuration) pipeline)
 - **Editor** — [VS Code](https://code.visualstudio.com/) [`settings.json`](https://code.visualstudio.com/docs/getstarted/settings#_settingsjson) and [`extensions.json`](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions) (additive merging preserves your existing extensions)
-- **Agent** — `AGENTS.md`, [`.agents/skills/`](https://docs.opencode.ai/skills) directory
+- **Agent** — `AGENTS.md`, [`.agents/skills/`](https://docs.opencode.ai/skills) directory, and install relevant [agent skills](https://skills.sh) via `npx skills@latest add` for your detected stack
 - **Scripts** — [`package.json` `scripts`](https://docs.npmjs.com/cli/v10/using-npm/scripts) (with [Ultracite](https://www.ultracite.ai/) detection if installed)
 
 <Aside>
@@ -123,6 +123,7 @@ This will replace the default `biome.json` with Ultracite's stricter configurati
 - [Plop Documentation](https://plopjs.com/documentation/) — Code scaffolding and generators
 - [Turborepo Documentation](https://turbo.build/repo/docs) — Monorepo task orchestration
 - [Ultracite](https://www.ultracite.ai/) — Strict Biome preset for code quality
+- [Agent Skills](https://skills.sh) — Open ecosystem of reusable AI agent capabilities
 
 ## Init Flow
 
