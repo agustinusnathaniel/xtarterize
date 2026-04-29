@@ -8,6 +8,7 @@ import {
 } from '@xtarterize/core'
 import { getAllTasks } from '@xtarterize/tasks'
 import { defineCommand } from 'citty'
+import { resolveCwd } from '@/utils/cwd.js'
 
 export const listCommand = defineCommand({
 	meta: {
@@ -21,7 +22,7 @@ export const listCommand = defineCommand({
 		},
 	},
 	async run({ args }) {
-		const cwd = process.cwd()
+		const cwd = resolveCwd(args)
 		const isCI = process.env.CI === 'true' || process.env.CI === '1'
 		const quiet = args.quiet || isCI
 

@@ -6,6 +6,7 @@ import {
 	restoreBackup,
 } from '@xtarterize/core'
 import { defineCommand } from 'citty'
+import { resolveCwd } from '@/utils/cwd.js'
 
 export const restoreCommand = defineCommand({
 	meta: {
@@ -19,7 +20,7 @@ export const restoreCommand = defineCommand({
 		},
 	},
 	async run({ args }) {
-		const cwd = process.cwd()
+		const cwd = resolveCwd(args)
 		const filepath = args.filepath
 		if (!filepath) {
 			logError('File path required. Usage: xtarterize restore <filepath>')

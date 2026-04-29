@@ -1,5 +1,6 @@
 import { defineCommand } from 'citty'
 import { runCommand } from '@/commands/run-command.js'
+import { resolveCwd } from '@/utils/cwd.js'
 
 export const syncCommand = defineCommand({
 	meta: {
@@ -29,7 +30,7 @@ export const syncCommand = defineCommand({
 		},
 	},
 	async run({ args }) {
-		await runCommand(process.cwd(), args, {
+		await runCommand(resolveCwd(args), args, {
 			actionableStatuses: ['patch', 'conflict'],
 			emptyMessage: 'No updates available',
 			confirmMessage: 'How would you like to proceed?',

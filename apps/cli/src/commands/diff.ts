@@ -11,6 +11,7 @@ import {
 import { getAllTasks } from '@xtarterize/tasks'
 import { defineCommand } from 'citty'
 import { displayDiffs } from '@/ui/diff-display.js'
+import { resolveCwd } from '@/utils/cwd.js'
 
 export const diffCommand = defineCommand({
 	meta: {
@@ -24,7 +25,7 @@ export const diffCommand = defineCommand({
 		},
 	},
 	async run({ args }) {
-		const cwd = process.cwd()
+		const cwd = resolveCwd(args)
 		const isCI = process.env.CI === 'true' || process.env.CI === '1'
 		const quiet = args.quiet || isCI
 
