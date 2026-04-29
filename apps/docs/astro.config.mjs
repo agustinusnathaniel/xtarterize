@@ -70,6 +70,10 @@ export default defineConfig({
 							link: '/contributing/core/preflight/',
 						},
 						{
+							label: 'Tasks',
+							autogenerate: { directory: 'contributing/tasks' },
+						},
+						{
 							label: 'Patchers',
 							autogenerate: { directory: 'contributing/patchers' },
 						},
