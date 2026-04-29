@@ -82,18 +82,18 @@ npx xtarterize init
 
 The `init` command applies all tasks that are applicable to your detected stack:
 
-- **Linting & Formatting** — Biome (lint + format)
-- **TypeScript** — incremental builds, `.gitignore` tsbuildinfo entries
+- **Linting & Formatting** — Biome (lint + format), with Tailwind CSS parser support when detected
+- **TypeScript** — strict mode, path aliases, incremental builds, `.gitignore` tsbuildinfo entries
 - **Vite Plugins** — type checker, bundle visualizer
-- **CI/CD** — GitHub workflows for release, CI, auto-updates
+- **CI/CD** — GitHub workflows for release, CI, auto-updates (with `pnpm/action-setup` for pnpm projects)
 - **Dependencies** — Renovate config
 - **Release** — Commitlint, czg, commit-and-tag-version
 - **Quality** — Knip (unused code detection)
 - **Codegen** — Plop (code generation scaffolds)
 - **Monorepo** — Turbo (when monorepo detected)
-- **Editor** — VS Code settings and extensions (combined task)
+- **Editor** — VS Code settings and extensions (additive merging preserves your existing extensions)
 - **Agent** — AGENTS.md, AI skills directory
-- **Scripts** — package.json scripts
+- **Scripts** — package.json scripts (with Ultracite detection if installed)
 
 <Aside>
   Each task checks if it's already applied and skips if conformant. Running `init` twice produces no changes on the second run.

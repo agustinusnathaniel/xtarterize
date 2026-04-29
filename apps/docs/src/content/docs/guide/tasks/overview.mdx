@@ -11,16 +11,34 @@ xtarterize applies conformance configuration through discrete, independently app
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `lint/biome` | Install Biome, write `biome.json` | Always (TS/JS projects) |
+| `lint/biome` | Install Biome, write `biome.json` with framework-aware parser options | Always (TS/JS projects) |
 
 <Aside type="tip">
-  For stricter, opinionated linting, run <code>npx ultracite init</code> after <code>xtarterize init</code>. The <code>package.json</code> lint scripts will auto-detect Ultracite.
+  For stricter, opinionated linting, run <code>npx ultracite init</code> after <code>xtarterize init</code>. The <code>package.json</code> lint scripts will auto-detect Ultracite and use <code>ultracite:check</code> / <code>ultracite:fix</code> instead of Biome directly.
 </Aside>
+
+### Framework-Aware Biome Config
+
+When Tailwind CSS is detected, the generated `biome.json` includes:
+
+```json
+{
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  }
+}
+```
+
+This enables Biome to parse Tailwind v4 directives like `@theme` without errors.
 
 ## TypeScript
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
+| `ts/strict` | Patch `tsconfig.json` with `strict: true` (skips if explicitly `false`) | TypeScript detected |
+| `ts/paths` | Patch `tsconfig.json` with path aliases (`@/*`) | TypeScript detected |
 | `ts/incremental` | Patch `tsconfig.json` with `incremental: true` and `tsBuildInfoFile` | TypeScript detected |
 | `gitignore/tsbuildinfo` | Add `*.tsbuildinfo` and `.tsbuildinfo/` to `.gitignore` | TypeScript detected |
 
@@ -38,6 +56,10 @@ xtarterize applies conformance configuration through discrete, independently app
 | `ci/release` | Write `.github/workflows/release.yml` — triggers on tag push | GitHub detected |
 | `ci/auto-update` | Write `.github/workflows/auto-update.yml` — weekly dependency updates | GitHub detected |
 | `ci/ci` | Write `.github/workflows/ci.yml` — lint, typecheck, test on PR | GitHub detected |
+
+### Conditional pnpm Setup
+
+For projects using **pnpm**, CI workflows automatically include `pnpm/action-setup@v4` before `actions/setup-node`. This ensures reproducible pnpm versions across runs. npm and yarn projects are unaffected.
 
 ## Dependencies
 
@@ -76,6 +98,10 @@ xtarterize applies conformance configuration through discrete, independently app
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
 | `editor/vscode` | Write/merge `.vscode/settings.json` and `.vscode/extensions.json` | Always |
+
+### Additive Extension Merging
+
+When `.vscode/extensions.json` already exists, xtarterize **adds** its recommended extensions to your existing list rather than replacing them. Your custom extensions are always preserved.
 
 ## Agent
 

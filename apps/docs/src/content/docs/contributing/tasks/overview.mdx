@@ -92,6 +92,8 @@ classDiagram
   - scripts/
     - package-scripts.ts
   - ts/
+    - strict.ts
+    - paths.ts
     - incremental.ts
     - gitignore-tsbuildinfo.ts
   - vite/
@@ -105,12 +107,16 @@ Most tasks are created through factory functions in `factory.ts` that eliminate 
 
 - **`createSimpleFileTask`** — For tasks that write a single new file (CI workflows, renovate, commitlint, knip, plop, AI skills)
 - **`createFileTask`** — For text files with custom check/merge logic (AGENTS.md, .gitignore entries)
-- **`createJsonMergeTask`** — For tasks that deep-merge JSON configs (tsconfig, biome, turbo)
-- **`createMultiFileJsonMergeTask`** — For tasks that merge multiple JSON files (VSCode settings + extensions)
+- **`createJsonMergeTask`** — For tasks that deep-merge JSON configs (tsconfig, biome, turbo). Uses `deepEqual` for key-order-independent comparison
+- **`createMultiFileJsonMergeTask`** — For tasks that merge multiple JSON files (VSCode settings + extensions). Supports custom per-file merge functions
 - **`createVitePluginTask`** — For injecting plugins into vite.config.ts (checker, visualizer)
 - **`createPackageJsonTask`** — For tasks that add scripts, deps, and extra files via package.json (czg, commit-and-tag-version, package scripts)
 
 This reduces most tasks from 40-80 lines to 10-15 lines of declarative configuration.
+
+### deepEqual Helper
+
+The `deepEqual` function compares objects regardless of key ordering, preventing false positives when `JSON.stringify` would differ due to object key order. Used by `createJsonMergeTask` and `createMultiFileJsonMergeTask` for reliable skip detection.
 
 ## Adding New Tasks
 
@@ -124,5 +130,17 @@ Each task must implement:
 - `check(cwd, profile)` — What's the current status?
 - `dryRun(cwd, profile)` — What would change?
 - `apply(cwd, profile)` — Make the changes
+
+## Conflict Detection Pattern
+
+For tasks that patch JSON config files, use a **tristate detection pattern** to avoid permanent patch loops:
+
+| State | Condition | Status | Behavior |
+|-------|-----------|--------|----------|
+| **Missing** | Key does not exist | `patch` | Add the key |
+| **Match** | Key exists with expected value | `skip` | No changes |
+| **Mismatch** | Key exists with different value | `conflict` | Alert user, don't overwrite |
+
+This prevents infinite loops when a user explicitly sets a value that differs from xtarterize's recommendation (e.g., `strict: false` in tsconfig).
 
 <LinkButton href="/contributing/architecture/overview/">Learn about the overall architecture →</LinkButton>

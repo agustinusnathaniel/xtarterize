@@ -96,7 +96,7 @@ npx xtarterize sync --yes
 
 ## `diff`
 
-Show pending changes for all tasks with `new` or `patch` status, without applying anything. Read-only.
+Show pending changes for all tasks with `new`, `patch`, or `conflict` status, without applying anything. Read-only.
 
 ### Options
 
@@ -107,6 +107,10 @@ Show pending changes for all tasks with `new` or `patch` status, without applyin
 ```bash
 npx xtarterize diff
 ```
+
+<Aside type="tip">
+  The <code>diff</code> command shows full file contents for <code>new</code> tasks (files that don't exist yet) and unified diffs for <code>patch</code> tasks (existing files that need updates).
+</Aside>
 
 ## `check`
 

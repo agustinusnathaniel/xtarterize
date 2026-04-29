@@ -32,7 +32,7 @@ Returns the merged `object`. Existing keys always take precedence over incoming 
 
 ## Deep Merge Behavior
 
-Nested objects are merged recursively:
+Nested objects are merged recursively. Existing keys take precedence, missing keys are filled from incoming:
 
 ```typescript
 const existing = {
@@ -60,6 +60,13 @@ const merged = mergeJson(existing, incoming)
 // }
 ```
 
+### Object vs Array Merge
+
+| Type | Behavior | Example |
+|------|----------|---------|
+| **Objects** | Deep merge, existing keys win | `{ a: { b: 1 } }` + `{ a: { c: 2 } }` → `{ a: { b: 1, c: 2 } }` |
+| **Arrays** | Replace entirely | `{ rules: ["a"] }` + `{ rules: ["b"] }` → `{ rules: ["b"] }` |
+
 ## Merge Flow
 
 ```mermaid
@@ -82,7 +89,7 @@ flowchart TD
 ## Array Handling
 
 <Aside type="caution">
-  Arrays are replaced, not merged. This is `defu`'s default behavior. For cases where arrays need to be combined (like Vite plugins), use the AST patcher instead.
+  Arrays are **replaced**, not concatenated. xtarterize uses a custom `createDefu` callback to overwrite arrays rather than merging them (which would produce duplicates like `[100, 100]`).
 </Aside>
 
 ```typescript
@@ -90,8 +97,10 @@ const existing = { plugins: ['pluginA'] }
 const incoming = { plugins: ['pluginB'] }
 
 const merged = mergeJson(existing, incoming)
-// { plugins: ['pluginA'] } — existing wins
+// { plugins: ['pluginB'] } — incoming replaces existing array
 ```
+
+For cases where arrays need to be combined (like VS Code extension recommendations), use a custom merge function instead of `mergeJson`.
 
 ## Real-World Examples
 
