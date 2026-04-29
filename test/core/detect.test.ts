@@ -84,8 +84,8 @@ describe('detectProject', () => {
 		expect(profile.framework).toBe(null)
 		expect(profile.bundler).toBe('expo')
 		expect(profile.router).toBe('expo-router')
-		// runtime is browser because framework is null (ambiguous) and bundler is expo
-		expect(profile.runtime).toBe('browser')
+		// runtime is native because bundler is expo (React Native)
+		expect(profile.runtime).toBe('native')
 		expect(profile.packageManager).toBe('yarn')
 		expect(profile.styling).toContain('vanilla')
 		expect(profile.typescript).toBe(true)

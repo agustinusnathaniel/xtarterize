@@ -183,7 +183,11 @@ function detectRuntime(
 	bundler: Bundler,
 ): 'browser' | 'node' | 'edge' | 'native' | 'universal' {
 	if (framework === 'react-native') return 'native'
+	if (bundler === 'expo') return 'native'
 	if (bundler === 'nextjs') return 'edge'
+	if (bundler === 'tanstack-start') return 'edge'
+	if (bundler === 'vite' || bundler === 'webpack' || bundler === 'rspack')
+		return 'browser'
 	if (framework === 'node') return 'node'
 	return 'browser'
 }
