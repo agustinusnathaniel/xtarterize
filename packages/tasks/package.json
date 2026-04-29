@@ -24,7 +24,8 @@
 		"json5": "^2.2.3",
 		"magicast": "^0.5.2",
 		"nypm": "^0.6.5",
-		"pathe": "^2.0.3"
+		"pathe": "^2.0.3",
+		"tinyexec": "^1.1.1"
 	},
 	"devDependencies": {
 		"@types/js-yaml": "^4.0.9",

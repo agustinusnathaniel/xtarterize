@@ -1,5 +1,6 @@
 import type { Task } from '@xtarterize/core'
 import { agentsMdTask } from '@/agent/agents-md.js'
+import { skillsInstallTask } from '@/agent/skills-install.js'
 import { skillsTask } from '@/agent/skills.js'
 import { autoUpdateWorkflowTask } from '@/ci/auto-update.js'
 import { ciWorkflowTask } from '@/ci/ci.js'
@@ -37,6 +38,7 @@ export {
 	plopTask,
 	releaseWorkflowTask,
 	renovateTask,
+	skillsInstallTask,
 	skillsTask,
 	strictTask,
 	turboTask,
@@ -67,6 +69,7 @@ export function getAllTasks(): Task[] {
 		vscodeTask,
 		agentsMdTask,
 		skillsTask,
+		skillsInstallTask,
 		packageScriptsTask,
 	]
 }
