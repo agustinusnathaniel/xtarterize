@@ -27,13 +27,28 @@ import { LinkCard, CardGrid, LinkButton } from '@astrojs/starlight/components'
 <span class="terminal-title">terminal</span>
 </div>
 <div class="terminal-body">
-<div class="terminal-line"><span class="prompt">$</span> <span class="command">npx xtarterize init</span></div>
-<div class="terminal-line output"><span class="success">✓</span> Detected: React + TypeScript + Vite</div>
-<div class="terminal-line output"><span class="success">✓</span> Biome config applied</div>
-<div class="terminal-line output"><span class="success">✓</span> TypeScript incremental enabled</div>
-<div class="terminal-line output"><span class="success">✓</span> GitHub CI workflow created</div>
-<div class="terminal-line output"><span class="success">✓</span> VS Code settings merged</div>
-<div class="terminal-line output"><span class="info">ℹ</span> 18 tasks applied · 0 conflicts</div>
+<div class="terminal-line"><span class="prompt">$</span> <span class="command">npx xtarterize init --dry-run</span></div>
+<div class="terminal-line output"><span class="info">◇</span> Project scanned</div>
+<div class="terminal-line output">Framework: react · Bundler: vite · Package Manager: pnpm</div>
+<div class="terminal-line output"></div>
+<div class="terminal-line output"><span class="bold">Conformance plan</span></div>
+<div class="terminal-line output"></div>
+<div class="terminal-line output">  Status    Task                           ID                      Group</div>
+<div class="terminal-line output">  <span class="dim">─────────────────────────────────────────────────────────────</span></div>
+<div class="terminal-line output">  <span class="success">new</span>       Biome (lint + format)          lint/biome              Linting</div>
+<div class="terminal-line output">  <span class="warning">patch</span>     tsconfig — strict: true        ts/strict               TypeScript</div>
+<div class="terminal-line output">  <span class="success">new</span>       Install agent skills           agent/skills-install    Agent</div>
+<div class="terminal-line output">  <span class="success">new</span>       vite-plugin-checker            vite/checker            Vite</div>
+<div class="terminal-line output">  <span class="success">new</span>       VSCode settings + extensions   editor/vscode           Editor</div>
+<div class="terminal-line output"></div>
+<div class="terminal-line output"><span class="bold">Files to change</span></div>
+<div class="terminal-line output"></div>
+<div class="terminal-line output">  Action    File</div>
+<div class="terminal-line output">  <span class="dim">───────────────────────────────────</span></div>
+<div class="terminal-line output">  <span class="success">create</span>    biome.json</div>
+<div class="terminal-line output">  <span class="warning">modify</span>    tsconfig.json</div>
+<div class="terminal-line output">  <span class="success">create</span>    .xtarterize/skills-install.log</div>
+<div class="terminal-line output"></div>
 <div class="terminal-line"><span class="prompt">$</span> <span class="cursor">_</span></div>
 </div>
 </div>

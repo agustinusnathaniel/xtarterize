@@ -210,6 +210,19 @@ body .hero .sl-link-button {
 	margin-right: 0.5rem;
 }
 
+.terminal-line .warning {
+	color: #f59e0b;
+	margin-right: 0.5rem;
+}
+
+.terminal-line .dim {
+	color: var(--sl-color-gray-4);
+}
+
+.terminal-line .bold {
+	font-weight: 600;
+}
+
 .terminal-line .cursor {
 	animation: blink 1s step-end infinite;
 	color: var(--sl-color-accent);
