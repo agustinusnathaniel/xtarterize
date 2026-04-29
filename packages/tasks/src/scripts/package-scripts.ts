@@ -1,6 +1,6 @@
-import { createPackageJsonTask } from '@/factory.js'
-import { dlxCommand } from 'nypm'
 import { readPackageJson } from '@xtarterize/core'
+import { dlxCommand } from 'nypm'
+import { createPackageJsonTask } from '@/factory.js'
 
 async function hasUltracite(cwd: string): Promise<boolean> {
 	const pkg = await readPackageJson(cwd)
@@ -14,23 +14,29 @@ export const packageScriptsTask = createPackageJsonTask({
 	applicable: () => true,
 	getScripts: async (cwd, profile) => {
 		const pm = profile.packageManager
-		const useUltracite = await hasUltracite(cwd)
 		const dlx = dlxCommand(pm, 'npm-check-updates')
-
-		const lint = useUltracite ? 'ultracite' : 'biome check --write .'
-		return [
-			{ script: 'lint', value: lint },
-			{ script: 'typecheck', value: 'tsc --noEmit' },
+		const useUltracite = await hasUltracite(cwd)
+		const scripts = useUltracite
+			? [
+					{ script: 'ultracite:check', value: 'ultracite check' },
+					{ script: 'ultracite:fix', value: 'ultracite fix' },
+				]
+			: [
+					{ script: 'lint', value: 'biome lint .' },
+					{ script: 'format', value: 'biome format --write .' },
+					{ script: 'check', value: 'biome check --write .' },
+				]
+		scripts.push(
 			{ script: 'upgrade', value: `${dlx} -u && ${pm} install` },
-		]
-	},
-	checkFn: async (cwd, _profile, pkg) => {
-		const scripts = (pkg as Record<string, Record<string, string>>).scripts ?? {}
-		const requiredScripts = ['lint', 'typecheck']
-		const missing = requiredScripts.filter((s) => !scripts[s])
+			{ script: 'release', value: 'commit-and-tag-version' },
+			{ script: 'plop', value: 'plop' },
+		)
 
-		if (missing.length === 0) return 'skip'
-		if (missing.length < requiredScripts.length) return 'patch'
-		return 'new'
+		if (profile.typescript) {
+			scripts.push({ script: 'typecheck', value: 'tsc --noEmit' })
+			scripts.push({ script: 'knip', value: 'knip' })
+		}
+
+		return scripts
 	},
 })

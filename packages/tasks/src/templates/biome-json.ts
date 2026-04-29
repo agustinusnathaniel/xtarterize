@@ -1,7 +1,11 @@
 import type { ProjectProfile } from '@xtarterize/core'
 
-export function renderBiomeJson(_profile: ProjectProfile): string {
-	const config = {
+export function renderBiomeJson(profile: ProjectProfile): string {
+	const hasTailwind =
+		profile.styling.includes('tailwind') ||
+		profile.styling.includes('nativewind')
+
+	const config: Record<string, unknown> = {
 		$schema: './node_modules/@biomejs/biome/configuration_schema.json',
 		vcs: { enabled: true, clientKind: 'git', useIgnoreFile: true },
 		files: {
@@ -42,5 +46,10 @@ export function renderBiomeJson(_profile: ProjectProfile): string {
 			},
 		},
 	}
+
+	if (hasTailwind) {
+		config.css = { parser: { tailwindDirectives: true } }
+	}
+
 	return JSON.stringify(config, null, 2)
 }

@@ -14,8 +14,10 @@ import { catVersionTask } from '@/release/cat-version.js'
 import { commitlintTask } from '@/release/commitlint.js'
 import { czgTask } from '@/release/czg.js'
 import { packageScriptsTask } from '@/scripts/package-scripts.js'
-import { incrementalTask } from '@/ts/incremental.js'
 import { gitignoreTsbuildinfoTask } from '@/ts/gitignore-tsbuildinfo.js'
+import { incrementalTask } from '@/ts/incremental.js'
+import { pathsTask } from '@/ts/paths.js'
+import { strictTask } from '@/ts/strict.js'
 import { viteCheckerTask } from '@/vite/checker.js'
 import { viteVisualizerTask } from '@/vite/visualizer.js'
 
@@ -31,10 +33,12 @@ export {
 	incrementalTask,
 	knipTask,
 	packageScriptsTask,
+	pathsTask,
 	plopTask,
 	releaseWorkflowTask,
 	renovateTask,
 	skillsTask,
+	strictTask,
 	turboTask,
 	viteCheckerTask,
 	viteVisualizerTask,
@@ -44,6 +48,8 @@ export {
 export function getAllTasks(): Task[] {
 	return [
 		biomeTask,
+		strictTask,
+		pathsTask,
 		incrementalTask,
 		gitignoreTsbuildinfoTask,
 		viteCheckerTask,
