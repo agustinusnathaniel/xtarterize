@@ -1,5 +1,11 @@
 # xtarterize
 
+## 1.1.0
+
+### Minor Changes
+
+- [`e230c41`](https://github.com/agustinusnathaniel/xtarterize/commit/e230c411c4b04cfdd942bc5d3f1d89f2e289e02c) Thanks [@agustinusnathaniel](https://github.com/agustinusnathaniel)! - adds automatic agent skills installation based on your stack, fixes the --cwd flag to actually work, renders the conformance plan and dry-run output as proper tables, and improves framework-aware config generation across Biome, Plop, and CI workflows.
+
 ## 1.0.1
 
 ### Patch Changes
