@@ -16,7 +16,7 @@ interface TurboJsonTemplate {
 
 const TURBO_TASKS: Record<string, TurboTaskConfig> = {
 	build: { dependsOn: ['^build'], outputs: ['dist/**'] },
-	lint: { dependsOn: ['^lint'] },
+	biome: { dependsOn: ['^biome'] },
 	typecheck: { dependsOn: ['^typecheck'] },
 	dev: { cache: false, persistent: true },
 	test: { dependsOn: ['^build'] },
@@ -39,9 +39,10 @@ function buildTurboJson(scripts: string[]): TurboJsonTemplate {
 
 export const turboTask = createJsonMergeTask({
 	id: 'monorepo/turbo',
-	label: 'Turbo (monorepo build)',
+	label: 'Turbo',
 	group: 'Monorepo',
-	applicable: (profile) => profile.monorepo,
+	applicable: (profile) =>
+		profile.monorepoTool === 'turbo' || profile.existing.turbo,
 	filepath: 'turbo.json',
 	depName: 'turbo',
 	installDev: true,

@@ -1,6 +1,20 @@
 import { readPackageJson } from '@xtarterize/core'
-import { dlxCommand } from 'nypm'
 import { createPackageJsonTask } from '@/factory.js'
+
+function getUpgradeCommand(pm: string): string {
+	switch (pm) {
+		case 'pnpm':
+			return 'pnpm up -i -L'
+		case 'yarn':
+			return 'yarn upgrade-interactive --latest'
+		case 'npm':
+			return 'npx npm-check-updates -i'
+		case 'bun':
+			return 'bun update'
+		default:
+			return 'npx npm-check-updates -i'
+	}
+}
 
 async function hasUltracite(cwd: string): Promise<boolean> {
 	const pkg = await readPackageJson(cwd)
@@ -14,7 +28,6 @@ export const packageScriptsTask = createPackageJsonTask({
 	applicable: () => true,
 	getScripts: async (cwd, profile) => {
 		const pm = profile.packageManager
-		const dlx = dlxCommand(pm, 'npm-check-updates')
 		const useUltracite = await hasUltracite(cwd)
 		const scripts = useUltracite
 			? [
@@ -22,12 +35,12 @@ export const packageScriptsTask = createPackageJsonTask({
 					{ script: 'ultracite:fix', value: 'ultracite fix' },
 				]
 			: [
-					{ script: 'lint', value: 'biome lint .' },
-					{ script: 'format', value: 'biome format --write .' },
-					{ script: 'check', value: 'biome check --write .' },
+					{ script: 'biome', value: 'biome check .' },
+					{ script: 'biome:fix', value: 'biome check --write .' },
 				]
 		scripts.push(
-			{ script: 'upgrade', value: `${dlx} -u && ${pm} install` },
+			{ script: 'test', value: 'vitest run' },
+			{ script: 'upgrade', value: getUpgradeCommand(pm) },
 			{ script: 'release', value: 'commit-and-tag-version' },
 			{ script: 'plop', value: 'plop' },
 		)
@@ -35,6 +48,20 @@ export const packageScriptsTask = createPackageJsonTask({
 		if (profile.typescript) {
 			scripts.push({ script: 'typecheck', value: 'tsc --noEmit' })
 			scripts.push({ script: 'knip', value: 'knip' })
+		}
+
+		const hasTurbo =
+			profile.monorepoTool === 'turbo' || profile.existing.turbo
+		if (hasTurbo) {
+			const checkTasks = useUltracite
+				? ['ultracite:check']
+				: ['biome']
+			if (profile.typescript) checkTasks.push('typecheck')
+			checkTasks.push('test')
+			scripts.push({
+				script: 'check:turbo',
+				value: `turbo run ${checkTasks.join(' ')}`,
+			})
 		}
 
 		return scripts

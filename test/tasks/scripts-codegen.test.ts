@@ -38,9 +38,9 @@ describe('packageScriptsTask', () => {
 		)
 		const pkgDiff = diffs.find((d) => d.filepath === 'package.json')
 		expect(pkgDiff).toBeDefined()
-		expect(pkgDiff?.after).toContain('lint')
-		expect(pkgDiff?.after).toContain('format')
-		expect(pkgDiff?.after).toContain('check')
+		expect(pkgDiff?.after).toContain('biome')
+		expect(pkgDiff?.after).toContain('biome:fix')
+		expect(pkgDiff?.after).toContain('test')
 		expect(pkgDiff?.after).toContain('typecheck')
 		expect(pkgDiff?.after).toContain('upgrade')
 		expect(pkgDiff?.after).toContain('release')
@@ -60,7 +60,7 @@ describe('packageScriptsTask', () => {
 					name: 'script-conflict',
 					type: 'module',
 					scripts: {
-						lint: 'next lint',
+						biome: 'eslint .',
 					},
 					dependencies: {
 						next: '^14.1.0',
@@ -82,8 +82,8 @@ describe('packageScriptsTask', () => {
 		const pkgDiff = diffs.find((d) => d.filepath === 'package.json')
 
 		expect(status).toBe('conflict')
-		expect(pkgDiff?.after).toContain('"lint": "next lint"')
-		expect(pkgDiff?.after).toContain('"format": "biome format --write ."')
+		expect(pkgDiff?.after).toContain('"biome": "eslint ."')
+		expect(pkgDiff?.after).toContain('"biome:fix": "biome check --write ."')
 	})
 
 	it('does not add typecheck or knip for non-TS projects', async () => {
@@ -102,7 +102,7 @@ describe('packageScriptsTask', () => {
 
 		expect(pkgDiff?.after).not.toContain('"typecheck"')
 		expect(pkgDiff?.after).not.toContain('"knip"')
-		expect(pkgDiff?.after).toContain('"lint"')
+		expect(pkgDiff?.after).toContain('"biome"')
 		expect(pkgDiff?.after).toContain('"release"')
 
 		await fs.rm(tmpDir, { recursive: true })
@@ -118,13 +118,13 @@ describe('packageScriptsTask', () => {
 				name: 'existing-scripts',
 				type: 'module',
 				scripts: {
-					lint: 'biome lint .',
-					format: 'biome format --write .',
-					check: 'biome check --write .',
+					biome: 'biome check .',
+					'biome:fix': 'biome check --write .',
+					test: 'vitest run',
 					typecheck: 'tsc --noEmit',
 					release: 'commit-and-tag-version',
 					plop: 'plop',
-					upgrade: 'pnpm dlx npm-check-updates -u && pnpm install',
+					upgrade: 'pnpm up -i -L',
 					knip: 'knip',
 				},
 			}),
