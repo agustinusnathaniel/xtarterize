@@ -37,15 +37,15 @@ Nested objects are merged recursively. Existing keys take precedence, missing ke
 ```typescript
 const existing = {
   compilerOptions: {
-    strict: true,
-    target: "ES2022"
+    strict: true,        // https://www.typescriptlang.org/tsconfig/#strict
+    target: "ES2022"     // https://www.typescriptlang.org/tsconfig/#target
   }
 }
 
 const incoming = {
   compilerOptions: {
-    incremental: true,
-    tsBuildInfoFile: ".tsbuildinfo"
+    incremental: true,           // https://www.typescriptlang.org/tsconfig/#incremental
+    tsBuildInfoFile: ".tsbuildinfo"  // https://www.typescriptlang.org/tsconfig/#tsBuildInfoFile
   }
 }
 
@@ -126,9 +126,9 @@ For cases where arrays need to be combined (like [VS Code extension recommendati
   <TabItem label=".vscode/settings.json">
     ```typescript
     // Existing
-    const existing = { "editor.formatOnSave": true }
+    const existing = { "editor.formatOnSave": true }  // https://code.visualstudio.com/docs/editor/codebasics#_format-on-save
     // Incoming: add Biome formatter
-    const incoming = { "[typescript]": { "editor.defaultFormatter": "biomejs.biome" } }
+    const incoming = { "[typescript]": { "editor.defaultFormatter": "biomejs.biome" } }  // https://code.visualstudio.com/docs/getstarted/settings#_language-specific-editor-settings
     // Result: both settings preserved
     ```
   </TabItem>

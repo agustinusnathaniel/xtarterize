@@ -19,7 +19,7 @@ xtarterize applies conformance configuration through discrete, independently app
 
 ### Framework-Aware Biome Config
 
-When [Tailwind CSS](https://tailwindcss.com/) is detected, the generated `biome.json` includes:
+When [Tailwind CSS](https://tailwindcss.com/) is detected, the generated [`biome.json`](https://biomejs.dev/reference/configuration/) includes:
 
 ```json
 {
@@ -31,90 +31,90 @@ When [Tailwind CSS](https://tailwindcss.com/) is detected, the generated `biome.
 }
 ```
 
-This enables Biome to parse [Tailwind v4 directives](https://tailwindcss.com/docs/functions-and-directives) like `@theme` without errors.
+This enables Biome to parse [Tailwind v4 directives](https://tailwindcss.com/docs/functions-and-directives) like [`@theme`](https://tailwindcss.com/docs/functions-and-directives#theme-directive) without errors. See [`css.parser.tailwindDirectives`](https://biomejs.dev/reference/configuration/#cssparsertailwinddirectives) in Biome's configuration reference.
 
 ## TypeScript
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
 | `ts/strict` | Patch [`tsconfig.json`](https://www.typescriptlang.org/tsconfig/) with [`strict: true`](https://www.typescriptlang.org/tsconfig/#strict) (skips if explicitly `false`) | TypeScript detected |
-| `ts/paths` | Patch `tsconfig.json` with [path aliases](https://www.typescriptlang.org/tsconfig/#paths) (`@/*`) | TypeScript detected |
-| `ts/incremental` | Patch `tsconfig.json` with [`incremental: true`](https://www.typescriptlang.org/tsconfig/#incremental) and [`tsBuildInfoFile`](https://www.typescriptlang.org/tsconfig/#tsBuildInfoFile) | TypeScript detected |
-| `gitignore/tsbuildinfo` | Add `*.tsbuildinfo` and `.tsbuildinfo/` to `.gitignore` | TypeScript detected |
+| `ts/paths` | Patch `tsconfig.json` with [`baseUrl`](https://www.typescriptlang.org/tsconfig/#baseUrl) and [`paths`](https://www.typescriptlang.org/tsconfig/#paths) aliases (`@/*` → [`./src/*`](https://www.typescriptlang.org/tsconfig/#paths)) | TypeScript detected |
+| `ts/incremental` | Patch `tsconfig.json` with [`incremental: true`](https://www.typescriptlang.org/tsconfig/#incremental) and [`tsBuildInfoFile: ".tsbuildinfo"`](https://www.typescriptlang.org/tsconfig/#tsBuildInfoFile) | TypeScript detected |
+| `gitignore/tsbuildinfo` | Add `*.tsbuildinfo` and `.tsbuildinfo/` to [`.gitignore`](https://git-scm.com/docs/gitignore) | TypeScript detected |
 
 ## Vite Plugins
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `vite/checker` | Inject [vite-plugin-checker](https://vite-plugin-checker.netlify.app/) into `vite.config.ts` via AST | Bundler is [Vite](https://vitejs.dev/) |
-| `vite/visualizer` | Inject [rollup-plugin-visualizer](https://github.com/btd/rollup-plugin-visualizer) into `vite.config.ts` via AST | Bundler is Vite |
+| `vite/checker` | Inject [`vite-plugin-checker`](https://vite-plugin-checker.netlify.app/) ([`checker()`](https://vite-plugin-checker.netlify.app/checkers/typescript.html)) into [`vite.config.ts`](https://vitejs.dev/config/) via [AST](https://github.com/unjs/magicast) | Bundler is [Vite](https://vitejs.dev/) |
+| `vite/visualizer` | Inject [`rollup-plugin-visualizer`](https://github.com/btd/rollup-plugin-visualizer) ([`visualizer()`](https://github.com/btd/rollup-plugin-visualizer#usage)) into `vite.config.ts` via AST | Bundler is Vite |
 
 ## CI/CD
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `ci/release` | Write `.github/workflows/release.yml` — triggers on tag push | [GitHub](https://github.com/) detected |
-| `ci/auto-update` | Write `.github/workflows/auto-update.yml` — weekly dependency updates | GitHub detected |
-| `ci/ci` | Write `.github/workflows/ci.yml` — lint, typecheck, test on PR | GitHub detected |
+| `ci/release` | Write [`.github/workflows/release.yml`](https://docs.github.com/en/actions/using-workflows/about-workflows) — triggers on [`push.tags`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-when-a-push-of-a-specific-tag-occurs) | [GitHub](https://github.com/) detected |
+| `ci/auto-update` | Write [`.github/workflows/auto-update.yml`](https://docs.github.com/en/actions/using-workflows/about-workflows) — [`schedule.cron`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule) for weekly dependency updates | GitHub detected |
+| `ci/ci` | Write [`.github/workflows/ci.yml`](https://docs.github.com/en/actions/using-workflows/about-workflows) — lint, typecheck, test on [`pull_request`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request) | GitHub detected |
 
 ### Conditional pnpm Setup
 
-For projects using [**pnpm**](https://pnpm.io/), CI workflows automatically include [`pnpm/action-setup@v4`](https://github.com/pnpm/action-setup) before [`actions/setup-node`](https://github.com/actions/setup-node). This ensures reproducible pnpm versions across runs. [npm](https://www.npmjs.com/) and [yarn](https://yarnpkg.com/) projects are unaffected.
+For projects using [**pnpm**](https://pnpm.io/), CI workflows automatically include [`pnpm/action-setup@v4`](https://github.com/pnpm/action-setup) with [`package_json_file`](https://github.com/pnpm/action-setup#inputs) before [`actions/setup-node@v6`](https://github.com/actions/setup-node). This ensures reproducible pnpm versions across runs. [npm](https://www.npmjs.com/) and [yarn](https://yarnpkg.com/) projects are unaffected.
 
 ## Dependencies
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `deps/renovate` | Write `renovate.json` with opinionated automerge config | Always |
+| `deps/renovate` | Write [`renovate.json`](https://docs.renovatebot.com/configuration-options/) with [`extends: ["config:base"]`](https://docs.renovatebot.com/presets-config/#configbase), [`automerge`](https://docs.renovatebot.com/key-concepts/automerge/), and [`stabilityDays: 2`](https://docs.renovatebot.com/configuration-options/#stabilitydays) | Always |
 
 ## Release
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `release/commitlint` | Install [commitlint](https://commitlint.js.org/), write `commitlint.config.ts` | [Git](https://git-scm.com/) detected |
-| `release/czg` | Install [czg](https://cz-git.qbb.sh/cli/), add `commit` script to `package.json` | Always |
-| `release/cat-version` | Install [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version), write `.versionrc` | Always |
+| `release/commitlint` | Install [commitlint](https://commitlint.js.org/) with [`@commitlint/config-conventional`](https://commitlint.js.org/reference/rules.html), write [`commitlint.config.ts`](https://commitlint.js.org/reference/configuration.html) | [Git](https://git-scm.com/) detected |
+| `release/czg` | Install [czg](https://cz-git.qbb.sh/cli/) ([Commitizen](https://commitizen.github.io/cz-cli/) adapter), add [`commit`](https://docs.npmjs.com/cli/v10/using-npm/scripts) script to `package.json` | Always |
+| `release/cat-version` | Install [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version), write [`.versionrc`](https://github.com/absolute-version/commit-and-tag-version#configuration) | Always |
 
 ## Code Quality
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `quality/knip` | Install [Knip](https://knip.dev/), write `knip.json` with framework-aware entry points | TypeScript detected |
+| `quality/knip` | Install [Knip](https://knip.dev/), write [`knip.json`](https://knip.dev/reference/configuration) with framework-aware [`entry`](https://knip.dev/reference/configuration#entry) and [`project`](https://knip.dev/reference/configuration#project) paths | TypeScript detected |
 
 ## Code Generation
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `codegen/plop` | Install [Plop](https://plopjs.com/), write `plopfile.ts` with framework-specific generators | Always |
+| `codegen/plop` | Install [Plop](https://plopjs.com/), write [`plopfile.ts`](https://plopjs.com/documentation/#getting-started) with framework-specific [generators](https://plopjs.com/documentation/#setgenerator) | Always |
 
 ## Monorepo
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `monorepo/turbo` | Install [Turborepo](https://turbo.build/), write `turbo.json` with build/lint/test pipeline | Monorepo detected |
+| `monorepo/turbo` | Install [Turborepo](https://turbo.build/), write [`turbo.json`](https://turbo.build/repo/docs/reference/configuration) with [`pipeline`](https://turbo.build/repo/docs/reference/configuration#pipeline) for build/lint/test | Monorepo detected |
 
 ## Editor
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `editor/vscode` | Write/merge [`.vscode/settings.json`](https://code.visualstudio.com/docs/getstarted/settings) and [`.vscode/extensions.json`](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions) | Always |
+| `editor/vscode` | Write/merge [`.vscode/settings.json`](https://code.visualstudio.com/docs/getstarted/settings#_settingsjson) and [`.vscode/extensions.json`](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions) | Always |
 
 ### Additive Extension Merging
 
-When `.vscode/extensions.json` already exists, xtarterize **adds** its recommended extensions to your existing list rather than replacing them. Your custom extensions are always preserved.
+When `.vscode/extensions.json` already exists, xtarterize **adds** its recommended extensions to your existing [`recommendations`](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions) array rather than replacing them. Your custom extensions are always preserved.
 
 ## Agent
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `agent/agents-md` | Write `AGENTS.md` with framework-specific AI agent instructions | Always |
-| `agent/skills` | Scaffold `.agents/skills/` directory with project context | TypeScript detected |
+| `agent/agents-md` | Write [`AGENTS.md`](https://docs.opencode.ai/agents) with framework-specific AI agent instructions | Always |
+| `agent/skills` | Scaffold [`.agents/skills/`](https://docs.opencode.ai/skills) directory with project context | TypeScript detected |
 
 ## Scripts
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `scripts/package-scripts` | Patch `package.json` scripts with lint, format, typecheck, etc. | Always |
+| `scripts/package-scripts` | Patch [`package.json`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) [`scripts`](https://docs.npmjs.com/cli/v10/using-npm/scripts) with `lint`, `format`, `typecheck`, etc. | Always |
 
 ## Idempotency
 

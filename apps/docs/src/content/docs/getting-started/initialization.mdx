@@ -82,18 +82,18 @@ npx xtarterize init
 
 The `init` command applies all tasks that are applicable to your detected stack:
 
-- **Linting & Formatting** — [Biome](https://biomejs.dev/) (lint + format), with [Tailwind CSS](https://tailwindcss.com/) parser support when detected
-- **TypeScript** — [strict mode](https://www.typescriptlang.org/tsconfig/#strict), [path aliases](https://www.typescriptlang.org/tsconfig/#paths), [incremental builds](https://www.typescriptlang.org/tsconfig/#incremental), `.gitignore` tsbuildinfo entries
-- **Vite Plugins** — [vite-plugin-checker](https://vite-plugin-checker.netlify.app/), [rollup-plugin-visualizer](https://github.com/btd/rollup-plugin-visualizer)
-- **CI/CD** — [GitHub Actions](https://docs.github.com/en/actions) workflows for release, CI, auto-updates (with [`pnpm/action-setup`](https://github.com/pnpm/action-setup) for pnpm projects)
-- **Dependencies** — [Renovate](https://docs.renovatebot.com/) config
-- **Release** — [Commitlint](https://commitlint.js.org/), [czg](https://cz-git.qbb.sh/cli/), [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version)
-- **Quality** — [Knip](https://knip.dev/) (unused code detection)
-- **Codegen** — [Plop](https://plopjs.com/) (code generation scaffolds)
-- **Monorepo** — [Turborepo](https://turbo.build/) (when monorepo detected)
-- **Editor** — [VS Code](https://code.visualstudio.com/) settings and extensions (additive merging preserves your existing extensions)
-- **Agent** — `AGENTS.md`, AI skills directory
-- **Scripts** — `package.json` scripts (with [Ultracite](https://www.ultracite.ai/) detection if installed)
+- **Linting & Formatting** — [Biome](https://biomejs.dev/) ([`linter`](https://biomejs.dev/reference/configuration/#linter) + [`formatter`](https://biomejs.dev/reference/configuration/#formatter)), with [Tailwind CSS](https://tailwindcss.com/) [`css.parser.tailwindDirectives`](https://biomejs.dev/reference/configuration/#cssparsertailwinddirectives) support when detected
+- **TypeScript** — [`strict: true`](https://www.typescriptlang.org/tsconfig/#strict), [`paths`](https://www.typescriptlang.org/tsconfig/#paths) aliases, [`incremental: true`](https://www.typescriptlang.org/tsconfig/#incremental) + [`tsBuildInfoFile`](https://www.typescriptlang.org/tsconfig/#tsBuildInfoFile), [`.gitignore`](https://git-scm.com/docs/gitignore) `*.tsbuildinfo` entries
+- **Vite Plugins** — [`vite-plugin-checker`](https://vite-plugin-checker.netlify.app/) ([`checker()`](https://vite-plugin-checker.netlify.app/checkers/typescript.html) for TypeScript), [`rollup-plugin-visualizer`](https://github.com/btd/rollup-plugin-visualizer)
+- **CI/CD** — [GitHub Actions](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions) workflows ([`on.push.tags`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-when-a-push-of-a-specific-tag-occurs) for release, [`schedule.cron`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule) for auto-updates, [`on.pull_request`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request) for CI) with [`pnpm/action-setup@v4`](https://github.com/pnpm/action-setup) for pnpm projects
+- **Dependencies** — [Renovate](https://docs.renovatebot.com/) config ([`extends: config:base`](https://docs.renovatebot.com/presets-config/#configbase), [`automerge`](https://docs.renovatebot.com/key-concepts/automerge/))
+- **Release** — [Commitlint](https://commitlint.js.org/) ([`@commitlint/config-conventional`](https://commitlint.js.org/reference/rules.html)), [czg](https://cz-git.qbb.sh/cli/) ([`commitizen`](https://commitizen.github.io/cz-cli/)), [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version)
+- **Quality** — [Knip](https://knip.dev/) ([`entry`](https://knip.dev/reference/configuration#entry) / [`project`](https://knip.dev/reference/configuration#project) detection)
+- **Codegen** — [Plop](https://plopjs.com/) ([`plopfile.ts`](https://plopjs.com/documentation/#getting-started) scaffolds)
+- **Monorepo** — [Turborepo](https://turbo.build/repo/docs/reference/configuration) ([`turbo.json`](https://turbo.build/repo/docs/reference/configuration) pipeline)
+- **Editor** — [VS Code](https://code.visualstudio.com/) [`settings.json`](https://code.visualstudio.com/docs/getstarted/settings#_settingsjson) and [`extensions.json`](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions) (additive merging preserves your existing extensions)
+- **Agent** — `AGENTS.md`, [`.agents/skills/`](https://docs.opencode.ai/skills) directory
+- **Scripts** — [`package.json` `scripts`](https://docs.npmjs.com/cli/v10/using-npm/scripts) (with [Ultracite](https://www.ultracite.ai/) detection if installed)
 
 <Aside>
   Each task checks if it's already applied and skips if conformant. Running `init` twice produces no changes on the second run.

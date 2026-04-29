@@ -11,9 +11,9 @@ xtarterize is organized as a monorepo using [Turborepo](https://turbo.build/repo
 
 <FileTree>
 - packages/
-  - core/ — @xtarterize/core — Detection, task interface, utils, backup
-  - patchers/ — @xtarterize/patchers — JSON/YAML merge, AST patching
-  - tasks/ — @xtarterize/tasks — All conformance task implementations
+  - core/ — [`@xtarterize/core`](https://github.com/agustinusnathaniel/xtarterize/tree/main/packages/core) — [`detect.ts`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/core/src/detect.ts), [`resolve.ts`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/core/src/resolve.ts), [`apply.ts`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/core/src/apply.ts), [`backup.ts`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/core/src/backup.ts), [`preflight.ts`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/core/src/preflight.ts)
+  - patchers/ — [`@xtarterize/patchers`](https://github.com/agustinusnathaniel/xtarterize/tree/main/packages/patchers) — [`json-merge.ts`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/patchers/src/json-merge.ts), [`ast-patch.ts`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/patchers/src/ast-patch.ts)
+  - tasks/ — [`@xtarterize/tasks`](https://github.com/agustinusnathaniel/xtarterize/tree/main/packages/tasks) — [`factory.ts`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/tasks/src/factory.ts), all task implementations
 - apps/
   - cli/ — **xtarterize** — CLI binary ([citty](https://github.com/unjs/citty) + [@clack/prompts](https://github.com/natemoo-re/clack))
   - docs/ — @xtarterize/docs — This documentation site ([Astro](https://astro.build/)/[Starlight](https://starlight.astro.build/))

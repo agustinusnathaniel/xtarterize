@@ -9,7 +9,7 @@ xtarterize applies conformance configuration through discrete, independently app
 
 ## Task Interface
 
-All tasks implement the `Task` interface from `@xtarterize/core`:
+All tasks implement the [`Task`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/core/src/types.ts) interface from `@xtarterize/core`:
 
 ```typescript
 interface Task {
@@ -103,14 +103,14 @@ classDiagram
 
 ## Task Factory
 
-Most tasks are created through factory functions in `factory.ts` that eliminate boilerplate:
+Most tasks are created through factory functions in [`factory.ts`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/tasks/src/factory.ts) that eliminate boilerplate:
 
 - **`createSimpleFileTask`** — For tasks that write a single new file (CI workflows, [renovate](https://docs.renovatebot.com/), [commitlint](https://commitlint.js.org/), [knip](https://knip.dev/), [plop](https://plopjs.com/), AI skills)
-- **`createFileTask`** — For text files with custom check/merge logic (`AGENTS.md`, `.gitignore` entries)
-- **`createJsonMergeTask`** — For tasks that deep-merge JSON configs ([tsconfig](https://www.typescriptlang.org/tsconfig/), [biome](https://biomejs.dev/reference/configuration/), [turbo](https://turbo.build/repo/docs)). Uses `deepEqual` for key-order-independent comparison
-- **`createMultiFileJsonMergeTask`** — For tasks that merge multiple JSON files ([VSCode settings](https://code.visualstudio.com/docs/getstarted/settings) + [extensions](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions)). Supports custom per-file merge functions
-- **`createVitePluginTask`** — For injecting plugins into `vite.config.ts` ([checker](https://vite-plugin-checker.netlify.app/), [visualizer](https://github.com/btd/rollup-plugin-visualizer))
-- **`createPackageJsonTask`** — For tasks that add scripts, deps, and extra files via `package.json` ([czg](https://cz-git.qbb.sh/cli/), [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version), package scripts)
+- **`createFileTask`** — For text files with custom check/merge logic (`AGENTS.md`, [`.gitignore`](https://git-scm.com/docs/gitignore) entries)
+- **`createJsonMergeTask`** — For tasks that deep-merge JSON configs ([`tsconfig.json`](https://www.typescriptlang.org/tsconfig/), [`biome.json`](https://biomejs.dev/reference/configuration/), [`turbo.json`](https://turbo.build/repo/docs/reference/configuration)). Uses [`deepEqual`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/tasks/src/factory.ts) for key-order-independent comparison
+- **`createMultiFileJsonMergeTask`** — For tasks that merge multiple JSON files ([`.vscode/settings.json`](https://code.visualstudio.com/docs/getstarted/settings#_settingsjson) + [`.vscode/extensions.json`](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions)). Supports custom per-file merge functions
+- **`createVitePluginTask`** — For injecting plugins into [`vite.config.ts`](https://vitejs.dev/config/) ([`vite-plugin-checker`](https://vite-plugin-checker.netlify.app/checkers/typescript.html), [`rollup-plugin-visualizer`](https://github.com/btd/rollup-plugin-visualizer))
+- **`createPackageJsonTask`** — For tasks that add scripts, deps, and extra files via [`package.json`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) ([`czg`](https://cz-git.qbb.sh/cli/), [`commit-and-tag-version`](https://github.com/absolute-version/commit-and-tag-version), package scripts)
 
 This reduces most tasks from 40-80 lines to 10-15 lines of declarative configuration.
 

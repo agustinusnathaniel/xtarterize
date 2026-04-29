@@ -15,9 +15,9 @@ Every command that modifies or inspects your project (`init`, `sync`, `diff`, `c
 
 | Check | Requirement | Error Code |
 |-------|-------------|------------|
-| `package.json` exists | Project root must contain a `package.json` | `MISSING_PACKAGE_JSON` |
-| `name` field present | `package.json` must have a `"name"` field | `INVALID_PACKAGE_JSON` |
-| Git repository | `.git` directory must exist | `MISSING_GIT` |
+| [`package.json`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) exists | Project root must contain a `package.json` | `MISSING_PACKAGE_JSON` |
+| [`name`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#name) field present | `package.json` must have a `"name"` field | `INVALID_PACKAGE_JSON` |
+| [Git](https://git-scm.com/) repository | [`.git`](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F) directory must exist | `MISSING_GIT` |
 
 ### Behavior
 
@@ -54,15 +54,15 @@ Detects incompatible or redundant tooling configurations:
 
 ### Tool Installation Checks
 
-Verifies that tools listed in `package.json` are actually installed:
+Verifies that tools listed in [`package.json`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) [`dependencies`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#dependencies)/[`devDependencies`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#devdependencies) are actually installed in [`node_modules`](https://docs.npmjs.com/cli/v10/configuring-npm/folders#node-modules):
 
 | Tool | Dependency | Command Checked |
 |------|------------|-----------------|
-| [Biome](https://biomejs.dev/) | `@biomejs/biome` | `biome --version` |
-| [ESLint](https://eslint.org/) | `eslint` | `eslint --version` |
-| [TypeScript](https://www.typescriptlang.org/) | `typescript` | `tsc --version` |
-| [Commitlint](https://commitlint.js.org/) | `@commitlint/cli` | `commitlint --version` |
-| [Knip](https://knip.dev/) | `knip` | `knip --version` |
+| [Biome](https://biomejs.dev/) | [`@biomejs/biome`](https://www.npmjs.com/package/@biomejs/biome) | [`biome --version`](https://biomejs.dev/reference/cli/) |
+| [ESLint](https://eslint.org/) | [`eslint`](https://www.npmjs.com/package/eslint) | [`eslint --version`](https://eslint.org/docs/latest/use/command-line-interface) |
+| [TypeScript](https://www.typescriptlang.org/) | [`typescript`](https://www.npmjs.com/package/typescript) | [`tsc --version`](https://www.typescriptlang.org/docs/handbook/compiler-options.html) |
+| [Commitlint](https://commitlint.js.org/) | [`@commitlint/cli`](https://www.npmjs.com/package/@commitlint/cli) | [`commitlint --version`](https://commitlint.js.org/reference/cli.html) |
+| [Knip](https://knip.dev/) | [`knip`](https://www.npmjs.com/package/knip) | [`knip --version`](https://knip.dev/reference/cli/) |
 
 ### Diagnostic Output
 
