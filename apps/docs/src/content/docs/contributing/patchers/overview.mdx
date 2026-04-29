@@ -11,9 +11,9 @@ The `@xtarterize/patchers` package provides utilities for safely modifying confi
 
 | Patcher | Description |
 |---------|-------------|
-| `mergeJson` | Deep merge JSON objects using `defu` — existing keys take precedence |
-| `mergeYaml` | Deep merge YAML objects using `defu` and `js-yaml` |
-| `injectVitePlugin` | AST-based plugin injection into `vite.config.ts` using `magicast` |
+| `mergeJson` | Deep merge JSON objects using [`defu`](https://github.com/unjs/defu) — existing keys take precedence |
+| `mergeYaml` | Deep merge YAML objects using [`defu`](https://github.com/unjs/defu) and [`js-yaml`](https://github.com/nodeca/js-yaml) |
+| `injectVitePlugin` | AST-based plugin injection into `vite.config.ts` using [`magicast`](https://github.com/unjs/magicast) |
 
 ## Architecture
 
@@ -47,7 +47,7 @@ const merged = mergeJson(existing, incoming)
 ```
 
 <Aside type="tip">
-  The `defu` library ensures that existing user configuration is never overwritten — incoming values only fill gaps.
+  The [`defu`](https://github.com/unjs/defu) library ensures that existing user configuration is never overwritten — incoming values only fill gaps. Learn more in the [JSON Merge](/contributing/patchers/json-merge/) reference.
 </Aside>
 
 ## YAML Merge
@@ -103,3 +103,10 @@ if (!result.success) {
 <Aside type="note">
   If the config structure is non-standard (factory functions, conditional exports), the AST patcher falls back to returning manual instructions rather than corrupting the file.
 </Aside>
+
+## References
+
+- [defu](https://github.com/unjs/defu) — Deep merge utility for JavaScript objects
+- [js-yaml](https://github.com/nodeca/js-yaml) — YAML parser and serializer for JavaScript
+- [magicast](https://github.com/unjs/magicast) — AST manipulation library for JavaScript/TypeScript
+- [Vite Plugin API](https://vitejs.dev/guide/api-plugin.html) — How Vite plugins work

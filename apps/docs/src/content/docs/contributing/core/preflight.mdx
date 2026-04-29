@@ -47,9 +47,9 @@ Detects incompatible or redundant tooling configurations:
 
 | Check | Condition | Status |
 |-------|-----------|--------|
-| Biome + ESLint | Both `@biomejs/biome` and `eslint` in dependencies | `warn` |
-| Biome + Prettier | Both `@biomejs/biome` and `prettier` in dependencies | `warn` |
-| Legacy ESLint config | `.eslintrc.*` file exists | `warn` |
+| Biome + ESLint | Both [`@biomejs/biome`](https://biomejs.dev/) and [`eslint`](https://eslint.org/) in dependencies | `warn` |
+| Biome + Prettier | Both [`@biomejs/biome`](https://biomejs.dev/) and [`prettier`](https://prettier.io/) in dependencies | `warn` |
+| Legacy ESLint config | [`.eslintrc.*`](https://eslint.org/docs/latest/use/configure/configuration-files-deprecated) file exists | `warn` |
 | No conflicts | None of the above | `pass` |
 
 ### Tool Installation Checks
@@ -58,11 +58,11 @@ Verifies that tools listed in `package.json` are actually installed:
 
 | Tool | Dependency | Command Checked |
 |------|------------|-----------------|
-| Biome | `@biomejs/biome` | `biome --version` |
-| ESLint | `eslint` | `eslint --version` |
-| TypeScript | `typescript` | `tsc --version` |
-| Commitlint | `@commitlint/cli` | `commitlint --version` |
-| Knip | `knip` | `knip --version` |
+| [Biome](https://biomejs.dev/) | `@biomejs/biome` | `biome --version` |
+| [ESLint](https://eslint.org/) | `eslint` | `eslint --version` |
+| [TypeScript](https://www.typescriptlang.org/) | `typescript` | `tsc --version` |
+| [Commitlint](https://commitlint.js.org/) | `@commitlint/cli` | `commitlint --version` |
+| [Knip](https://knip.dev/) | `knip` | `knip --version` |
 
 ### Diagnostic Output
 
@@ -119,6 +119,16 @@ for (const check of checks) {
   console.log(check.message) // 'Biome is installed'
 }
 ```
+
+## References
+
+- [Biome Documentation](https://biomejs.dev/) — Fast linter and formatter
+- [ESLint Documentation](https://eslint.org/docs/latest/) — Pluggable JavaScript linter
+- [Prettier Documentation](https://prettier.io/docs/en/) — Opinionated code formatter
+- [ESLint Configuration Files (Deprecated)](https://eslint.org/docs/latest/use/configure/configuration-files-deprecated) — Legacy `.eslintrc` format
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/) — Typed JavaScript
+- [Commitlint Documentation](https://commitlint.js.org/) — Lint commit messages
+- [Knip Documentation](https://knip.dev/) — Find unused files and dependencies
 
 ## CI Mode
 

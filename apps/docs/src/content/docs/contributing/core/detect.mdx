@@ -5,7 +5,7 @@ description: How xtarterize detects your project's stack and builds a ProjectPro
 
 import { Aside, Tabs, TabItem } from '@astrojs/starlight/components'
 
-The `@xtarterize/core` package provides the `detectProject()` function — the foundation of xtarterize's context-aware behavior.
+The `@xtarterize/core` package provides the `detectProject()` function — the foundation of xtarterize's context-aware behavior. It analyzes your project directory to build a [`ProjectProfile`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/core/src/detect.ts) that drives which conformance tasks are applicable.
 
 ## Overview
 
@@ -119,18 +119,18 @@ flowchart TD
   <TabItem label="Dependencies">
     | Signal | Source |
     |--------|--------|
-    | Framework | `package.json` dependencies (`react`, `vue`, `react-native`, etc.) |
-    | Bundler | `vite`, `next`, `expo`, `webpack`, `@rspack/core` in deps |
-    | Router | `@tanstack/react-router`, `react-router-dom`, `vue-router` in deps |
-    | Styling | `tailwindcss`, `styled-components`, `nativewind` in deps |
+    | Framework | [`package.json`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) dependencies ([`react`](https://react.dev/), [`vue`](https://vuejs.org/), [`react-native`](https://reactnative.dev/), etc.) |
+    | Bundler | [`vite`](https://vitejs.dev/), [`next`](https://nextjs.org/), [`expo`](https://expo.dev/), [`webpack`](https://webpack.js.org/), [`@rspack/core`](https://rspack.dev/) in deps |
+    | Router | [`@tanstack/react-router`](https://tanstack.com/router/latest), [`react-router-dom`](https://reactrouter.com/), [`vue-router`](https://router.vuejs.org/) in deps |
+    | Styling | [`tailwindcss`](https://tailwindcss.com/), [`styled-components`](https://styled-components.com/), [`nativewind`](https://www.nativewind.dev/) in deps |
   </TabItem>
   <TabItem label="Filesystem">
     | Signal | Source |
     |--------|--------|
-    | TypeScript | `tsconfig.json` existence, `typescript` in deps |
-    | Package manager | Lockfile presence (`pnpm-lock.yaml`, `yarn.lock`, etc.) |
-    | Monorepo | `pnpm-workspace.yaml`, `turbo.json`, `packages/` + `apps/` dirs |
-    | GitHub | `.github/` directory presence |
+    | TypeScript | [`tsconfig.json`](https://www.typescriptlang.org/tsconfig/) existence, `typescript` in deps |
+    | Package manager | Lockfile presence ([`pnpm-lock.yaml`](https://pnpm.io/), [`yarn.lock`](https://yarnpkg.com/), etc.) |
+    | Monorepo | [`pnpm-workspace.yaml`](https://pnpm.io/workspaces), [`turbo.json`](https://turbo.build/repo/docs), `packages/` + `apps/` dirs |
+    | GitHub | [`.github/`](https://docs.github.com/en/actions) directory presence |
   </TabItem>
 </Tabs>
 
@@ -153,3 +153,24 @@ if (profile.monorepo && profile.monorepoTool === 'turbo') {
   // Turbo task may be skip if already configured
 }
 ```
+
+## References
+
+- [npm package.json Documentation](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) — Package manifest format
+- [React](https://react.dev/) — UI library for web and native apps
+- [Vue.js](https://vuejs.org/) — Progressive JavaScript framework
+- [React Native](https://reactnative.dev/) — Native app development with React
+- [Vite](https://vitejs.dev/) — Next-generation frontend build tool
+- [Next.js](https://nextjs.org/) — React framework for production
+- [TanStack Router](https://tanstack.com/router/latest) — Type-safe routing for React
+- [React Router](https://reactrouter.com/) — Declarative routing for React
+- [Vue Router](https://router.vuejs.org/) — Official router for Vue.js
+- [Expo](https://expo.dev/) — React Native framework
+- [Webpack](https://webpack.js.org/) — Module bundler
+- [Rspack](https://rspack.dev/) — Fast Rust-based web bundler
+- [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework
+- [Styled Components](https://styled-components.com/) — CSS-in-JS for React
+- [NativeWind](https://www.nativewind.dev/) — Tailwind CSS for React Native
+- [pnpm Workspaces](https://pnpm.io/workspaces) — Monorepo workspace support
+- [Turborepo](https://turbo.build/repo/docs) — Monorepo task runner
+- [TypeScript tsconfig](https://www.typescriptlang.org/tsconfig/) — Compiler configuration

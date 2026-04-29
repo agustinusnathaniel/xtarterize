@@ -5,11 +5,11 @@ description: Learn what xtarterize is and how it automates conformance configura
 
 import { Steps, LinkButton } from '@astrojs/starlight/components'
 
-xtarterize is an adaptive CLI tool that automates the setup, enforcement, and ongoing synchronization of developer conformance configurations across JavaScript/TypeScript projects.
+xtarterize is an adaptive CLI tool that automates the setup, enforcement, and ongoing synchronization of developer conformance configurations across [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)/[TypeScript](https://www.typescriptlang.org/) projects.
 
 ## Why xtarterize?
 
-Modern JS/TS projects require a large and growing set of tooling configuration: linters, formatters, bundler plugins, TypeScript settings, CI/CD workflows, release automation, code generation scaffolds, dependency management, and editor settings. Setting these up consistently across projects is:
+Modern JS/TS projects require a large and growing set of tooling configuration: [linters](https://biomejs.dev/), [formatters](https://biomejs.dev/), [bundler plugins](https://vitejs.dev/guide/using-plugins.html), [TypeScript settings](https://www.typescriptlang.org/tsconfig/), [CI/CD workflows](https://docs.github.com/en/actions), [release automation](https://github.com/absolute-version/commit-and-tag-version), [code generation scaffolds](https://plopjs.com/), [dependency management](https://docs.renovatebot.com/), and [editor settings](https://code.visualstudio.com/docs/getstarted/settings). Setting these up consistently across projects is:
 
 - **Repetitive** — the same configs are rewritten or copy-pasted project to project
 - **Error-prone** — manual patching of `package.json`, `tsconfig.json`, or `vite.config.ts` often misses edge cases
@@ -23,10 +23,10 @@ xtarterize solves this by being detection-first, context-aware, non-destructive,
 <Steps>
 
 1. **Detect** — Scans your project to build a full `ProjectProfile` (framework, bundler, styling, package manager, monorepo status, existing configs)
-2. **Resolve** — Maps the profile to applicable conformance tasks (e.g., vite tasks only for Vite projects)
+2. **Resolve** — Maps the profile to applicable conformance tasks (e.g., [Vite](https://vitejs.dev/) tasks only for Vite projects)
 3. **Check** — Determines each task's status: `new` (file doesn't exist), `patch` (needs merging), `skip` (already conformant), or `conflict` (incompatible)
 4. **Plan** — Displays a conformance plan table for review
-5. **Apply** — Backs up files, then applies changes using deep merge or AST manipulation
+5. **Apply** — Backs up files, then applies changes using [deep merge](https://github.com/unjs/defu) or [AST manipulation](https://github.com/unjs/magicast)
 
 </Steps>
 
@@ -70,5 +70,16 @@ npx create-xtarter-app@latest my-app
 cd my-app
 npx xtarterize init
 ```
+
+## References
+
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/) — Learn about TypeScript compiler options and configuration
+- [Biome](https://biomejs.dev/) — Fast linter and formatter for JavaScript/TypeScript
+- [Vite](https://vitejs.dev/) — Next-generation frontend build tool
+- [GitHub Actions](https://docs.github.com/en/actions) — CI/CD automation platform
+- [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) — Automated versioning and changelog generation
+- [Plop](https://plopjs.com/) — Micro-generator framework for code scaffolding
+- [Renovate](https://docs.renovatebot.com/) — Automated dependency updates
+- [VS Code Settings](https://code.visualstudio.com/docs/getstarted/settings) — Editor configuration documentation
 
 <LinkButton href="/getting-started/installation/">Install xtarterize →</LinkButton>

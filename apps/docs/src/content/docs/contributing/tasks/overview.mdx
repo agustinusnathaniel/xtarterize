@@ -105,12 +105,12 @@ classDiagram
 
 Most tasks are created through factory functions in `factory.ts` that eliminate boilerplate:
 
-- **`createSimpleFileTask`** — For tasks that write a single new file (CI workflows, renovate, commitlint, knip, plop, AI skills)
-- **`createFileTask`** — For text files with custom check/merge logic (AGENTS.md, .gitignore entries)
-- **`createJsonMergeTask`** — For tasks that deep-merge JSON configs (tsconfig, biome, turbo). Uses `deepEqual` for key-order-independent comparison
-- **`createMultiFileJsonMergeTask`** — For tasks that merge multiple JSON files (VSCode settings + extensions). Supports custom per-file merge functions
-- **`createVitePluginTask`** — For injecting plugins into vite.config.ts (checker, visualizer)
-- **`createPackageJsonTask`** — For tasks that add scripts, deps, and extra files via package.json (czg, commit-and-tag-version, package scripts)
+- **`createSimpleFileTask`** — For tasks that write a single new file (CI workflows, [renovate](https://docs.renovatebot.com/), [commitlint](https://commitlint.js.org/), [knip](https://knip.dev/), [plop](https://plopjs.com/), AI skills)
+- **`createFileTask`** — For text files with custom check/merge logic (`AGENTS.md`, `.gitignore` entries)
+- **`createJsonMergeTask`** — For tasks that deep-merge JSON configs ([tsconfig](https://www.typescriptlang.org/tsconfig/), [biome](https://biomejs.dev/reference/configuration/), [turbo](https://turbo.build/repo/docs)). Uses `deepEqual` for key-order-independent comparison
+- **`createMultiFileJsonMergeTask`** — For tasks that merge multiple JSON files ([VSCode settings](https://code.visualstudio.com/docs/getstarted/settings) + [extensions](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions)). Supports custom per-file merge functions
+- **`createVitePluginTask`** — For injecting plugins into `vite.config.ts` ([checker](https://vite-plugin-checker.netlify.app/), [visualizer](https://github.com/btd/rollup-plugin-visualizer))
+- **`createPackageJsonTask`** — For tasks that add scripts, deps, and extra files via `package.json` ([czg](https://cz-git.qbb.sh/cli/), [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version), package scripts)
 
 This reduces most tasks from 40-80 lines to 10-15 lines of declarative configuration.
 
@@ -141,6 +141,22 @@ For tasks that patch JSON config files, use a **tristate detection pattern** to 
 | **Match** | Key exists with expected value | `skip` | No changes |
 | **Mismatch** | Key exists with different value | `conflict` | Alert user, don't overwrite |
 
-This prevents infinite loops when a user explicitly sets a value that differs from xtarterize's recommendation (e.g., `strict: false` in tsconfig).
+This prevents infinite loops when a user explicitly sets a value that differs from xtarterize's recommendation (e.g., [`strict: false`](https://www.typescriptlang.org/tsconfig/#strict) in tsconfig).
+
+## References
+
+- [defu](https://github.com/unjs/defu) — Deep merge utility used by JSON merge tasks
+- [magicast](https://github.com/unjs/magicast) — AST manipulation for Vite plugin injection
+- [TypeScript tsconfig](https://www.typescriptlang.org/tsconfig/) — Compiler configuration reference
+- [Biome Configuration](https://biomejs.dev/reference/configuration/) — `biome.json` schema
+- [Turborepo Configuration](https://turbo.build/repo/docs/reference/configuration) — `turbo.json` schema
+- [commitlint Rules](https://commitlint.js.org/reference/rules.html) — Commit message validation rules
+- [czg Documentation](https://cz-git.qbb.sh/cli/) — Interactive commit helper
+- [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) — Automated versioning
+- [Knip Documentation](https://knip.dev/) — Unused code detection
+- [Plop Documentation](https://plopjs.com/documentation/) — Code scaffolding
+- [VS Code Settings](https://code.visualstudio.com/docs/getstarted/settings) — Editor configuration
+- [VS Code Extensions](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions) — Workspace recommendations
+- [Renovate Configuration](https://docs.renovatebot.com/configuration-options/) — Dependency automation
 
 <LinkButton href="/contributing/architecture/overview/">Learn about the overall architecture →</LinkButton>

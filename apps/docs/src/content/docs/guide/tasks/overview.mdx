@@ -11,15 +11,15 @@ xtarterize applies conformance configuration through discrete, independently app
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `lint/biome` | Install Biome, write `biome.json` with framework-aware parser options | Always (TS/JS projects) |
+| `lint/biome` | Install [Biome](https://biomejs.dev/), write `biome.json` with framework-aware parser options | Always (TS/JS projects) |
 
 <Aside type="tip">
-  For stricter, opinionated linting, run <code>npx ultracite init</code> after <code>xtarterize init</code>. The <code>package.json</code> lint scripts will auto-detect Ultracite and use <code>ultracite:check</code> / <code>ultracite:fix</code> instead of Biome directly.
+  For stricter, opinionated linting, run <code>npx ultracite init</code> after <code>xtarterize init</code>. The <code>package.json</code> lint scripts will auto-detect [Ultracite](https://www.ultracite.ai/) and use <code>ultracite:check</code> / <code>ultracite:fix</code> instead of Biome directly.
 </Aside>
 
 ### Framework-Aware Biome Config
 
-When Tailwind CSS is detected, the generated `biome.json` includes:
+When [Tailwind CSS](https://tailwindcss.com/) is detected, the generated `biome.json` includes:
 
 ```json
 {
@@ -31,35 +31,35 @@ When Tailwind CSS is detected, the generated `biome.json` includes:
 }
 ```
 
-This enables Biome to parse Tailwind v4 directives like `@theme` without errors.
+This enables Biome to parse [Tailwind v4 directives](https://tailwindcss.com/docs/functions-and-directives) like `@theme` without errors.
 
 ## TypeScript
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `ts/strict` | Patch `tsconfig.json` with `strict: true` (skips if explicitly `false`) | TypeScript detected |
-| `ts/paths` | Patch `tsconfig.json` with path aliases (`@/*`) | TypeScript detected |
-| `ts/incremental` | Patch `tsconfig.json` with `incremental: true` and `tsBuildInfoFile` | TypeScript detected |
+| `ts/strict` | Patch [`tsconfig.json`](https://www.typescriptlang.org/tsconfig/) with [`strict: true`](https://www.typescriptlang.org/tsconfig/#strict) (skips if explicitly `false`) | TypeScript detected |
+| `ts/paths` | Patch `tsconfig.json` with [path aliases](https://www.typescriptlang.org/tsconfig/#paths) (`@/*`) | TypeScript detected |
+| `ts/incremental` | Patch `tsconfig.json` with [`incremental: true`](https://www.typescriptlang.org/tsconfig/#incremental) and [`tsBuildInfoFile`](https://www.typescriptlang.org/tsconfig/#tsBuildInfoFile) | TypeScript detected |
 | `gitignore/tsbuildinfo` | Add `*.tsbuildinfo` and `.tsbuildinfo/` to `.gitignore` | TypeScript detected |
 
 ## Vite Plugins
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `vite/checker` | Inject `vite-plugin-checker` into `vite.config.ts` via AST | Bundler is Vite |
-| `vite/visualizer` | Inject `rollup-plugin-visualizer` into `vite.config.ts` via AST | Bundler is Vite |
+| `vite/checker` | Inject [vite-plugin-checker](https://vite-plugin-checker.netlify.app/) into `vite.config.ts` via AST | Bundler is [Vite](https://vitejs.dev/) |
+| `vite/visualizer` | Inject [rollup-plugin-visualizer](https://github.com/btd/rollup-plugin-visualizer) into `vite.config.ts` via AST | Bundler is Vite |
 
 ## CI/CD
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `ci/release` | Write `.github/workflows/release.yml` — triggers on tag push | GitHub detected |
+| `ci/release` | Write `.github/workflows/release.yml` — triggers on tag push | [GitHub](https://github.com/) detected |
 | `ci/auto-update` | Write `.github/workflows/auto-update.yml` — weekly dependency updates | GitHub detected |
 | `ci/ci` | Write `.github/workflows/ci.yml` — lint, typecheck, test on PR | GitHub detected |
 
 ### Conditional pnpm Setup
 
-For projects using **pnpm**, CI workflows automatically include `pnpm/action-setup@v4` before `actions/setup-node`. This ensures reproducible pnpm versions across runs. npm and yarn projects are unaffected.
+For projects using [**pnpm**](https://pnpm.io/), CI workflows automatically include [`pnpm/action-setup@v4`](https://github.com/pnpm/action-setup) before [`actions/setup-node`](https://github.com/actions/setup-node). This ensures reproducible pnpm versions across runs. [npm](https://www.npmjs.com/) and [yarn](https://yarnpkg.com/) projects are unaffected.
 
 ## Dependencies
 
@@ -71,33 +71,33 @@ For projects using **pnpm**, CI workflows automatically include `pnpm/action-set
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `release/commitlint` | Install commitlint, write `commitlint.config.ts` | Git detected |
-| `release/czg` | Install czg, add `commit` script to `package.json` | Always |
-| `release/cat-version` | Install `commit-and-tag-version`, write `.versionrc` | Always |
+| `release/commitlint` | Install [commitlint](https://commitlint.js.org/), write `commitlint.config.ts` | [Git](https://git-scm.com/) detected |
+| `release/czg` | Install [czg](https://cz-git.qbb.sh/cli/), add `commit` script to `package.json` | Always |
+| `release/cat-version` | Install [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version), write `.versionrc` | Always |
 
 ## Code Quality
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `quality/knip` | Install knip, write `knip.json` with framework-aware entry points | TypeScript detected |
+| `quality/knip` | Install [Knip](https://knip.dev/), write `knip.json` with framework-aware entry points | TypeScript detected |
 
 ## Code Generation
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `codegen/plop` | Install plop, write `plopfile.ts` with framework-specific generators | Always |
+| `codegen/plop` | Install [Plop](https://plopjs.com/), write `plopfile.ts` with framework-specific generators | Always |
 
 ## Monorepo
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `monorepo/turbo` | Install turbo, write `turbo.json` with build/lint/test pipeline | Monorepo detected |
+| `monorepo/turbo` | Install [Turborepo](https://turbo.build/), write `turbo.json` with build/lint/test pipeline | Monorepo detected |
 
 ## Editor
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `editor/vscode` | Write/merge `.vscode/settings.json` and `.vscode/extensions.json` | Always |
+| `editor/vscode` | Write/merge [`.vscode/settings.json`](https://code.visualstudio.com/docs/getstarted/settings) and [`.vscode/extensions.json`](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions) | Always |
 
 ### Additive Extension Merging
 
@@ -136,5 +136,50 @@ Tasks only run when their conditions are met:
 - Monorepo tasks only run when `monorepo === true`
 - CI tasks only run when `hasGitHub === true`
 - TypeScript tasks only run when `typescript === true`
+
+## References
+
+### Linting & Formatting
+- [Biome Documentation](https://biomejs.dev/) — Fast linter and formatter for JavaScript/TypeScript
+- [Ultracite](https://www.ultracite.ai/) — Strict Biome preset for code quality
+- [Tailwind CSS Directives](https://tailwindcss.com/docs/functions-and-directives) — `@theme`, `@apply`, and other directives
+
+### TypeScript
+- [TypeScript tsconfig Reference](https://www.typescriptlang.org/tsconfig/) — All compiler options
+- [strict](https://www.typescriptlang.org/tsconfig/#strict) — Enable all strict type-checking options
+- [paths](https://www.typescriptlang.org/tsconfig/#paths) — Module resolution path mapping
+- [incremental](https://www.typescriptlang.org/tsconfig/#incremental) — Incremental compilation
+
+### Vite
+- [Vite Documentation](https://vitejs.dev/) — Next-generation build tool
+- [vite-plugin-checker](https://vite-plugin-checker.netlify.app/) — Type-checking in development
+- [rollup-plugin-visualizer](https://github.com/btd/rollup-plugin-visualizer) — Bundle visualization
+
+### CI/CD
+- [GitHub Actions Documentation](https://docs.github.com/en/actions) — Workflow syntax and features
+- [actions/checkout](https://github.com/actions/checkout) — Check out repository
+- [actions/setup-node](https://github.com/actions/setup-node) — Set up Node.js
+- [pnpm/action-setup](https://github.com/pnpm/action-setup) — Set up pnpm
+
+### Dependencies
+- [Renovate Documentation](https://docs.renovatebot.com/) — Automated dependency updates
+
+### Release
+- [commitlint](https://commitlint.js.org/) — Lint commit messages
+- [czg](https://cz-git.qbb.sh/cli/) — Interactive commit message helper
+- [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) — Automated versioning
+
+### Code Quality
+- [Knip Documentation](https://knip.dev/) — Find unused files, dependencies, and exports
+
+### Code Generation
+- [Plop Documentation](https://plopjs.com/documentation/) — Micro-generator framework
+
+### Monorepo
+- [Turborepo Documentation](https://turbo.build/repo/docs) — Monorepo task orchestration
+
+### Editor
+- [VS Code Settings](https://code.visualstudio.com/docs/getstarted/settings) — Editor configuration
+- [VS Code Extension Recommendations](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions) — Workspace extensions
 
 <LinkButton href="/contributing/tasks/overview/">Learn how to contribute a new task →</LinkButton>

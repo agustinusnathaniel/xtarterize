@@ -5,7 +5,7 @@ description: How the JSON merge patcher safely combines configuration objects.
 
 import { Aside, Tabs, TabItem } from '@astrojs/starlight/components'
 
-The `mergeJson` function performs a deep merge of two JavaScript objects using the `defu` library. It's used whenever xtarterize needs to modify JSON configuration files like `tsconfig.json`, `biome.json`, or `.vscode/settings.json`.
+The `mergeJson` function performs a deep merge of two JavaScript objects using the [`defu`](https://github.com/unjs/defu) library. It's used whenever xtarterize needs to modify JSON configuration files like [`tsconfig.json`](https://www.typescriptlang.org/tsconfig/), [`biome.json`](https://biomejs.dev/reference/configuration/), or [`.vscode/settings.json`](https://code.visualstudio.com/docs/getstarted/settings).
 
 ## Usage
 
@@ -100,7 +100,7 @@ const merged = mergeJson(existing, incoming)
 // { plugins: ['pluginB'] } — incoming replaces existing array
 ```
 
-For cases where arrays need to be combined (like VS Code extension recommendations), use a custom merge function instead of `mergeJson`.
+For cases where arrays need to be combined (like [VS Code extension recommendations](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions)), use a custom merge function instead of `mergeJson`.
 
 ## Real-World Examples
 
@@ -133,3 +133,11 @@ For cases where arrays need to be combined (like VS Code extension recommendatio
     ```
   </TabItem>
 </Tabs>
+
+## References
+
+- [defu GitHub Repository](https://github.com/unjs/defu) — Deep merge utility
+- [TypeScript tsconfig Reference](https://www.typescriptlang.org/tsconfig/) — Compiler configuration options
+- [Biome Configuration Reference](https://biomejs.dev/reference/configuration/) — `biome.json` schema
+- [VS Code Settings](https://code.visualstudio.com/docs/getstarted/settings) — Editor configuration documentation
+- [VS Code Extension Recommendations](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions) — Workspace recommended extensions

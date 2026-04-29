@@ -5,7 +5,7 @@ description: Complete reference for the xtarterize command-line interface.
 
 import { Aside, Tabs, TabItem, LinkButton } from '@astrojs/starlight/components'
 
-The xtarterize CLI provides commands to detect, apply, and maintain conformance configuration for JavaScript/TypeScript projects.
+The xtarterize CLI provides commands to detect, apply, and maintain conformance configuration for [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)/[TypeScript](https://www.typescriptlang.org/) projects.
 
 ## Global Options
 
@@ -109,7 +109,7 @@ npx xtarterize diff
 ```
 
 <Aside type="tip">
-  The <code>diff</code> command shows full file contents for <code>new</code> tasks (files that don't exist yet) and unified diffs for <code>patch</code> tasks (existing files that need updates).
+  The <code>diff</code> command shows full file contents for <code>new</code> tasks (files that don't exist yet) and [unified diffs](https://www.gnu.org/software/diffutils/manual/html_node/Detailed-Unified.html) for <code>patch</code> tasks (existing files that need updates).
 </Aside>
 
 ## `check`
@@ -216,5 +216,10 @@ flowchart TD
     style D fill:#f59e0b,color:#fff
     style E fill:#22c55e,color:#fff
 ```
+
+## References
+
+- [GNU Diff Unified Format](https://www.gnu.org/software/diffutils/manual/html_node/Detailed-Unified.html) — How unified diffs work
+- [GitHub Actions Documentation](https://docs.github.com/en/actions) — CI/CD workflow reference
 
 <LinkButton href="/guide/tasks/overview/">Explore conformance tasks →</LinkButton>

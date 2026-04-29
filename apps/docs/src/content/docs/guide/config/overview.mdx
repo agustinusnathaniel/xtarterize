@@ -11,11 +11,11 @@ xtarterize doesn't require a config file. It detects your project's stack automa
 
 When you run `init`, xtarterize scans your project to build a `ProjectProfile`:
 
-- **Framework** — React, Vue, Svelte, Solid, React Native, or Node (from `package.json` deps)
-- **Bundler** — Vite, Next.js, TanStack Start, Expo, Webpack, or none
-- **Router** — TanStack Router, React Router, Vue Router, Expo Router, or none
-- **Styling** — Tailwind, CSS Modules, Styled Components, Vanilla Extract, NativeWind, or Vanilla
-- **Package Manager** — pnpm, npm, yarn, or bun (from lockfiles or `packageManager` field)
+- **Framework** — [React](https://react.dev/), [Vue](https://vuejs.org/), [Svelte](https://svelte.dev/), [Solid](https://www.solidjs.com/), [React Native](https://reactnative.dev/), or [Node](https://nodejs.org/) (from `package.json` deps)
+- **Bundler** — [Vite](https://vitejs.dev/), [Next.js](https://nextjs.org/), [TanStack Start](https://tanstack.com/start/latest), [Expo](https://expo.dev/), [Webpack](https://webpack.js.org/), or none
+- **Router** — [TanStack Router](https://tanstack.com/router/latest), [React Router](https://reactrouter.com/), [Vue Router](https://router.vuejs.org/), [Expo Router](https://docs.expo.dev/router/introduction/), or none
+- **Styling** — [Tailwind CSS](https://tailwindcss.com/), [CSS Modules](https://github.com/css-modules/css-modules), [Styled Components](https://styled-components.com/), [Vanilla Extract](https://vanilla-extract.style/), [NativeWind](https://www.nativewind.dev/), or Vanilla
+- **Package Manager** — [pnpm](https://pnpm.io/), [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/), or [bun](https://bun.sh/) (from lockfiles or `packageManager` field)
 - **Monorepo** — Detected via `pnpm-workspace.yaml`, `turbo.json`, `packages/` + `apps/` dirs
 - **GitHub** — `.github/` directory presence
 - **Existing Configs** — Checks for `biome.json`, `tsconfig.json`, `renovate.json`, `vite.config.*`, `.versionrc`, `.gitignore`, etc.
@@ -108,6 +108,23 @@ Restore with:
 ```bash
 npx xtarterize restore tsconfig.json
 ```
+
+## References
+
+- [React](https://react.dev/) — UI library
+- [Vue.js](https://vuejs.org/) — Progressive JavaScript framework
+- [Svelte](https://svelte.dev/) — Cybernetically enhanced web apps
+- [Solid](https://www.solidjs.com/) — Simple and performant reactivity
+- [React Native](https://reactnative.dev/) — Native apps with React
+- [Vite](https://vitejs.dev/) — Next-generation frontend tooling
+- [Next.js](https://nextjs.org/) — React framework for production
+- [TanStack Start](https://tanstack.com/start/latest) — Full-stack React framework
+- [Expo](https://expo.dev/) — React Native framework
+- [Webpack](https://webpack.js.org/) — Module bundler
+- [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework
+- [pnpm Workspaces](https://pnpm.io/workspaces) — Monorepo support
+- [Turborepo](https://turbo.build/repo/docs) — Monorepo task runner
+- [Bun](https://bun.sh/) — Fast JavaScript runtime and package manager
 
 ## Backup Architecture
 
