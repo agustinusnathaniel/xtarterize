@@ -63,25 +63,6 @@ h6 {
 	padding: 4rem 1rem 2rem;
 }
 
-/* Radial glow behind hero */
-.hero::before {
-	content: "";
-	position: absolute;
-	top: -40%;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 900px;
-	height: 700px;
-	background: radial-gradient(
-		circle at center,
-		rgba(249, 115, 22, 0.12) 0%,
-		rgba(249, 115, 22, 0.04) 35%,
-		transparent 65%
-	);
-	pointer-events: none;
-	z-index: -1;
-}
-
 /* Hero title - larger, bolder, sans-serif */
 body .hero h1 {
 	font-size: clamp(2.5rem, 6vw, 4rem);
@@ -132,6 +113,7 @@ body .hero .sl-link-button {
    ============================================ */
 
 .terminal-demo {
+	width: 100%;
 	max-width: 720px;
 	margin: 0 auto 3rem;
 	border-radius: 12px;
@@ -140,6 +122,12 @@ body .hero .sl-link-button {
 	box-shadow:
 		0 20px 60px rgba(0, 0, 0, 0.3),
 		0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+	box-sizing: border-box;
+}
+
+/* Allow horizontal scroll within markdown content on mobile */
+.sl-markdown-content .terminal-demo {
+	overflow-x: auto;
 }
 
 .terminal-header {
@@ -353,13 +341,22 @@ hr {
 	}
 
 	.terminal-demo {
-		margin: 0 -0.5rem 2rem;
+		max-width: 100%;
+		margin: 0 auto 2rem;
 		border-radius: 8px;
+		min-width: min-content;
 	}
 
 	.terminal-body {
-		font-size: 0.8rem;
-		padding: 1rem;
+		font-size: 0.65rem;
+		padding: 0.75rem;
+		line-height: 1.6;
+		overflow-x: auto;
+		min-width: min-content;
+	}
+
+	.terminal-line {
+		white-space: pre;
 	}
 
 	.hero-buttons {
