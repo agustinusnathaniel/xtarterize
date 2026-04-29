@@ -1,5 +1,11 @@
 # xtarterize
 
+## 1.1.1
+
+### Patch Changes
+
+- [`04b6ce4`](https://github.com/agustinusnathaniel/xtarterize/commit/04b6ce4126dca549992b12f15913b71d740d50ef) Thanks [@agustinusnathaniel](https://github.com/agustinusnathaniel)! - extract plop templates to .hbs files
+
 ## 1.1.0
 
 ### Minor Changes
