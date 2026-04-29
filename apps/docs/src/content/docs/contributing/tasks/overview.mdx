@@ -105,7 +105,8 @@ classDiagram
 
 Most tasks are created through factory functions in [`factory.ts`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/tasks/src/factory.ts) that eliminate boilerplate:
 
-- **`createSimpleFileTask`** — For tasks that write a single new file (CI workflows, [renovate](https://docs.renovatebot.com/), [commitlint](https://commitlint.js.org/), [knip](https://knip.dev/), [plop](https://plopjs.com/), AI skills)
+- **`createSimpleFileTask`** — For tasks that write a single new file (CI workflows, [renovate](https://docs.renovatebot.com/), [commitlint](https://commitlint.js.org/), [knip](https://knip.dev/), AI skills)
+- **`createMultiFileTask`** — For tasks that write multiple text files with optional dependency install (e.g. [plop](https://plopjs.com/) writes both `plopfile.ts` and `plop/*.hbs` template files)
 - **`createFileTask`** — For text files with custom check/merge logic (`AGENTS.md`, [`.gitignore`](https://git-scm.com/docs/gitignore) entries)
 - **`createJsonMergeTask`** — For tasks that deep-merge JSON configs ([`tsconfig.json`](https://www.typescriptlang.org/tsconfig/), [`biome.json`](https://biomejs.dev/reference/configuration/), [`turbo.json`](https://turbo.build/repo/docs/reference/configuration)). Uses [`deepEqual`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/tasks/src/factory.ts) for key-order-independent comparison
 - **`createMultiFileJsonMergeTask`** — For tasks that merge multiple JSON files ([`.vscode/settings.json`](https://code.visualstudio.com/docs/getstarted/settings#_settingsjson) + [`.vscode/extensions.json`](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions)). Supports custom per-file merge functions

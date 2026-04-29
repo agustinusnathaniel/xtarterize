@@ -375,6 +375,109 @@ export function createSimpleFileTask(options: SimpleFileTaskOptions): Task {
 	}
 }
 
+// ─── MultiFileTask ───
+
+export interface MultiFileEntry {
+	filepath: string
+	content: (profile: ProjectProfile) => string
+}
+
+export interface MultiFileTaskOptions {
+	id: string
+	label: string
+	group: string
+	applicable: (profile: ProjectProfile) => boolean
+	files: (profile: ProjectProfile) => MultiFileEntry[]
+	depName?: string
+	installDev?: boolean
+}
+
+export function createMultiFileTask(options: MultiFileTaskOptions): Task {
+	return {
+		id: options.id,
+		label: options.label,
+		group: options.group,
+		applicable: options.applicable,
+
+		async check(cwd, profile): Promise<TaskStatus> {
+			const files = options.files(profile)
+			let hasMissing = false
+			let hasMismatch = false
+
+			for (const f of files) {
+				const fullPath = resolvePath(cwd, f.filepath)
+				const exists = await fileExists(fullPath)
+				if (!exists) {
+					hasMissing = true
+					continue
+				}
+				const expected = f.content(profile)
+				const actual = await readFile(fullPath)
+				if (actual.trim() !== expected.trim()) {
+					hasMismatch = true
+				}
+			}
+
+			if (hasMismatch) return 'conflict'
+			if (hasMissing) return 'new'
+
+			if (options.depName) {
+				const pkg = await readPackageJson(cwd)
+				const hasDep =
+					pkg?.devDependencies?.[options.depName] ||
+					pkg?.dependencies?.[options.depName]
+				if (!hasDep) return 'patch'
+			}
+
+			return 'skip'
+		},
+
+		async dryRun(cwd, profile): Promise<FileDiff[]> {
+			const files = options.files(profile)
+			const diffs: FileDiff[] = []
+
+			for (const f of files) {
+				const fullPath = resolvePath(cwd, f.filepath)
+				const exists = await fileExists(fullPath)
+				const before = exists ? await readFile(fullPath) : null
+				const after = f.content(profile)
+
+				if (!exists || before?.trim() !== after.trim()) {
+					diffs.push({
+						filepath: relativeToCwd(fullPath, cwd),
+						before,
+						after,
+					})
+				}
+			}
+
+			return diffs
+		},
+
+		async apply(cwd, profile): Promise<void> {
+			if (options.depName) {
+				const pkg = await readPackageJson(cwd)
+				const hasDep =
+					pkg?.devDependencies?.[options.depName] ||
+					pkg?.dependencies?.[options.depName]
+				if (!hasDep) {
+					await addDependency([options.depName], {
+						cwd,
+						dev: options.installDev ?? true,
+					})
+				}
+			}
+
+			const diffs = await this.dryRun(cwd, profile)
+			for (const diff of diffs) {
+				const fullPath = resolvePath(cwd, diff.filepath)
+				await ensureDir(resolvePath(fullPath, '..'))
+				await writeFile(fullPath, diff.after)
+			}
+		},
+	}
+}
+
 // ─── VitePluginTask ───
 
 export interface VitePluginTaskOptions {

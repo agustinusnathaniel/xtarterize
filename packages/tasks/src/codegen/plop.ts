@@ -1,14 +1,21 @@
-import { createSimpleFileTask } from '@/factory.js'
-import { renderPlopfile } from '@/templates/plopfile.js'
+import { createMultiFileTask } from '@/factory.js'
+import { getPlopTemplateFiles, plopTemplates, renderPlopfile } from '@/templates/plopfile.js'
 
-export const plopTask = createSimpleFileTask({
+export const plopTask = createMultiFileTask({
 	id: 'codegen/plop',
 	label: 'Plop (code generator)',
 	group: 'Codegen',
 	applicable: () => true,
-	filepath: 'plopfile',
-	extensions: ['.ts', '.js', '.mjs', '.mts', '.cts'],
-	render: (profile) => renderPlopfile(profile),
 	depName: 'plop',
 	installDev: true,
+	files: (profile) => [
+		{
+			filepath: 'plopfile.ts',
+			content: (p) => renderPlopfile(p),
+		},
+		...getPlopTemplateFiles(profile).map((filename) => ({
+			filepath: `plop/${filename}`,
+			content: (_p: typeof profile) => plopTemplates[filename],
+		})),
+	],
 })
