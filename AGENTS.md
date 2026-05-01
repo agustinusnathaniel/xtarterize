@@ -1,0 +1,129 @@
+# Agent Workflow
+
+> This is the mandatory entry point for any AI agent working on `xtarterize`. Read this entire file before planning or writing any code.
+
+`xtarterize` is a CLI tool that scans JavaScript/TypeScript projects and applies production-grade conformance configurations (linting, type checking, CI, editor settings, etc.) via a task-based engine. It is a **pnpm monorepo** with Turborepo orchestration.
+
+## 1. Understand the Project and Current State
+
+Before proposing any change:
+
+- Read `README.md` to understand the product, supported stacks, and high-level architecture.
+- Read `package.json` and `turbo.json` to understand workspace scripts, dependencies, and task pipelines.
+- Review the monorepo structure:
+  - `packages/core/` — project detection, task interface, file utilities, resolve/apply/backup engine
+  - `packages/patchers/` — JSON merge, YAML merge, AST patching (magicast)
+  - `packages/tasks/` — all task implementations and template renderers
+  - `apps/cli/` — CLI entry point using citty + @clack/prompts
+  - `apps/docs/` — Astro + Starlight documentation site
+  - `test/` — shared test fixtures and test suites
+- **Check recent changes** to understand the current implementation state:
+  ```bash
+  git log --oneline -20
+  git diff --name-only HEAD~5..HEAD
+  ```
+- Review any open or related files in the current context before modifying them.
+
+## 2. Understand the Problem
+
+- Read the linked issue, PR description, or task thoroughly.
+- Identify the acceptance criteria. If they are ambiguous, ask for clarification before coding.
+- Determine which package(s) are affected: core, patchers, tasks, cli, or docs.
+- Map the problem to existing abstractions (Task interface, patchers, detection engine) before inventing new ones.
+
+## 3. Read the Architecture Decision Records (ADRs)
+
+All significant architectural decisions are recorded in `docs/ADRs/`. You **must** read any ADR relevant to your change before implementation.
+
+Current ADRs:
+- `001-monorepo-structure.md`
+- `002-package-boundaries.md`
+- `003-vite-plus-detection.md`
+- `004-exclude-ultracite-integration.md`
+- `005-conditional-pnpm-action-setup.md`
+- `006-actions-version-upgrade-policy.md`
+- `007-array-replacement-in-json-merge.md`
+- `008-tristate-conflict-detection.md`
+- `009-framework-aware-biome-config.md`
+
+If your change introduces a new architectural pattern, dependency, or structural change, **create a new ADR** following the existing format (Status, Date, Context, Decision, Rationale, Alternatives, Consequences).
+
+## 4. Be Pragmatic — Reuse Before Reinventing
+
+- Search the existing codebase for utilities, patterns, or tasks that already solve similar problems.
+- Check `packages/core/src/` for utilities (file I/O, package.json reading, path resolution) before writing new helpers.
+- Check `packages/patchers/src/` for existing merge/patch strategies.
+- Check `packages/tasks/src/` for existing task implementations that can serve as a reference.
+- Prefer wrapping, composing, or extending existing libraries over building from scratch.
+- If introducing a new dependency, justify it in your reasoning and ensure it aligns with the project's philosophy (lightweight, ecosystem-standard, no runtime bloat).
+
+## 5. Implement with Comprehensive Testing and Validation
+
+Every code change must pass the full quality pipeline:
+
+```bash
+# Run tests
+pnpm test:run
+
+# Type check all packages
+pnpm typecheck
+
+# Build all packages
+pnpm build
+
+# Lint and format checks
+pnpm lint
+pnpm check
+```
+
+- Add or update tests in `test/` for any new behavior, especially for:
+  - New tasks in `test/tasks/`
+  - Patcher changes in `test/patchers/`
+  - Core engine changes in `test/core/`
+- Ensure your changes are **idempotent** — running the same operation twice should produce the same result.
+- Ensure tasks follow the `Task` interface correctly: `applicable`, `check`, `dryRun`, `apply`.
+- For CLI changes, verify commands work in both dry-run and apply modes.
+
+## 6. Commit Your Work
+
+After implementation and testing are complete, commit the changes:
+
+- Review all modified files with `git diff` and `git status` before committing.
+- **Split into multiple commits** if the change spans unrelated concerns (e.g., core engine fix + new task + docs update should be separate commits).
+- Include documentation updates in the same commit when they belong to the same logical change.
+- **If unsure whether to commit or not, ask the user first.** Do not commit secrets, temporary files, or unrelated changes.
+- Write clear commit messages following the project's convention (Conventional Commits).
+
+## 7. Update Documentation
+
+If your change affects behavior, architecture, or user-facing features, update the relevant documentation:
+
+- **Internal decisions**: Add or update ADRs in `docs/ADRs/`.
+- **Publishable docs**: Update the Astro Starlight site in `apps/docs/src/content/docs/`:
+  - CLI commands or behavior changes → `apps/docs/src/content/docs/guide/cli/`
+  - Task system or contributing changes → `apps/docs/src/content/docs/contributing/`
+  - Configuration or setup changes → `apps/docs/src/content/docs/getting-started/`
+- Preview doc changes locally:
+  ```bash
+  pnpm docs:dev
+  ```
+- Ensure `pnpm docs:build` passes without errors before finishing.
+
+## Quick Reference
+
+| Concern | Location |
+|---------|----------|
+| Project overview | `README.md` |
+| Architecture decisions | `docs/ADRs/` |
+| Task interface | `packages/core/src/_base.ts` |
+| Core utilities | `packages/core/src/` |
+| Patching engine | `packages/patchers/src/` |
+| Task implementations | `packages/tasks/src/` |
+| CLI commands | `apps/cli/src/commands/` |
+| Publishable docs | `apps/docs/src/content/docs/` |
+| Tests | `test/` |
+| Workspace scripts | Root `package.json` |
+
+---
+
+**Do not skip these steps.** The quality of your work is measured by how well you follow this workflow, not just by the code you produce.
