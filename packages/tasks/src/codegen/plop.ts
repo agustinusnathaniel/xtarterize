@@ -1,5 +1,9 @@
 import { createMultiFileTask } from '@/factory.js'
-import { getPlopTemplateFiles, plopTemplates, renderPlopfile } from '@/templates/plopfile.js'
+import {
+	getPlopTemplateFiles,
+	plopTemplates,
+	renderPlopfile,
+} from '@/templates/plopfile.js'
 
 export const plopTask = createMultiFileTask({
 	id: 'codegen/plop',

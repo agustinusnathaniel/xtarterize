@@ -15,7 +15,12 @@ import {
 	writeFile,
 	writePackageJson,
 } from '@xtarterize/core'
-import { injectVitePlugin, mergeJson, parseJsonc, patchJson } from '@xtarterize/patchers'
+import {
+	injectVitePlugin,
+	mergeJson,
+	parseJsonc,
+	patchJson,
+} from '@xtarterize/patchers'
 import JSON5 from 'json5'
 import { addDependency } from 'nypm'
 import { relative } from 'pathe'
@@ -346,14 +351,14 @@ export function createSimpleFileTask(options: SimpleFileTaskOptions): Task {
 				return options.checkFn(cwd, profile, fullPath, content)
 			}
 
-		const expected = options.render(profile)
-		const actual = await readFile(fullPath)
-		if (
-			normalizeLineEndings(actual.trim()) ===
-			normalizeLineEndings(expected.trim())
-		)
-			return 'skip'
-		return 'conflict'
+			const expected = options.render(profile)
+			const actual = await readFile(fullPath)
+			if (
+				normalizeLineEndings(actual.trim()) ===
+				normalizeLineEndings(expected.trim())
+			)
+				return 'skip'
+			return 'conflict'
 		},
 
 		async dryRun(cwd, profile): Promise<FileDiff[]> {

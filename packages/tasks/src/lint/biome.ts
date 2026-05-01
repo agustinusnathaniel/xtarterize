@@ -48,7 +48,7 @@ export const biomeTask = createJsonMergeTask({
 			return 'patch'
 		}
 
-		const actual = normalizeExtends(await readJsonIfExists(fullPath) ?? {})
+		const actual = normalizeExtends((await readJsonIfExists(fullPath)) ?? {})
 		const expected = normalizeExtends(JSON.parse(renderBiomeJson(profile)))
 		const merged = mergeJson(actual, expected)
 		if (deepEqual(actual, merged)) return 'skip'

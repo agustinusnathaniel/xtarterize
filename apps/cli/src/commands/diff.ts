@@ -8,9 +8,9 @@ import {
 	resolveTasks,
 	runPreflight,
 } from '@xtarterize/core'
+import { patchJson } from '@xtarterize/patchers'
 import { getAllTasks } from '@xtarterize/tasks'
 import { defineCommand } from 'citty'
-import { patchJson } from '@xtarterize/patchers'
 import { displayDiffs } from '@/ui/diff-display.js'
 import { resolveCwd } from '@/utils/cwd.js'
 
@@ -29,9 +29,13 @@ function mergeFileDiffs(diffs: FileDiff[]): FileDiff[] {
 			continue
 		}
 
-		if (filepath.endsWith('.json') || filepath.endsWith('.jsonc') || filepath.endsWith('.json5')) {
+		if (
+			filepath.endsWith('.json') ||
+			filepath.endsWith('.jsonc') ||
+			filepath.endsWith('.json5')
+		) {
 			const first = list.find((d) => d.before !== null)
-			let before = first?.before ?? list[0].before
+			const before = first?.before ?? list[0].before
 			let after = before ?? '{}'
 			for (const diff of list) {
 				try {

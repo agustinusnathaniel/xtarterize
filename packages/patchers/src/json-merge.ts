@@ -1,6 +1,6 @@
-import { applyEdits, modify } from 'jsonc-parser'
 import { createDefu } from 'defu'
 import JSON5 from 'json5'
+import { applyEdits, modify } from 'jsonc-parser'
 
 const mergeJsonDefu = createDefu((obj, key, value) => {
 	if (Array.isArray(obj[key])) {
@@ -17,7 +17,10 @@ export function mergeJson(existing: object, incoming: object): object {
 	return mergeJsonDefu(existing, incoming)
 }
 
-function detectIndent(text: string): { insertSpaces: boolean; tabSize: number } {
+function detectIndent(text: string): {
+	insertSpaces: boolean
+	tabSize: number
+} {
 	const match = text.match(/\n([ \t]+)\S/)
 	if (match) {
 		const indent = match[1]

@@ -1,7 +1,7 @@
 import type { Task } from '@xtarterize/core'
 import { agentsMdTask } from '@/agent/agents-md.js'
-import { skillsInstallTask } from '@/agent/skills-install.js'
 import { skillsTask } from '@/agent/skills.js'
+import { skillsInstallTask } from '@/agent/skills-install.js'
 import { autoUpdateWorkflowTask } from '@/ci/auto-update.js'
 import { ciWorkflowTask } from '@/ci/ci.js'
 import { releaseWorkflowTask } from '@/ci/release.js'

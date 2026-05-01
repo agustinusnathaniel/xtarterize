@@ -1,9 +1,11 @@
 import type { ProjectProfile } from '@xtarterize/core'
-import { plopTemplates, type PlopTemplateKey } from './plop/index.js'
+import { type PlopTemplateKey, plopTemplates } from './plop/index.js'
 
-export { plopTemplates, type PlopTemplateKey }
+export { type PlopTemplateKey, plopTemplates }
 
-export function getPlopTemplateFiles(profile: ProjectProfile): PlopTemplateKey[] {
+export function getPlopTemplateFiles(
+	profile: ProjectProfile,
+): PlopTemplateKey[] {
 	const files: PlopTemplateKey[] = []
 
 	if (profile.framework === 'vue') {
@@ -37,7 +39,9 @@ export function renderPlopfile(profile: ProjectProfile): string {
 				? 'src/components/{{pascalCase name}}.tsx'
 				: 'src/components/{{pascalCase name}}/{{pascalCase name}}.tsx'
 	const componentTemplateFile =
-		profile.framework === 'vue' ? 'plop/component.vue.hbs' : 'plop/component.tsx.hbs'
+		profile.framework === 'vue'
+			? 'plop/component.vue.hbs'
+			: 'plop/component.tsx.hbs'
 
 	const pagePath =
 		profile.bundler === 'nextjs'
@@ -95,7 +99,8 @@ export default function (plop: any) {
       },
     ],
   })
-${profile.framework === 'node'
+${
+	profile.framework === 'node'
 		? `
   plop.setGenerator('module', {
     description: 'Create a Node module',
@@ -110,7 +115,8 @@ ${profile.framework === 'node'
   })
 `
 		: ''
-}${profile.framework === 'react-native'
+}${
+	profile.framework === 'react-native'
 		? `
   plop.setGenerator('screen', {
     description: 'Create a React Native screen',
@@ -137,7 +143,8 @@ ${profile.framework === 'node'
   })
 `
 		: ''
-}${profile.framework === 'react'
+}${
+	profile.framework === 'react'
 		? `
   plop.setGenerator('page', {
     description: 'Create an app page',

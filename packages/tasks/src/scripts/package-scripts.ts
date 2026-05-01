@@ -50,12 +50,9 @@ export const packageScriptsTask = createPackageJsonTask({
 			scripts.push({ script: 'knip', value: 'knip' })
 		}
 
-		const hasTurbo =
-			profile.monorepoTool === 'turbo' || profile.existing.turbo
+		const hasTurbo = profile.monorepoTool === 'turbo' || profile.existing.turbo
 		if (hasTurbo) {
-			const checkTasks = useUltracite
-				? ['ultracite:check']
-				: ['biome']
+			const checkTasks = useUltracite ? ['ultracite:check'] : ['biome']
 			if (profile.typescript) checkTasks.push('typecheck')
 			checkTasks.push('test')
 			scripts.push({

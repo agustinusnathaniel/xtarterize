@@ -34,9 +34,13 @@ function mergeFileDiffs(diffs: FileDiff[]): FileDiff[] {
 		}
 
 		// For JSON files, merge the after values using patchJson
-		if (filepath.endsWith('.json') || filepath.endsWith('.jsonc') || filepath.endsWith('.json5')) {
+		if (
+			filepath.endsWith('.json') ||
+			filepath.endsWith('.jsonc') ||
+			filepath.endsWith('.json5')
+		) {
 			const first = list.find((d) => d.before !== null)
-			let before = first?.before ?? list[0].before
+			const before = first?.before ?? list[0].before
 			let after = before ?? '{}'
 			for (const diff of list) {
 				try {

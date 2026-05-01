@@ -1,4 +1,9 @@
-import type { FileDiff, ProjectProfile, Task, TaskStatus } from '@xtarterize/core'
+import type {
+	FileDiff,
+	ProjectProfile,
+	Task,
+	TaskStatus,
+} from '@xtarterize/core'
 import {
 	fileExists,
 	readFile,
@@ -154,9 +159,7 @@ async function getInstalledSkills(cwd: string): Promise<Set<string>> {
 	const installed = new Set<string>()
 
 	// Check project-level skills lock file (e.g. viteboard-pro/skills-lock.json)
-	const projectLocks = [
-		resolvePath(cwd, 'skills-lock.json'),
-	]
+	const projectLocks = [resolvePath(cwd, 'skills-lock.json')]
 
 	for (const lockPath of projectLocks) {
 		const skills = await readSkillLockFile(lockPath)

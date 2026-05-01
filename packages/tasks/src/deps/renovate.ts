@@ -34,7 +34,7 @@ export const renovateTask = createJsonMergeTask({
 	incoming: incomingRenovate,
 	async checkFn(_cwd, _profile, fullPath, content) {
 		if (!fullPath || !content) return 'new'
-		const actual = normalizeExtends(await readJsonIfExists(fullPath) ?? {})
+		const actual = normalizeExtends((await readJsonIfExists(fullPath)) ?? {})
 		const expected = normalizeExtends(incomingRenovate())
 		const merged = mergeJson(actual, expected)
 		if (deepEqual(actual, merged)) return 'skip'

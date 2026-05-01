@@ -27,9 +27,7 @@ function getPathStatus(
 	}
 	const alias = (paths as Record<string, unknown>)['@/*']
 	const validTargets =
-		profile.bundler === 'nextjs'
-			? ['./*', './src/*']
-			: ['./src/*']
+		profile.bundler === 'nextjs' ? ['./*', './src/*'] : ['./src/*']
 	const hasValidAlias =
 		Array.isArray(alias) &&
 		alias.some((entry) => validTargets.includes(entry as string))
