@@ -45,6 +45,9 @@ Current ADRs:
 - `007-array-replacement-in-json-merge.md`
 - `008-tristate-conflict-detection.md`
 - `009-framework-aware-biome-config.md`
+- `010-surgical-json-patching.md`
+- `011-deduplicating-file-diffs.md`
+- `012-value-based-equivalence-detection.md`
 
 If your change introduces a new architectural pattern, dependency, or structural change, **create a new ADR** following the existing format (Status, Date, Context, Decision, Rationale, Alternatives, Consequences).
 
@@ -84,7 +87,40 @@ pnpm check
 - Ensure tasks follow the `Task` interface correctly: `applicable`, `check`, `dryRun`, `apply`.
 - For CLI changes, verify commands work in both dry-run and apply modes.
 
-## 6. Commit Your Work
+## 6. Dependency Updates
+
+When updating dependencies, follow this workflow to avoid breaking changes:
+
+```bash
+# 1. Check what can be updated (minor/patch only; major versions require individual review)
+npx taze -r
+
+# 2. Apply safe updates (minor + patch)
+npx taze minor --write -r
+
+# 3. Manually bump any non-semver-tracked packages (e.g., @tailwindcss/vite pinned in apps/docs/package.json)
+# DO NOT blindly update packages known to break the build. See locked versions below.
+
+# 4. Install and dedupe
+pnpm install
+pnpm dedupe
+
+# 5. Run full verification pipeline
+pnpm typecheck
+pnpm build
+pnpm test:run
+pnpm lint
+```
+
+### Known Locked / Problematic Packages
+
+| Package | Locked Version | Reason |
+|---------|---------------|--------|
+| `@tailwindcss/vite` | `4.2.2` | `4.2.4` breaks Vite 8 build with `Missing field tsconfigPaths on BindingViteResolvePluginConfig.resolveOptions` |
+
+If a dependency update causes any of the verification steps to fail, revert that specific package to its previous working version rather than trying to fix the breakage inline.
+
+## 7. Commit Your Work
 
 After implementation and testing are complete, commit the changes:
 
@@ -94,7 +130,7 @@ After implementation and testing are complete, commit the changes:
 - **If unsure whether to commit or not, ask the user first.** Do not commit secrets, temporary files, or unrelated changes.
 - Write clear commit messages following the project's convention (Conventional Commits).
 
-## 7. Update Documentation
+## 8. Update Documentation
 
 If your change affects behavior, architecture, or user-facing features, update the relevant documentation:
 
