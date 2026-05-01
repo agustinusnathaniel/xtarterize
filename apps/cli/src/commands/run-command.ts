@@ -12,10 +12,48 @@ import {
 	resolveTasks,
 	runPreflight,
 } from '@xtarterize/core'
+import { patchJson } from '@xtarterize/patchers'
 import { getAllTasks } from '@xtarterize/tasks'
 import { displayDiffs } from '@/ui/diff-display.js'
 import { displayPlan } from '@/ui/plan-display.js'
 import { selectTasks } from '@/ui/select-menu.js'
+
+function mergeFileDiffs(diffs: FileDiff[]): FileDiff[] {
+	const grouped = new Map<string, FileDiff[]>()
+	for (const diff of diffs) {
+		const list = grouped.get(diff.filepath) ?? []
+		list.push(diff)
+		grouped.set(diff.filepath, list)
+	}
+
+	const merged: FileDiff[] = []
+	for (const [filepath, list] of grouped) {
+		if (list.length === 1) {
+			merged.push(list[0])
+			continue
+		}
+
+		// For JSON files, merge the after values using patchJson
+		if (filepath.endsWith('.json') || filepath.endsWith('.jsonc') || filepath.endsWith('.json5')) {
+			const first = list.find((d) => d.before !== null)
+			let before = first?.before ?? list[0].before
+			let after = before ?? '{}'
+			for (const diff of list) {
+				try {
+					after = patchJson(after, JSON.parse(diff.after))
+				} catch {
+					after = diff.after
+				}
+			}
+			merged.push({ filepath, before, after })
+		} else {
+			// For non-JSON files, keep the last diff
+			merged.push(list[list.length - 1])
+		}
+	}
+
+	return merged
+}
 
 interface CommandArgs {
 	dryRun?: boolean
@@ -121,7 +159,7 @@ export async function runCommand(
 			const taskDiffs = await task.dryRun(cwd, profile)
 			diffs.push(...taskDiffs)
 		}
-		displayDiffs(diffs)
+		displayDiffs(mergeFileDiffs(diffs))
 		return
 	}
 
@@ -164,7 +202,7 @@ export async function runCommand(
 			const taskDiffs = await task.dryRun(cwd, profile)
 			diffs.push(...taskDiffs)
 		}
-		displayDiffs(diffs)
+		displayDiffs(mergeFileDiffs(diffs))
 		return
 	}
 

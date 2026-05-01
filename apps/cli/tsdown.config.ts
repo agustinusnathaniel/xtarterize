@@ -14,5 +14,6 @@ export default defineConfig({
 			'@xtarterize/patchers',
 			'nypm',
 		],
+		neverBundle: ['jsonc-parser'],
 	},
 })
