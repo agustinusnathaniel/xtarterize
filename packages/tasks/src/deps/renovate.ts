@@ -1,4 +1,28 @@
-import { createJsonMergeTask } from '@/factory.js'
+import { readJsonIfExists } from '@xtarterize/core'
+import { mergeJson } from '@xtarterize/patchers'
+import { createJsonMergeTask, deepEqual, normalizeExtends } from '@/factory.js'
+
+const incomingRenovate = () => ({
+	$schema: 'https://docs.renovatebot.com/renovate-schema.json',
+	extends: ['config:base', 'group:all'],
+	timezone: 'Asia/Jakarta',
+	rangeStrategy: 'bump',
+	ignoreDeps: ['node', 'pnpm'],
+	updatePinnedDependencies: false,
+	stabilityDays: 2,
+	packageRules: [
+		{
+			groupName: 'all non-major dependencies',
+			groupSlug: 'all-minor-patch',
+			matchUpdateTypes: ['minor', 'patch'],
+			matchPackagePatterns: ['*'],
+			automerge: true,
+			automergeType: 'branch',
+		},
+	],
+	major: { enabled: false },
+	schedule: ['before 1am on the first day of the month'],
+})
 
 export const renovateTask = createJsonMergeTask({
 	id: 'deps/renovate',
@@ -7,25 +31,13 @@ export const renovateTask = createJsonMergeTask({
 	applicable: (profile) => profile.hasGitHub,
 	filepath: 'renovate.json',
 	extensions: ['.json', '.json5'],
-	incoming: () => ({
-		$schema: 'https://docs.renovatebot.com/renovate-schema.json',
-		extends: ['config:base', 'group:all'],
-		timezone: 'Asia/Jakarta',
-		rangeStrategy: 'bump',
-		ignoreDeps: ['node', 'pnpm'],
-		updatePinnedDependencies: false,
-		stabilityDays: 2,
-		packageRules: [
-			{
-				groupName: 'all non-major dependencies',
-				groupSlug: 'all-minor-patch',
-				matchUpdateTypes: ['minor', 'patch'],
-				matchPackagePatterns: ['*'],
-				automerge: true,
-				automergeType: 'branch',
-			},
-		],
-		major: { enabled: false },
-		schedule: ['before 1am on the first day of the month'],
-	}),
+	incoming: incomingRenovate,
+	async checkFn(_cwd, _profile, fullPath, content) {
+		if (!fullPath || !content) return 'new'
+		const actual = normalizeExtends(await readJsonIfExists(fullPath) ?? {})
+		const expected = normalizeExtends(incomingRenovate())
+		const merged = mergeJson(actual, expected)
+		if (deepEqual(actual, merged)) return 'skip'
+		return 'patch'
+	},
 })

@@ -44,6 +44,19 @@ export function deepEqual(a: unknown, b: unknown): boolean {
 	)
 }
 
+export function normalizeExtends<T extends object>(obj: T): T {
+	if (!('extends' in obj)) return obj
+	const ext = (obj as Record<string, unknown>).extends
+	if (typeof ext === 'string') {
+		return { ...obj, extends: [ext] } as T
+	}
+	return obj
+}
+
+export function normalizeLineEndings(value: string): string {
+	return value.replace(/\r\n/g, '\n')
+}
+
 function getDefaultFilepath(filepath: string, extensions?: string[]): string {
 	if (!extensions || extensions.length === 0) return filepath
 	const hasExt = extensions.some((ext) => filepath.endsWith(ext))
@@ -259,6 +272,7 @@ export function createJsonMergeTask(options: JsonMergeTaskOptions): Task {
 				after = JSON.stringify(await options.incoming(cwd, profile), null, 2)
 			}
 
+			if (after === before) return []
 			return [{ filepath, before, after }]
 		},
 
@@ -330,10 +344,14 @@ export function createSimpleFileTask(options: SimpleFileTaskOptions): Task {
 				return options.checkFn(cwd, profile, fullPath, content)
 			}
 
-			const expected = options.render(profile)
-			const actual = await readFile(fullPath)
-			if (actual.trim() === expected.trim()) return 'skip'
-			return 'conflict'
+		const expected = options.render(profile)
+		const actual = await readFile(fullPath)
+		if (
+			normalizeLineEndings(actual.trim()) ===
+			normalizeLineEndings(expected.trim())
+		)
+			return 'skip'
+		return 'conflict'
 		},
 
 		async dryRun(cwd, profile): Promise<FileDiff[]> {
@@ -641,13 +659,17 @@ function hasOwnScript(scripts: PackageScriptsMap, script: string): boolean {
 	return Object.hasOwn(scripts, script)
 }
 
+function hasScriptValue(scripts: PackageScriptsMap, value: string): boolean {
+	return Object.values(scripts).some((v) => v === value)
+}
+
 function mergePackageScripts(
 	current: PackageScriptsMap | undefined,
 	scripts: PackageJsonScriptEntry[],
 ): PackageScriptsMap {
 	const next = { ...current }
 	for (const s of scripts) {
-		if (!hasOwnScript(next, s.script)) {
+		if (!hasOwnScript(next, s.script) && !hasScriptValue(next, s.value)) {
 			next[s.script] = s.value
 		}
 	}
@@ -842,7 +864,9 @@ export function createMultiFileJsonMergeTask(
 					after = JSON.stringify(await f.incoming(profile), null, 2)
 				}
 
-				diffs.push({ filepath, before, after })
+				if (!exists || after !== before) {
+					diffs.push({ filepath, before, after })
+				}
 			}
 			return diffs
 		},

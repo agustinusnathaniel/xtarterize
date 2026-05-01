@@ -7,6 +7,6 @@ export const knipTask = createSimpleFileTask({
 	group: 'Quality',
 	applicable: (profile) => profile.typescript,
 	filepath: 'knip.config',
-	extensions: ['.ts', '.mts'],
+	extensions: ['.ts', '.mts', '.json'],
 	render: (profile) => renderKnipConfig(profile, 'ts'),
 })
