@@ -17,10 +17,10 @@
 		"@fontsource-variable/geist-mono": "^5.2.7",
 		"@fontsource/lora": "^5.2.8",
 		"@tailwindcss/vite": "4.2.2",
-		"astro": "^6.1.10",
+		"astro": "^6.2.1",
 		"astro-mermaid": "^2.0.1",
 		"mermaid": "^11.14.0",
-		"sharp": "^0.34.3",
+		"sharp": "^0.34.5",
 		"tailwindcss": "^4.2.4"
 	}
 }
