@@ -56,8 +56,15 @@ async function resolveTaskFile(
 	extensions?: string[],
 ): Promise<string | null> {
 	if (extensions) {
-		const base = filepath.replace(/\.[^.]+$/, '')
-		return findConfigFile(cwd, base, extensions)
+		const lastDot = filepath.lastIndexOf('.')
+		if (lastDot !== -1) {
+			const ext = filepath.slice(lastDot)
+			if (extensions.includes(ext)) {
+				const base = filepath.slice(0, lastDot)
+				return findConfigFile(cwd, base, extensions)
+			}
+		}
+		return findConfigFile(cwd, filepath, extensions)
 	}
 	return resolvePath(cwd, filepath)
 }
