@@ -115,9 +115,29 @@ Most tasks are created through factory functions in [`factory.ts`](https://githu
 
 This reduces most tasks from 40-80 lines to 10-15 lines of declarative configuration.
 
-### deepEqual Helper
+### Helper Functions
 
-The `deepEqual` function compares objects regardless of key ordering, preventing false positives when `JSON.stringify` would differ due to object key order. Used by `createJsonMergeTask` and `createMultiFileJsonMergeTask` for reliable skip detection.
+The factory provides several utilities for robust equivalence detection:
+
+| Helper | Purpose | Used By |
+|--------|---------|---------|
+| `deepEqual` | Compare objects regardless of key ordering | `createJsonMergeTask`, `createMultiFileJsonMergeTask` |
+| `normalizeExtends` | Normalize `"extends": "str"` to `"extends": ["str"]` | `biomeTask`, `renovateTask` |
+| `normalizeLineEndings` | Convert `\r\n` to `\n` before comparison | `createSimpleFileTask` |
+| `hasScriptValue` | Check if a command value already exists under any script name | `createPackageJsonTask` |
+
+#### `normalizeExtends`
+
+Config tools like [Renovate](https://docs.renovatebot.com/) and [Biome](https://biomejs.dev/) accept `extends` as either a string or array. `normalizeExtends` ensures both forms are treated as equivalent during comparison:
+
+```typescript
+normalizeExtends({ extends: "config:base" })
+// → { extends: ["config:base"] }
+```
+
+#### `hasScriptValue`
+
+Package script tasks skip adding a script not only when the key exists, but also when the **exact same command** already exists under a different name. This handles real-world aliases like `type:check` vs `typecheck`.
 
 ## Adding New Tasks
 

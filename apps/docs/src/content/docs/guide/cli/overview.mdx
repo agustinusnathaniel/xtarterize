@@ -112,6 +112,10 @@ npx xtarterize diff
   The <code>diff</code> command shows full file contents for <code>new</code> tasks (files that don't exist yet) and [unified diffs](https://www.gnu.org/software/diffutils/manual/html_node/Detailed-Unified.html) for <code>patch</code> tasks (existing files that need updates).
 </Aside>
 
+<Aside type="note">
+  When multiple tasks modify the same JSON file (e.g., <code>tsconfig.json</code>), <code>diff</code> merges their changes into a single unified diff so you see the complete intended state rather than overlapping individual patches.
+</Aside>
+
 ## `check`
 
 Audit which tasks are conformant and which need attention. Also runs diagnostics for conflicting tools and missing installations.

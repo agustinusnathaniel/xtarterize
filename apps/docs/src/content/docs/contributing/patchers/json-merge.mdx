@@ -102,6 +102,45 @@ const merged = mergeJson(existing, incoming)
 
 For cases where arrays need to be combined (like [VS Code extension recommendations](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions)), use a custom merge function instead of `mergeJson`.
 
+## `patchJson`: Surgical Text Editing
+
+While `mergeJson` operates on objects, `patchJson` edits JSON text directly using [`jsonc-parser`](https://github.com/microsoft/node-jsonc-parser). It preserves:
+
+- Existing comments (`// inline` and `/* block */`)
+- Key ordering
+- Whitespace and indentation style
+- Trailing commas (in JSONC)
+
+### Usage
+
+```typescript
+import { patchJson } from '@xtarterize/patchers'
+
+const existing = `{
+  // Keep this comment
+  "strict": true,
+  "target": "ES2022"
+}`
+
+const incoming = { compilerOptions: { incremental: true } }
+const result = patchJson(existing, incoming)
+// {
+//   // Keep this comment
+//   "strict": true,
+//   "target": "ES2022",
+//   "incremental": true
+// }
+```
+
+### When to Use Each
+
+| Function | Use When | Preservation |
+|----------|----------|--------------|
+| `mergeJson` | Object-level logic, deep merging | None (returns new object) |
+| `patchJson` | Writing changes back to a file | Comments, formatting, key order |
+
+`createJsonMergeTask` and `createMultiFileJsonMergeTask` use **both**: `mergeJson` computes the target state, then `patchJson` applies it surgically to the original text.
+
 ## Real-World Examples
 
 <Tabs>
