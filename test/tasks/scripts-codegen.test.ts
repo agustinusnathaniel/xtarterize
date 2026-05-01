@@ -86,6 +86,39 @@ describe('packageScriptsTask', () => {
 		expect(pkgDiff?.after).toContain('"biome:fix": "biome check --write ."')
 	})
 
+	it('skips scripts whose value already exists under a different key', async () => {
+		const tmpDir = await fs.mkdtemp(
+			path.join(os.tmpdir(), 'xtarterize-script-dedup-'),
+		)
+		await fs.writeFile(
+			path.join(tmpDir, 'package.json'),
+			JSON.stringify(
+				{
+					name: 'script-dedup',
+					type: 'module',
+					scripts: {
+						'type:check': 'tsc --noEmit',
+						dev: 'next dev',
+					},
+					devDependencies: {
+						typescript: '^5.3.0',
+					},
+				},
+				null,
+				2,
+			),
+		)
+
+		const profile = await detectProject(tmpDir)
+		const status = await packageScriptsTask.check(tmpDir, profile)
+		const diffs = await packageScriptsTask.dryRun(tmpDir, profile)
+		const pkgDiff = diffs.find((d) => d.filepath === 'package.json')
+
+		expect(status).toBe('patch')
+		expect(pkgDiff?.after).not.toContain('"typecheck"')
+		expect(pkgDiff?.after).toContain('"test"')
+	})
+
 	it('does not add typecheck or knip for non-TS projects', async () => {
 		const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'xtarterize-no-ts-'))
 		await fs.writeFile(

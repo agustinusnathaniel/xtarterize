@@ -701,7 +701,9 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 			const scripts = await resolveScripts(options, cwd, profile)
 			const scriptsMap = pkg.scripts ?? {}
 			const missingScripts = scripts.filter(
-				(s) => !hasOwnScript(scriptsMap, s.script),
+				(s) =>
+					!hasOwnScript(scriptsMap, s.script) &&
+					!hasScriptValue(scriptsMap, s.value),
 			)
 
 			const hasDep =
@@ -755,7 +757,9 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 					const scripts = await resolveScripts(options, cwd, profile)
 					const scriptsMap = pkg.scripts ?? {}
 					const missingScripts = scripts.filter(
-						(s) => !hasOwnScript(scriptsMap, s.script),
+						(s) =>
+							!hasOwnScript(scriptsMap, s.script) &&
+							!hasScriptValue(scriptsMap, s.value),
 					)
 					if (missingScripts.length > 0) {
 						const incomingScripts: Record<string, string> = {}
