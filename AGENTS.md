@@ -35,19 +35,7 @@ Before proposing any change:
 
 All significant architectural decisions are recorded in `docs/ADRs/`. You **must** read any ADR relevant to your change before implementation.
 
-Current ADRs:
-- `001-monorepo-structure.md`
-- `002-package-boundaries.md`
-- `003-vite-plus-detection.md`
-- `004-exclude-ultracite-integration.md`
-- `005-conditional-pnpm-action-setup.md`
-- `006-actions-version-upgrade-policy.md`
-- `007-array-replacement-in-json-merge.md`
-- `008-tristate-conflict-detection.md`
-- `009-framework-aware-biome-config.md`
-- `010-surgical-json-patching.md`
-- `011-deduplicating-file-diffs.md`
-- `012-value-based-equivalence-detection.md`
+All ADRs are in `docs/ADRs/`. Read any ADR relevant to your change before implementation.
 
 If your change introduces a new architectural pattern, dependency, or structural change, **create a new ADR** following the existing format (Status, Date, Context, Decision, Rationale, Alternatives, Consequences).
 
