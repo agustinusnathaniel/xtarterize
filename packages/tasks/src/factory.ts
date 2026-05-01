@@ -15,7 +15,7 @@ import {
 	writeFile,
 	writePackageJson,
 } from '@xtarterize/core'
-import { injectVitePlugin, mergeJson, parseJsonc } from '@xtarterize/patchers'
+import { injectVitePlugin, mergeJson, parseJsonc, patchJson } from '@xtarterize/patchers'
 import JSON5 from 'json5'
 import { addDependency } from 'nypm'
 import { relative } from 'pathe'
@@ -253,9 +253,8 @@ export function createJsonMergeTask(options: JsonMergeTaskOptions): Task {
 
 			let after: string
 			if (exists && before) {
-				const existing = JSON5.parse(before)
 				const incoming = await options.incoming(cwd, profile)
-				after = JSON.stringify(mergeJson(existing, incoming), null, 2)
+				after = patchJson(before, incoming)
 			} else {
 				after = JSON.stringify(await options.incoming(cwd, profile), null, 2)
 			}
@@ -675,11 +674,6 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 			const missingScripts = scripts.filter(
 				(s) => !hasOwnScript(scriptsMap, s.script),
 			)
-			const conflictingScripts = scripts.filter(
-				(s) =>
-					hasOwnScript(scriptsMap, s.script) &&
-					scriptsMap[s.script] !== s.value,
-			)
 
 			const hasDep =
 				!options.depName ||
@@ -694,7 +688,6 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 				if (!exists) missingFiles.push(f.filepath)
 			}
 
-			if (conflictingScripts.length > 0) return 'conflict'
 			if (missingScripts.length === 0 && hasDep && missingFiles.length === 0)
 				return 'skip'
 			if (missingScripts.length === 0 && hasDep && missingFiles.length > 0)
@@ -724,14 +717,28 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 				})
 			}
 
-			const pkg = await readPackageJson(cwd)
-			if (pkg) {
-				const before = JSON.stringify(pkg, null, 2)
-				const updated = { ...pkg }
-				const scripts = await resolveScripts(options, cwd, profile)
-				updated.scripts = mergePackageScripts(updated.scripts, scripts)
-				const after = JSON.stringify(updated, null, 2)
-				diffs.push({ filepath: 'package.json', before, after })
+			const pkgPath = resolvePath(cwd, 'package.json')
+			const pkgExists = await fileExists(pkgPath)
+			if (pkgExists) {
+				const before = await readFile(pkgPath)
+				const pkg = await readPackageJson(cwd)
+				if (pkg) {
+					const scripts = await resolveScripts(options, cwd, profile)
+					const scriptsMap = pkg.scripts ?? {}
+					const missingScripts = scripts.filter(
+						(s) => !hasOwnScript(scriptsMap, s.script),
+					)
+					if (missingScripts.length > 0) {
+						const incomingScripts: Record<string, string> = {}
+						for (const s of missingScripts) {
+							incomingScripts[s.script] = s.value
+						}
+						const after = patchJson(before, { scripts: incomingScripts })
+						if (after !== before) {
+							diffs.push({ filepath: 'package.json', before, after })
+						}
+					}
+				}
 			}
 
 			return diffs
@@ -829,10 +836,8 @@ export function createMultiFileJsonMergeTask(
 
 				let after: string
 				if (exists && before) {
-					const existing = JSON5.parse(before)
 					const incoming = await f.incoming(profile)
-					const doMerge = f.merge ?? mergeJson
-					after = JSON.stringify(doMerge(existing, incoming), null, 2)
+					after = patchJson(before, incoming)
 				} else {
 					after = JSON.stringify(await f.incoming(profile), null, 2)
 				}

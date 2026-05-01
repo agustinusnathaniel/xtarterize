@@ -1,3 +1,4 @@
+import type { ProjectProfile } from '@xtarterize/core'
 import { readPackageJson } from '@xtarterize/core'
 import { createJsonMergeTask } from '@/factory.js'
 
@@ -14,18 +15,28 @@ interface TurboJsonTemplate {
 	tasks: Record<string, TurboTaskConfig>
 }
 
-const TURBO_TASKS: Record<string, TurboTaskConfig> = {
-	build: { dependsOn: ['^build'], outputs: ['dist/**'] },
-	biome: { dependsOn: ['^biome'] },
-	typecheck: { dependsOn: ['^typecheck'] },
-	dev: { cache: false, persistent: true },
-	test: { dependsOn: ['^build'] },
+function getBuildOutputs(profile: ProjectProfile): string[] {
+	if (profile.bundler === 'nextjs') {
+		return ['.next/**', '!.next/cache/**', 'public/**']
+	}
+	return ['dist/**']
 }
 
-function buildTurboJson(scripts: string[]): TurboJsonTemplate {
+function buildTurboJson(
+	scripts: string[],
+	profile: ProjectProfile,
+): TurboJsonTemplate {
 	const tasks: Record<string, TurboTaskConfig> = {}
 
-	for (const [taskName, config] of Object.entries(TURBO_TASKS)) {
+	const turboTasks: Record<string, TurboTaskConfig> = {
+		build: { dependsOn: ['^build'], outputs: getBuildOutputs(profile) },
+		biome: { dependsOn: ['^biome'] },
+		typecheck: { dependsOn: ['^typecheck'] },
+		dev: { cache: false, persistent: true },
+		test: { dependsOn: ['^build'] },
+	}
+
+	for (const [taskName, config] of Object.entries(turboTasks)) {
 		if (scripts.includes(taskName)) {
 			tasks[taskName] = config
 		}
@@ -46,9 +57,9 @@ export const turboTask = createJsonMergeTask({
 	filepath: 'turbo.json',
 	depName: 'turbo',
 	installDev: true,
-	incoming: async (cwd) => {
+	incoming: async (cwd, profile: ProjectProfile) => {
 		const pkg = await readPackageJson(cwd)
 		const scripts = Object.keys(pkg?.scripts ?? {})
-		return buildTurboJson(scripts)
+		return buildTurboJson(scripts, profile)
 	},
 })

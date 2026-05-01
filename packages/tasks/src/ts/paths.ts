@@ -26,15 +26,19 @@ function getPathStatus(
 		return 'missing'
 	}
 	const alias = (paths as Record<string, unknown>)['@/*']
-	const expectedTarget = profile.bundler === 'nextjs' ? './*' : './src/*'
-	const hasExpectedAlias =
-		Array.isArray(alias) && alias.some((entry) => entry === expectedTarget)
+	const validTargets =
+		profile.bundler === 'nextjs'
+			? ['./*', './src/*']
+			: ['./src/*']
+	const hasValidAlias =
+		Array.isArray(alias) &&
+		alias.some((entry) => validTargets.includes(entry as string))
 
 	if (profile.bundler === 'nextjs') {
-		return hasExpectedAlias ? 'match' : 'mismatch'
+		return hasValidAlias ? 'match' : 'mismatch'
 	}
 
-	if (!hasExpectedAlias) return 'mismatch'
+	if (!hasValidAlias) return 'mismatch'
 	if (options.baseUrl !== '.') return 'mismatch'
 	return 'match'
 }

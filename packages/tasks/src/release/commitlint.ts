@@ -1,12 +1,18 @@
-import { createSimpleFileTask } from '@/factory.js'
+import { createFileTask } from '@/factory.js'
 import { renderCommitlintConfig } from '@/templates/commitlint-config.js'
 
-export const commitlintTask = createSimpleFileTask({
+export const commitlintTask = createFileTask({
 	id: 'release/commitlint',
 	label: 'Commitlint config',
 	group: 'Release',
 	applicable: () => true,
 	filepath: 'commitlint.config',
 	extensions: ['.ts', '.js', '.mjs', '.mts', '.cts'],
-	render: (profile) => renderCommitlintConfig(profile),
+	render: (profile, _existing) => renderCommitlintConfig(profile),
+	checkFn: async (_cwd, _profile, fullPath, content) => {
+		if (!fullPath || !content) return 'new'
+		// Check if the config already extends @commitlint/config-conventional
+		const hasExtends = /['"]@commitlint\/config-conventional['"]/.test(content)
+		return hasExtends ? 'skip' : 'conflict'
+	},
 })
