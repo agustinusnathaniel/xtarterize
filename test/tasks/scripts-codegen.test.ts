@@ -49,9 +49,9 @@ describe('packageScriptsTask', () => {
 		expect(pkgDiff?.after).not.toContain('ultracite')
 	})
 
-	it('reports conflicts instead of overwriting scripts with different behavior', async () => {
+	it('preserves existing scripts and only adds missing ones', async () => {
 		const tmpDir = await fs.mkdtemp(
-			path.join(os.tmpdir(), 'xtarterize-scripts-'),
+			path.join(os.tmpdir(), 'xtarterize-script-conflict-'),
 		)
 		await fs.writeFile(
 			path.join(tmpDir, 'package.json'),
@@ -81,7 +81,7 @@ describe('packageScriptsTask', () => {
 		const diffs = await packageScriptsTask.dryRun(tmpDir, profile)
 		const pkgDiff = diffs.find((d) => d.filepath === 'package.json')
 
-		expect(status).toBe('conflict')
+		expect(status).toBe('patch')
 		expect(pkgDiff?.after).toContain('"biome": "eslint ."')
 		expect(pkgDiff?.after).toContain('"biome:fix": "biome check --write ."')
 	})

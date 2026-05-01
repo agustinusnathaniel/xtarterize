@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { runPreflight } from '@xtarterize/core'
@@ -8,11 +10,18 @@ const fixtures = path.resolve(__dirname, '../fixtures')
 
 describe('runPreflight', () => {
 	it('passes for valid project with git', async () => {
-		const result = await runPreflight(
-			path.join(fixtures, 'react-vite-tailwind'),
+		const tmpDir = await fs.mkdtemp(
+			path.join(os.tmpdir(), 'xtarterize-preflight-'),
 		)
+		await fs.writeFile(
+			path.join(tmpDir, 'package.json'),
+			JSON.stringify({ name: 'test-project' }),
+		)
+		await fs.mkdir(path.join(tmpDir, '.git'))
+		const result = await runPreflight(tmpDir)
 		expect(result.valid).toBe(true)
 		expect(result.errors).toHaveLength(0)
+		await fs.rm(tmpDir, { recursive: true })
 	})
 
 	it('fails when package.json is missing', async () => {

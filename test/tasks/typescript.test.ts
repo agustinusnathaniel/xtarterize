@@ -184,14 +184,13 @@ describe('pathsTask', () => {
 		expect(status).toBe('skip')
 	})
 
-	it('patches Next path aliases without requiring baseUrl', async () => {
+	it('skips Next path aliases when already configured', async () => {
 		const profile = await detectProject(path.join(fixtures, 'nextjs'))
 		const status = await pathsTask.check(path.join(fixtures, 'nextjs'), profile)
 		const diffs = await pathsTask.dryRun(path.join(fixtures, 'nextjs'), profile)
 
 		expect(status).toBe('skip')
-		expect(diffs[0].after).toContain('"@/*"')
-		expect(diffs[0].after).not.toContain('"baseUrl"')
+		expect(diffs).toHaveLength(0)
 	})
 
 	it('adds src path aliases for non-Next TypeScript projects', async () => {

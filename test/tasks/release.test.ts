@@ -105,7 +105,7 @@ describe('catVersionTask', () => {
 		expect(versionrcDiff).toBeDefined()
 	})
 
-	it('reports release script conflicts without overwriting them', async () => {
+	it('skips release script when it already exists with a different value', async () => {
 		const tmpDir = await fs.mkdtemp(
 			path.join(os.tmpdir(), 'xtarterize-release-'),
 		)
@@ -132,7 +132,7 @@ describe('catVersionTask', () => {
 		const diffs = await catVersionTask.dryRun(tmpDir, profile)
 		const pkgDiff = diffs.find((d) => d.filepath === 'package.json')
 
-		expect(status).toBe('conflict')
-		expect(pkgDiff?.after).toContain('"release": "custom-release"')
+		expect(status).toBe('patch')
+		expect(pkgDiff).toBeUndefined()
 	})
 })

@@ -267,7 +267,9 @@ export function createJsonMergeTask(options: JsonMergeTaskOptions): Task {
 			let after: string
 			if (exists && before) {
 				const incoming = await options.incoming(cwd, profile)
-				after = patchJson(before, incoming)
+				const actual = parseJsonc(before)
+				const merged = mergeJson(actual ?? {}, incoming)
+				after = patchJson(before, merged)
 			} else {
 				after = JSON.stringify(await options.incoming(cwd, profile), null, 2)
 			}
@@ -859,7 +861,10 @@ export function createMultiFileJsonMergeTask(
 				let after: string
 				if (exists && before) {
 					const incoming = await f.incoming(profile)
-					after = patchJson(before, incoming)
+					const actual = parseJsonc(before)
+					const doMerge = f.merge ?? mergeJson
+					const merged = doMerge(actual ?? {}, incoming)
+					after = patchJson(before, merged)
 				} else {
 					after = JSON.stringify(await f.incoming(profile), null, 2)
 				}

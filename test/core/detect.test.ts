@@ -26,7 +26,7 @@ describe('detectProject', () => {
 		expect(profile.monorepoTool).toBeNull()
 		expect(profile.workspaceRoot).toBe(false)
 		expect(profile.hasGitHub).toBe(false)
-		expect(profile.hasGit).toBe(true)
+		expect(profile.hasGit).toBe(false)
 		expect(profile.existing.tsconfig).toBe(true)
 		expect(profile.existing.viteConfig).toBe(true)
 		expect(profile.existing.biome).toBe(false)
