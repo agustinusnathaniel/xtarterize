@@ -9,6 +9,7 @@
 Before proposing any change:
 
 - Read `README.md` to understand the product, supported stacks, and high-level architecture.
+- Run `git pull` first and check the latest commits to see recent changes and avoid conflicts.
 - Read `package.json` and `turbo.json` to understand workspace scripts, dependencies, and task pipelines.
 - Review the monorepo structure:
   - `packages/core/` — project detection, task interface, file utilities, resolve/apply/backup engine
