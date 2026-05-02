@@ -1,10 +1,9 @@
-import { readJsonIfExists } from '@xtarterize/core'
+import { readJsonIfExists, readPackageJson } from '@xtarterize/core'
 import { mergeJson, parseJsonc } from '@xtarterize/patchers'
 import { createJsonMergeTask, deepEqual, normalizeExtends } from '@/factory.js'
 import { renderBiomeJson } from '@/templates/biome-json.js'
 
 async function hasUltracite(cwd: string): Promise<boolean> {
-	const { readPackageJson } = await import('@xtarterize/core')
 	const pkg = await readPackageJson(cwd)
 	return !!(pkg?.devDependencies?.ultracite || pkg?.dependencies?.ultracite)
 }
@@ -39,7 +38,6 @@ export const biomeTask = createJsonMergeTask({
 			return 'skip'
 		}
 
-		const { readPackageJson } = await import('@xtarterize/core')
 		const pkg = await readPackageJson(cwd)
 		if (
 			!pkg?.devDependencies?.['@biomejs/biome'] &&

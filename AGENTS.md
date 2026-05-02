@@ -140,6 +140,7 @@ If your change affects behavior, architecture, or user-facing features, update t
 |---------|----------|
 | Project overview | `README.md` |
 | Architecture decisions | `docs/ADRs/` |
+| Import conventions | `docs/ADRs/013-dynamic-import-conventions.md` |
 | Task interface | `packages/core/src/_base.ts` |
 | Core utilities | `packages/core/src/` |
 | Patching engine | `packages/patchers/src/` |
