@@ -244,12 +244,10 @@ export const skillsInstallTask: Task = {
 			const result = await x(
 				'npx',
 				['skills@latest', 'add', source, '--skill', skill, '-y'],
-				{ nodeOptions: { cwd } },
+				{ nodeOptions: { cwd, stdio: 'inherit' } },
 			)
 			if (result.exitCode !== 0) {
-				throw new Error(
-					`Failed to install skill ${skill}: ${result.stderr || result.stdout || 'unknown error'}`,
-				)
+				throw new Error(`Failed to install skill ${skill}`)
 			}
 		}
 	},
