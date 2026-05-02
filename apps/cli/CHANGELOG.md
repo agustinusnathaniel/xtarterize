@@ -1,5 +1,11 @@
 # xtarterize
 
+## 1.2.1
+
+### Patch Changes
+
+- [`d561f32`](https://github.com/agustinusnathaniel/xtarterize/commit/d561f325a596cb7dd026a894d83296d13c3e5eec) Thanks [@agustinusnathaniel](https://github.com/agustinusnathaniel)! - fix(tasks): inherit stdio in skills-install for visible progress
+
 ## 1.2.0
 
 ### Minor Changes
