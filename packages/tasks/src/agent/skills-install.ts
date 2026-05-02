@@ -136,6 +136,16 @@ async function readSkillLockFile(lockPath: string): Promise<Set<string>> {
 	return installed
 }
 
+async function isDirNonEmpty(dirPath: string): Promise<boolean> {
+	try {
+		const { readdir } = await import('node:fs/promises')
+		const entries = await readdir(dirPath)
+		return entries.length > 0
+	} catch {
+		return false
+	}
+}
+
 async function readSkillsFromDir(skillsDir: string): Promise<Set<string>> {
 	const installed = new Set<string>()
 	if (!(await fileExists(skillsDir))) return installed
@@ -145,7 +155,11 @@ async function readSkillsFromDir(skillsDir: string): Promise<Set<string>> {
 		const entries = await readdir(skillsDir, { withFileTypes: true })
 		for (const entry of entries) {
 			if (entry.isDirectory()) {
-				installed.add(entry.name)
+				const skillPath = resolvePath(skillsDir, entry.name)
+				const hasContent = await isDirNonEmpty(skillPath)
+				if (hasContent) {
+					installed.add(entry.name)
+				}
 			}
 		}
 	} catch {
@@ -156,26 +170,32 @@ async function readSkillsFromDir(skillsDir: string): Promise<Set<string>> {
 }
 
 async function getInstalledSkills(cwd: string): Promise<Set<string>> {
-	const installed = new Set<string>()
-
-	// Check project-level skills lock file (e.g. viteboard-pro/skills-lock.json)
-	const projectLocks = [resolvePath(cwd, 'skills-lock.json')]
-
-	for (const lockPath of projectLocks) {
-		const skills = await readSkillLockFile(lockPath)
-		for (const s of skills) installed.add(s)
-	}
-
-	// Check project-local skill directories
+	// Check project-local skill directories first
 	const projectDirs = [
 		resolvePath(cwd, '.agents', 'skills'),
 		resolvePath(cwd, '.claude', 'skills'),
 		resolvePath(cwd, '.cursor', 'skills'),
 	]
 
+	const dirSkills = new Set<string>()
 	for (const dir of projectDirs) {
 		const skills = await readSkillsFromDir(dir)
-		for (const s of skills) installed.add(s)
+		for (const s of skills) dirSkills.add(s)
+	}
+
+	// Validate lock file entries against actual directories
+	const lockPath = resolvePath(cwd, 'skills-lock.json')
+	const lockSkills = await readSkillLockFile(lockPath)
+
+	const installed = new Set<string>()
+	for (const s of lockSkills) {
+		if (dirSkills.has(s)) {
+			installed.add(s)
+		}
+	}
+	// Also include any directory skills not in lock file
+	for (const s of dirSkills) {
+		installed.add(s)
 	}
 
 	return installed
