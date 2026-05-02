@@ -32,7 +32,7 @@ describe('skillsInstallTask', () => {
 		expect(status).toBe('new')
 	})
 
-	it('dryRun includes react skills for react projects', async () => {
+	it('dryRun includes react and frontend skills for react projects', async () => {
 		const profile = await detectProject(
 			path.join(fixtures, 'react-vite-tailwind'),
 		)
@@ -44,13 +44,23 @@ describe('skillsInstallTask', () => {
 		expect(diffs[0].filepath).toBe('.xtarterize/skills-install.log')
 		expect(diffs[0].before).toBeNull()
 		const after = diffs[0].after ?? ''
+		// React skills
 		expect(after).toContain('vercel-react-best-practices')
+		expect(after).toContain('vercel-composition-patterns')
+		expect(after).toContain('react-dev')
+		expect(after).toContain('react-useeffect')
+		// Frontend / UI skills
 		expect(after).toContain('frontend-design')
 		expect(after).toContain('web-design-guidelines')
-		expect(after).toContain('vercel-composition-patterns')
+		expect(after).toContain('baseline-ui')
+		expect(after).toContain('fixing-accessibility')
+		expect(after).toContain('fixing-metadata')
+		expect(after).toContain('fixing-motion-performance')
+		// Build tool skills
+		expect(after).toContain('vite')
 	})
 
-	it('dryRun includes web frontend skills for vue projects', async () => {
+	it('dryRun includes vue and frontend skills for vue projects', async () => {
 		const profile = await detectProject(path.join(fixtures, 'vue-vite'))
 		const diffs = await skillsInstallTask.dryRun(
 			path.join(fixtures, 'vue-vite'),
@@ -58,10 +68,20 @@ describe('skillsInstallTask', () => {
 		)
 		expect(diffs.length).toBe(1)
 		const after = diffs[0].after ?? ''
+		// Vue skills
+		expect(after).toContain('vue')
+		expect(after).toContain('vue-best-practices')
+		// Frontend / UI skills
 		expect(after).toContain('frontend-design')
 		expect(after).toContain('web-design-guidelines')
+		expect(after).toContain('baseline-ui')
+		// Build tool skills
+		expect(after).toContain('vite')
+		// React skills should NOT be present
 		expect(after).not.toContain('vercel-react-best-practices')
 		expect(after).not.toContain('vercel-composition-patterns')
+		expect(after).not.toContain('react-dev')
+		expect(after).not.toContain('react-useeffect')
 	})
 
 	it('dryRun includes nextjs skills for nextjs projects', async () => {
@@ -72,11 +92,16 @@ describe('skillsInstallTask', () => {
 		)
 		expect(diffs.length).toBe(1)
 		const after = diffs[0].after ?? ''
-		// Next.js is also React, so should include both React and Next.js skills
-		expect(after).toContain('vercel-react-best-practices')
+		// Next.js skills
 		expect(after).toContain('next-best-practices')
 		expect(after).toContain('next-cache-components')
 		expect(after).toContain('next-upgrade')
+		// React skills (Next.js is React)
+		expect(after).toContain('vercel-react-best-practices')
+		expect(after).toContain('react-dev')
+		expect(after).toContain('react-useeffect')
+		// Frontend / UI skills
+		expect(after).toContain('baseline-ui')
 	})
 
 	it('dryRun includes expo skills for expo projects', async () => {
@@ -96,6 +121,8 @@ describe('skillsInstallTask', () => {
 		expect(after).toContain('building-native-ui')
 		expect(after).toContain('native-data-fetching')
 		expect(after).toContain('expo-module')
+		expect(after).toContain('upgrading-expo')
+		expect(after).toContain('vercel-react-native-skills')
 	})
 
 	it('returns skip when no relevant framework is detected', async () => {

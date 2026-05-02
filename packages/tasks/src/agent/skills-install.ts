@@ -17,6 +17,12 @@ interface SkillEntry {
 	skill: string
 }
 
+interface SkillDefinition {
+	source: string
+	skill: string
+	condition: (profile: ProjectProfile, deps: Record<string, string>) => boolean
+}
+
 function getAllDeps(pkg: Record<string, unknown>): Record<string, string> {
 	const deps: Record<string, string> = {}
 	if (
@@ -36,83 +42,257 @@ function getAllDeps(pkg: Record<string, unknown>): Record<string, string> {
 	return deps
 }
 
+/** Declarative catalog of all installable skills, grouped by category.
+ *
+ *  To add a new skill, append an entry with its source, skill name, and a
+ *  `condition` that returns `true` when the project stack matches.
+ */
+const SKILL_CATALOG: SkillDefinition[] = [
+	// ═════════════════════════════════════════════════════════════════
+	//  Frontend / UI
+	// ═════════════════════════════════════════════════════════════════
+	{
+		source: 'anthropics/skills',
+		skill: 'frontend-design',
+		condition: (p) => p.runtime === 'browser' || p.runtime === 'edge',
+	},
+	{
+		source: 'vercel-labs/agent-skills',
+		skill: 'web-design-guidelines',
+		condition: (p) => p.runtime === 'browser' || p.runtime === 'edge',
+	},
+	{
+		source: 'ibelick/ui-skills',
+		skill: 'baseline-ui',
+		condition: (p) => p.runtime === 'browser' || p.runtime === 'edge',
+	},
+	{
+		source: 'ibelick/ui-skills',
+		skill: 'fixing-accessibility',
+		condition: (p) => p.runtime === 'browser' || p.runtime === 'edge',
+	},
+	{
+		source: 'ibelick/ui-skills',
+		skill: 'fixing-metadata',
+		condition: (p) => p.runtime === 'browser' || p.runtime === 'edge',
+	},
+	{
+		source: 'ibelick/ui-skills',
+		skill: 'fixing-motion-performance',
+		condition: (p) => p.runtime === 'browser' || p.runtime === 'edge',
+	},
+
+	// ═════════════════════════════════════════════════════════════════
+	//  React
+	// ═════════════════════════════════════════════════════════════════
+	{
+		source: 'vercel-labs/agent-skills',
+		skill: 'vercel-react-best-practices',
+		condition: (p) => p.framework === 'react',
+	},
+	{
+		source: 'vercel-labs/agent-skills',
+		skill: 'vercel-composition-patterns',
+		condition: (p) => p.framework === 'react',
+	},
+	{
+		source: 'softaworks/agent-toolkit',
+		skill: 'react-dev',
+		condition: (p) => p.framework === 'react',
+	},
+	{
+		source: 'softaworks/agent-toolkit',
+		skill: 'react-useeffect',
+		condition: (p) => p.framework === 'react',
+	},
+
+	// ═════════════════════════════════════════════════════════════════
+	//  Next.js
+	// ═════════════════════════════════════════════════════════════════
+	{
+		source: 'vercel-labs/next-skills',
+		skill: 'next-best-practices',
+		condition: (p) => p.bundler === 'nextjs',
+	},
+	{
+		source: 'vercel-labs/next-skills',
+		skill: 'next-cache-components',
+		condition: (p) => p.bundler === 'nextjs',
+	},
+	{
+		source: 'vercel-labs/next-skills',
+		skill: 'next-upgrade',
+		condition: (p) => p.bundler === 'nextjs',
+	},
+
+	// ═════════════════════════════════════════════════════════════════
+	//  Vue / Nuxt
+	// ═════════════════════════════════════════════════════════════════
+	{
+		source: 'antfu/skills',
+		skill: 'vue',
+		condition: (p) => p.framework === 'vue',
+	},
+	{
+		source: 'antfu/skills',
+		skill: 'vue-best-practices',
+		condition: (p) => p.framework === 'vue',
+	},
+	{
+		source: 'antfu/skills',
+		skill: 'nuxt',
+		condition: (_p, d) => !!d.nuxt,
+	},
+
+	// ═════════════════════════════════════════════════════════════════
+	//  Shadcn
+	// ═════════════════════════════════════════════════════════════════
+	{
+		source: 'shadcn/ui',
+		skill: 'shadcn',
+		condition: (_p, d) =>
+			!!(d.shadcn || d['shadcn-ui'] || d['@shadcn/ui'] || d['@shadcn-ui/cli']),
+	},
+
+	// ═════════════════════════════════════════════════════════════════
+	//  Ultracite
+	// ═════════════════════════════════════════════════════════════════
+	{
+		source: 'haydenbleasel/ultracite',
+		skill: 'ultracite',
+		condition: (_p, d) => !!d.ultracite,
+	},
+
+	// ═════════════════════════════════════════════════════════════════
+	//  Expo / React Native
+	// ═════════════════════════════════════════════════════════════════
+	{
+		source: 'expo/skills',
+		skill: 'expo-tailwind-setup',
+		condition: (p) => p.bundler === 'expo' || p.framework === 'react-native',
+	},
+	{
+		source: 'expo/skills',
+		skill: 'expo-cicd-workflows',
+		condition: (p) => p.bundler === 'expo' || p.framework === 'react-native',
+	},
+	{
+		source: 'expo/skills',
+		skill: 'expo-deployment',
+		condition: (p) => p.bundler === 'expo' || p.framework === 'react-native',
+	},
+	{
+		source: 'expo/skills',
+		skill: 'expo-dev-client',
+		condition: (p) => p.bundler === 'expo' || p.framework === 'react-native',
+	},
+	{
+		source: 'expo/skills',
+		skill: 'building-native-ui',
+		condition: (p) => p.bundler === 'expo' || p.framework === 'react-native',
+	},
+	{
+		source: 'expo/skills',
+		skill: 'native-data-fetching',
+		condition: (p) => p.bundler === 'expo' || p.framework === 'react-native',
+	},
+	{
+		source: 'expo/skills',
+		skill: 'expo-module',
+		condition: (p) => p.bundler === 'expo' || p.framework === 'react-native',
+	},
+	{
+		source: 'expo/skills',
+		skill: 'upgrading-expo',
+		condition: (p) => p.bundler === 'expo' || p.framework === 'react-native',
+	},
+	{
+		source: 'vercel-labs/agent-skills',
+		skill: 'vercel-react-native-skills',
+		condition: (p) => p.bundler === 'expo' || p.framework === 'react-native',
+	},
+
+	// ═════════════════════════════════════════════════════════════════
+	//  Build / Dev tools
+	// ═════════════════════════════════════════════════════════════════
+	{
+		source: 'antfu/skills',
+		skill: 'vite',
+		condition: (p, d) => p.bundler === 'vite' || !!d.vite,
+	},
+	{
+		source: 'antfu/skills',
+		skill: 'vitest',
+		condition: (_p, d) => !!d.vitest,
+	},
+	{
+		source: 'antfu/skills',
+		skill: 'tsdown',
+		condition: (_p, d) => !!d.tsdown,
+	},
+	{
+		source: 'vercel/turborepo',
+		skill: 'turborepo',
+		condition: (p) => p.monorepoTool === 'turbo' || p.existing.turbo,
+	},
+
+	// ═════════════════════════════════════════════════════════════════
+	//  Database / Auth
+	// ═════════════════════════════════════════════════════════════════
+	{
+		source: 'supabase/agent-skills',
+		skill: 'supabase-postgres-best-practices',
+		condition: (_p, d) =>
+			!!(d['@supabase/supabase-js'] || d.supabase || d.pg || d.postgres),
+	},
+	{
+		source: 'ccheney/robust-skills',
+		skill: 'postgres-drizzle',
+		condition: (_p, d) => !!d['drizzle-orm'],
+	},
+	{
+		source: 'mindrally/skills',
+		skill: 'redis-best-practices',
+		condition: (_p, d) => !!(d.redis || d.ioredis),
+	},
+	{
+		source: 'better-auth/skills',
+		skill: 'better-auth-best-practices',
+		condition: (_p, d) => !!d['better-auth'],
+	},
+	{
+		source: 'better-auth/skills',
+		skill: 'create-auth-skill',
+		condition: (_p, d) => !!d['better-auth'],
+	},
+
+	// ═════════════════════════════════════════════════════════════════
+	//  AI / SDKs
+	// ═════════════════════════════════════════════════════════════════
+	{
+		source: 'vercel/ai',
+		skill: 'ai-sdk',
+		condition: (_p, d) => !!d.ai,
+	},
+
+	// ═════════════════════════════════════════════════════════════════
+	//  Media / Specialized
+	// ═════════════════════════════════════════════════════════════════
+	{
+		source: 'remotion-dev/skills',
+		skill: 'remotion-best-practices',
+		condition: (_p, d) => !!(d.remotion || d['@remotion/cli']),
+	},
+]
+
 function getSkillsToInstall(
 	profile: ProjectProfile,
 	deps: Record<string, string>,
 ): SkillEntry[] {
-	const skills: SkillEntry[] = []
-
-	// Frontend design skills apply to all web frontend projects
-	const isWebFrontend =
-		profile.runtime === 'browser' || profile.runtime === 'edge'
-	if (isWebFrontend) {
-		skills.push(
-			{ source: 'anthropics/skills', skill: 'frontend-design' },
-			{
-				source: 'vercel-labs/agent-skills',
-				skill: 'web-design-guidelines',
-			},
-		)
-	}
-
-	// React-specific skills (includes Next.js since framework === 'react' for Next)
-	if (profile.framework === 'react') {
-		skills.push(
-			{
-				source: 'vercel-labs/agent-skills',
-				skill: 'vercel-react-best-practices',
-			},
-			{
-				source: 'vercel-labs/agent-skills',
-				skill: 'vercel-composition-patterns',
-			},
-		)
-	}
-
-	// Next.js skills
-	if (profile.bundler === 'nextjs') {
-		skills.push(
-			{
-				source: 'vercel-labs/next-skills',
-				skill: 'next-best-practices',
-			},
-			{
-				source: 'vercel-labs/next-skills',
-				skill: 'next-cache-components',
-			},
-			{ source: 'vercel-labs/next-skills', skill: 'next-upgrade' },
-		)
-	}
-
-	// Shadcn detection via components.json or deps
-	const hasShadcn =
-		deps.shadcn ||
-		deps['shadcn-ui'] ||
-		deps['@shadcn/ui'] ||
-		deps['@shadcn-ui/cli']
-	if (hasShadcn) {
-		skills.push({ source: 'shadcn/ui', skill: 'shadcn' })
-	}
-
-	// Ultracite detection
-	if (deps.ultracite) {
-		skills.push({ source: 'haydenbleasel/ultracite', skill: 'ultracite' })
-	}
-
-	// Expo / React Native skills
-	if (profile.bundler === 'expo' || profile.framework === 'react-native') {
-		skills.push(
-			{ source: 'expo/skills', skill: 'expo-tailwind-setup' },
-			{ source: 'expo/skills', skill: 'expo-cicd-workflows' },
-			{ source: 'expo/skills', skill: 'expo-deployment' },
-			{ source: 'expo/skills', skill: 'expo-dev-client' },
-			{ source: 'expo/skills', skill: 'building-native-ui' },
-			{ source: 'expo/skills', skill: 'native-data-fetching' },
-			{ source: 'expo/skills', skill: 'expo-module' },
-		)
-	}
-
-	return skills
+	return SKILL_CATALOG.filter((s) => s.condition(profile, deps)).map((s) => ({
+		source: s.source,
+		skill: s.skill,
+	}))
 }
 
 async function readSkillLockFile(lockPath: string): Promise<Set<string>> {
