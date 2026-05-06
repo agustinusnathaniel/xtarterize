@@ -25,10 +25,6 @@ import JSON5 from 'json5'
 import { addDependency } from 'nypm'
 import { relative } from 'pathe'
 
-function relativeToCwd(fullPath: string, cwd: string): string {
-	return relative(cwd, fullPath)
-}
-
 export function deepEqual(a: unknown, b: unknown): boolean {
 	if (a === b) return true
 	if (typeof a !== typeof b) return false
@@ -159,7 +155,7 @@ export function createFileTask(options: FileTaskOptions): Task {
 			const exists = fullPath !== null && (await fileExists(fullPath))
 			const before = exists ? await readFile(fullPath) : null
 			const filepath = exists
-				? relativeToCwd(fullPath, cwd)
+				? relative(cwd, fullPath)
 				: getDefaultFilepath(options.filepath, options.extensions)
 
 			const after = options.render(profile, before)
@@ -266,7 +262,7 @@ export function createJsonMergeTask(options: JsonMergeTaskOptions): Task {
 			const exists = fullPath !== null && (await fileExists(fullPath))
 			const before = exists ? await readFile(fullPath) : null
 			const filepath = exists
-				? relativeToCwd(fullPath, cwd)
+				? relative(cwd, fullPath)
 				: getDefaultFilepath(options.filepath, options.extensions)
 
 			let after: string
@@ -371,7 +367,7 @@ export function createSimpleFileTask(options: SimpleFileTaskOptions): Task {
 			const exists = fullPath !== null && (await fileExists(fullPath))
 			const before = exists ? await readFile(fullPath) : null
 			const filepath = exists
-				? relativeToCwd(fullPath, cwd)
+				? relative(cwd, fullPath)
 				: getDefaultFilepath(options.filepath, options.extensions)
 			const after = options.render(profile)
 
@@ -475,7 +471,7 @@ export function createMultiFileTask(options: MultiFileTaskOptions): Task {
 
 				if (!exists || before?.trim() !== after.trim()) {
 					diffs.push({
-						filepath: relativeToCwd(fullPath, cwd),
+						filepath: relative(cwd, fullPath),
 						before,
 						after,
 					})
@@ -639,9 +635,10 @@ export interface PackageJsonTaskOptions {
 		profile: ProjectProfile,
 	) => Promise<PackageJsonScriptEntry[]>
 	depName?: string
+	depCondition?: (profile: ProjectProfile) => boolean
 	installDev?: boolean
 	files?: {
-		filepath: string
+		filepath: string | ((profile: ProjectProfile) => string)
 		render: (cwd: string, profile: ProjectProfile) => Promise<string> | string
 	}[]
 	checkFn?: (
@@ -649,6 +646,23 @@ export interface PackageJsonTaskOptions {
 		profile: ProjectProfile,
 		pkg: Record<string, unknown>,
 	) => Promise<TaskStatus>
+}
+
+function resolveFilepath(
+	filepath: string | ((profile: ProjectProfile) => string),
+	profile: ProjectProfile,
+): string {
+	return typeof filepath === 'function' ? filepath(profile) : filepath
+}
+
+function shouldInstallDep(
+	options: PackageJsonTaskOptions,
+	profile: ProjectProfile,
+): boolean {
+	return !!(
+		options.depName &&
+		(!options.depCondition || options.depCondition(profile))
+	)
 }
 
 async function resolveScripts(
@@ -706,17 +720,19 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 					!hasScriptValue(scriptsMap, s.value),
 			)
 
+			const needsDep = shouldInstallDep(options, profile)
 			const hasDep =
-				!options.depName ||
-				pkg.devDependencies?.[options.depName] ||
-				pkg.dependencies?.[options.depName]
+				!needsDep ||
+				pkg.devDependencies?.[options.depName!] ||
+				pkg.dependencies?.[options.depName!]
 
 			const extraFiles = options.files ?? []
 			const missingFiles: string[] = []
 			for (const f of extraFiles) {
-				const fullPath = resolvePath(cwd, f.filepath)
+				const fp = resolveFilepath(f.filepath, profile)
+				const fullPath = resolvePath(cwd, fp)
 				const exists = await fileExists(fullPath)
-				if (!exists) missingFiles.push(f.filepath)
+				if (!exists) missingFiles.push(fp)
 			}
 
 			if (missingScripts.length === 0 && hasDep && missingFiles.length === 0)
@@ -727,7 +743,7 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 				return 'patch'
 			if (
 				missingScripts.length === scripts.length &&
-				(!options.depName || !hasDep) &&
+				(!needsDep || !hasDep) &&
 				missingFiles.length === extraFiles.length
 			)
 				return 'new'
@@ -738,11 +754,12 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 			const diffs: FileDiff[] = []
 
 			for (const f of options.files ?? []) {
-				const fullPath = resolvePath(cwd, f.filepath)
+				const fp = resolveFilepath(f.filepath, profile)
+				const fullPath = resolvePath(cwd, fp)
 				const exists = await fileExists(fullPath)
 				if (exists) continue
 				diffs.push({
-					filepath: f.filepath,
+					filepath: fp,
 					before: null,
 					after: await f.render(cwd, profile),
 				})
@@ -778,13 +795,13 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 		},
 
 		async apply(cwd, profile): Promise<void> {
-			if (options.depName) {
+			if (shouldInstallDep(options, profile)) {
 				const pkg = await readPackageJson(cwd)
 				if (
-					!pkg?.devDependencies?.[options.depName] &&
-					!pkg?.dependencies?.[options.depName]
+					!pkg?.devDependencies?.[options.depName!] &&
+					!pkg?.dependencies?.[options.depName!]
 				) {
-					await addDependency([options.depName], {
+					await addDependency([options.depName!], {
 						cwd,
 						dev: options.installDev ?? true,
 					})
@@ -792,7 +809,8 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 			}
 
 			for (const f of options.files ?? []) {
-				const fullPath = resolvePath(cwd, f.filepath)
+				const fp = resolveFilepath(f.filepath, profile)
+				const fullPath = resolvePath(cwd, fp)
 				const exists = await fileExists(fullPath)
 				if (!exists) {
 					await writeFile(fullPath, await f.render(cwd, profile))
