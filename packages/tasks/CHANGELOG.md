@@ -1,5 +1,27 @@
 # @xtarterize/tasks
 
+## 1.4.0
+
+### Minor Changes
+
+- [`52511f0`](https://github.com/agustinusnathaniel/xtarterize/commit/52511f048510f2bfdd81afccd97545eb69d1264d) Thanks [@agustinusnathaniel](https://github.com/agustinusnathaniel)! - feat: add pnpm workspace catalog for centralized dependency versions
+
+  feat(tasks): add editorconfig, npmrc, nvmrc, lint-staged, and git hooks tasks
+
+  refactor(factory): add depCondition option and dynamic filepath support to PackageJsonTask
+
+### Patch Changes
+
+- [`52511f0`](https://github.com/agustinusnathaniel/xtarterize/commit/52511f048510f2bfdd81afccd97545eb69d1264d) Thanks [@agustinusnathaniel](https://github.com/agustinusnathaniel)! - fix(tasks): exclude .agents and .claude dirs from Biome file includes
+
+  fix(tasks): make knip task applicable to all projects with format-aware config
+
+  fix(tasks): replace non-null assertions with type-safe depName guards
+
+- Updated dependencies [[`52511f0`](https://github.com/agustinusnathaniel/xtarterize/commit/52511f048510f2bfdd81afccd97545eb69d1264d), [`52511f0`](https://github.com/agustinusnathaniel/xtarterize/commit/52511f048510f2bfdd81afccd97545eb69d1264d)]:
+  - @xtarterize/core@1.4.0
+  - @xtarterize/patchers@1.4.0
+
 ## 1.3.0
 
 ### Minor Changes
