@@ -7,13 +7,18 @@ import { ciWorkflowTask } from '@/ci/ci.js'
 import { releaseWorkflowTask } from '@/ci/release.js'
 import { plopTask } from '@/codegen/plop.js'
 import { renovateTask } from '@/deps/renovate.js'
+import { editorconfigTask } from '@/editor/editorconfig.js'
 import { vscodeTask } from '@/editor/vscode.js'
 import { biomeTask } from '@/lint/biome.js'
 import { turboTask } from '@/monorepo/turbo.js'
 import { knipTask } from '@/quality/knip.js'
+import { lintStagedTask } from '@/quality/lint-staged.js'
 import { catVersionTask } from '@/release/cat-version.js'
 import { commitlintTask } from '@/release/commitlint.js'
 import { czgTask } from '@/release/czg.js'
+import { gitHooksTask } from '@/release/git-hooks.js'
+import { npmrcTask } from '@/scripts/npmrc.js'
+import { nvmrcTask } from '@/scripts/nvmrc.js'
 import { packageScriptsTask } from '@/scripts/package-scripts.js'
 import { gitignoreTsbuildinfoTask } from '@/ts/gitignore-tsbuildinfo.js'
 import { incrementalTask } from '@/ts/incremental.js'
@@ -30,9 +35,14 @@ export {
 	ciWorkflowTask,
 	commitlintTask,
 	czgTask,
+	editorconfigTask,
+	gitHooksTask,
 	gitignoreTsbuildinfoTask,
 	incrementalTask,
 	knipTask,
+	lintStagedTask,
+	npmrcTask,
+	nvmrcTask,
 	packageScriptsTask,
 	pathsTask,
 	plopTask,
@@ -63,13 +73,18 @@ export function getAllTasks(): Task[] {
 		commitlintTask,
 		czgTask,
 		catVersionTask,
+		gitHooksTask,
 		knipTask,
+		lintStagedTask,
 		plopTask,
 		turboTask,
 		vscodeTask,
+		editorconfigTask,
 		agentsMdTask,
 		skillsTask,
 		skillsInstallTask,
 		packageScriptsTask,
+		npmrcTask,
+		nvmrcTask,
 	]
 }
