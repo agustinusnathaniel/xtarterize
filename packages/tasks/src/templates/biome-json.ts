@@ -10,7 +10,14 @@ export function renderBiomeJson(profile: ProjectProfile): string {
 		vcs: { enabled: true, clientKind: 'git', useIgnoreFile: true },
 		files: {
 			ignoreUnknown: false,
-			includes: ['src/**/*', '*.config.ts', '!**/*.css', '!**/*.d.ts'],
+			includes: [
+				'src/**/*',
+				'*.config.ts',
+				'!**/*.css',
+				'!**/*.d.ts',
+				'!.agents',
+				'!.claude',
+			],
 		},
 		formatter: { enabled: true, indentStyle: 'space' },
 		linter: {
