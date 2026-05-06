@@ -16,7 +16,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const fixtures = path.resolve(__dirname, '../fixtures')
 
 describe('knipTask', () => {
-	it('is applicable to TS projects only', async () => {
+	it('is applicable to all projects (JSON format if no TS)', async () => {
 		const tsProfile = await detectProject(
 			path.join(fixtures, 'react-vite-tailwind'),
 		)
@@ -25,7 +25,7 @@ describe('knipTask', () => {
 		const nonTsProfile = await detectProject(
 			path.join(fixtures, 'monorepo-turbo'),
 		)
-		expect(knipTask.applicable(nonTsProfile)).toBe(false)
+		expect(knipTask.applicable(nonTsProfile)).toBe(true)
 	})
 
 	it('returns new on clean fixture', async () => {
