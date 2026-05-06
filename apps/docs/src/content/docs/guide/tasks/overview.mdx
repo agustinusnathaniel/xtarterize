@@ -74,12 +74,14 @@ For projects using [**pnpm**](https://pnpm.io/), CI workflows automatically incl
 | `release/commitlint` | Install [commitlint](https://commitlint.js.org/) with [`@commitlint/config-conventional`](https://commitlint.js.org/reference/rules.html), write [`commitlint.config.ts`](https://commitlint.js.org/reference/configuration.html) | [Git](https://git-scm.com/) detected |
 | `release/czg` | Install [czg](https://cz-git.qbb.sh/cli/) ([Commitizen](https://commitizen.github.io/cz-cli/) adapter), add [`commit`](https://docs.npmjs.com/cli/v10/using-npm/scripts) script to `package.json` | Always |
 | `release/cat-version` | Install [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version), write [`.versionrc`](https://github.com/absolute-version/commit-and-tag-version#configuration) | Always |
+| `release/git-hooks` | Install [simple-git-hooks](https://github.com/toplenboren/simple-git-hooks), wire `commit-msg` hook to commitlint, add `prepare` script | Always |
 
 ## Code Quality
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
-| `quality/knip` | Install [Knip](https://knip.dev/), write [`knip.json`](https://knip.dev/reference/configuration) with framework-aware [`entry`](https://knip.dev/reference/configuration#entry) and [`project`](https://knip.dev/reference/configuration#project) paths | TypeScript detected |
+| `quality/knip` | Install [Knip](https://knip.dev/), write [`knip.json`](https://knip.dev/reference/configuration) with framework-aware [`entry`](https://knip.dev/reference/configuration#entry) and [`project`](https://knip.dev/reference/configuration#project) paths | Always (JSON format if no TypeScript) |
+| `quality/lint-staged` | Install [lint-staged](https://github.com/okonet/lint-staged), write [`.lintstagedrc.json`](https://github.com/okonet/lint-staged#configuration) running Biome on staged files | Always |
 
 ## Code Generation
 
@@ -97,6 +99,7 @@ For projects using [**pnpm**](https://pnpm.io/), CI workflows automatically incl
 
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
+| `editor/editorconfig` | Write [`.editorconfig`](https://editorconfig.org/) with consistent indentation, charset, and line endings | Always |
 | `editor/vscode` | Write/merge [`.vscode/settings.json`](https://code.visualstudio.com/docs/getstarted/settings#_settingsjson) and [`.vscode/extensions.json`](https://code.visualstudio.com/docs/editor/extension-marketplace#_workspace-recommended-extensions) | Always |
 
 ### Additive Extension Merging
@@ -141,6 +144,8 @@ The `agent/skills-install` task automatically installs [agent skills](https://sk
 | Task ID | Description | Applicable When |
 |---------|-------------|-----------------|
 | `scripts/package-scripts` | Patch [`package.json`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) [`scripts`](https://docs.npmjs.com/cli/v10/using-npm/scripts) with `lint`, `format`, `typecheck`, etc. | Always |
+| `scripts/nvmrc` | Write [`.nvmrc`](https://github.com/nvm-sh/nvm#nvmrc) with `lts/*` to pin Node.js version | Always |
+| `scripts/npmrc` | Write [`.npmrc`](https://docs.npmjs.com/cli/v10/configuring-npm/npmrc) with `save-exact`, `strict-peer-dependencies`, and `auto-install-peers` | Always |
 
 ## Idempotency
 

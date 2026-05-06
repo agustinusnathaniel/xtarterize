@@ -70,6 +70,14 @@ export default defineConfig({
 							link: '/contributing/core/preflight/',
 						},
 						{
+							label: 'Task Resolution',
+							link: '/contributing/core/resolve/',
+						},
+						{
+							label: 'Apply Engine',
+							link: '/contributing/core/apply/',
+						},
+						{
 							label: 'Tasks',
 							autogenerate: { directory: 'contributing/tasks' },
 						},

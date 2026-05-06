@@ -1,0 +1,76 @@
+---
+title: Apply Engine
+description: How xtarterize applies conformance tasks with backups and error handling.
+---
+
+import { Aside } from '@astrojs/starlight/components'
+
+The apply engine is the final stage of the conformance pipeline. It runs applicable tasks, backs up modified files, and handles errors gracefully.
+
+## Apply Pipeline
+
+```
+tasks + profile → check each → backup files → apply each → report results
+```
+
+### `applyTasks(tasks, cwd, profile, selectedIds?, options?)`
+
+The [`applyTasks`](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/core/src/apply.ts) function orchestrates the entire process:
+
+1. **Filter** — Uses `selectedIds` when the user picks specific tasks; otherwise applies all
+2. **Check** — Re-runs `task.check()` to get current status (skips `skip` tasks, optionally includes `conflict`)
+3. **Backup** — Collects all unique filepaths from `task.dryRun()` and backs them up once before writing anything
+4. **Apply** — Executes `task.apply()` for each task sequentially
+5. **Report** — Returns `{ applied, skipped, errors }` counts
+
+```typescript
+import { applyTasks } from '@xtarterize/core'
+
+const result = await applyTasks(
+  tasks,
+  '/path/to/project',
+  profile,
+  selectedIds, // optional: only apply these
+  { includeConflicts: true }, // optional: allow conflicts
+)
+
+console.log(result.applied) // number of successfully applied tasks
+console.log(result.errors)  // error messages for failed tasks
+```
+
+## Backup System
+
+Before any file is modified, the engine creates timestamped backups in `.xtarterize/backups/`:
+
+```
+.xtarterize/backups/
+├── .index.json
+├── biome.json.2026-04-30T17-36-00.bak
+├── tsconfig.json.2026-04-30T17-36-00.bak
+└── ...
+```
+
+- Each unique filepath is backed up **once**, even if multiple tasks modify it
+- Backups are indexed in `.xtarterize/backups/.index.json` for the `restore` command
+- The `backupFile()` utility handles directory creation and timestamping
+
+## Error Handling
+
+Errors are collected and reported without aborting the entire run:
+
+- **Check/dryRun failures** — Logged as errors; the file is not backed up and the task is skipped
+- **Apply failures** — Logged with the task ID and error message; subsequent tasks continue
+- **Backup failures** — Caught internally; the apply continues but the file may not be restorable
+
+The function always returns a result object rather than throwing, making it safe for CLI use.
+
+## Ordering
+
+Tasks are applied in registration order (the order they appear in `getAllTasks()`). There is no dependency graph — each task is independent and idempotent. This means any subset of tasks can be applied in any order without producing different results.
+
+## References
+
+- [Task interface](/contributing/tasks/overview/)
+- [Task resolution](/contributing/core/resolve/)
+- [Preflight checks](/contributing/core/preflight/)
+- [Backup utilities](https://github.com/agustinusnathaniel/xtarterize/blob/main/packages/core/src/backup.ts)
