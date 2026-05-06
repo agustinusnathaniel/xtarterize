@@ -4,6 +4,36 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@types/node':
+      specifier: ^25.6.0
+      version: 25.6.0
+    json5:
+      specifier: ^2.2.3
+      version: 2.2.3
+    jsonc-parser:
+      specifier: ^3.3.1
+      version: 3.3.1
+    magicast:
+      specifier: ^0.5.2
+      version: 0.5.2
+    nypm:
+      specifier: ^0.6.6
+      version: 0.6.6
+    pathe:
+      specifier: ^2.0.3
+      version: 2.0.3
+    tinyexec:
+      specifier: ^1.1.2
+      version: 1.1.2
+    tsdown:
+      specifier: ^0.21.10
+      version: 0.21.10
+    typescript:
+      specifier: ^6.0.3
+      version: 6.0.3
+
 importers:
 
   .:
@@ -39,11 +69,11 @@ importers:
         specifier: ^0.6.5
         version: 0.6.5
       jsonc-parser:
-        specifier: ^3.3.1
+        specifier: 'catalog:'
         version: 3.3.1
     devDependencies:
       '@types/node':
-        specifier: ^25.6.0
+        specifier: 'catalog:'
         version: 25.6.0
       '@xtarterize/core':
         specifier: workspace:*
@@ -55,10 +85,10 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tasks
       tsdown:
-        specifier: ^0.21.10
+        specifier: 'catalog:'
         version: 0.21.10(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
   apps/docs:
@@ -90,12 +120,13 @@ importers:
       mermaid:
         specifier: ^11.14.0
         version: 11.14.0
-      sharp:
-        specifier: ^0.34.5
-        version: 0.34.5
       tailwindcss:
         specifier: ^4.2.4
         version: 4.2.4
+    devDependencies:
+      sharp:
+        specifier: ^0.34.5
+        version: 0.34.5
 
   packages/core:
     dependencies:
@@ -106,13 +137,13 @@ importers:
         specifier: ^9.0.0
         version: 9.0.0
       json5:
-        specifier: ^2.2.3
+        specifier: 'catalog:'
         version: 2.2.3
       nypm:
-        specifier: ^0.6.6
+        specifier: 'catalog:'
         version: 0.6.6
       pathe:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       picocolors:
         specifier: ^1.1.1
@@ -121,17 +152,17 @@ importers:
         specifier: ^2.3.1
         version: 2.3.1
       tinyexec:
-        specifier: ^1.1.2
+        specifier: 'catalog:'
         version: 1.1.2
     devDependencies:
       '@types/node':
-        specifier: ^25.6.0
+        specifier: 'catalog:'
         version: 25.6.0
       tsdown:
-        specifier: ^0.21.10
+        specifier: 'catalog:'
         version: 0.21.10(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
   packages/patchers:
@@ -139,33 +170,27 @@ importers:
       defu:
         specifier: ^6.1.7
         version: 6.1.7
-      js-yaml:
-        specifier: ^4.1.1
-        version: 4.1.1
       json5:
-        specifier: ^2.2.3
+        specifier: 'catalog:'
         version: 2.2.3
       jsonc-parser:
-        specifier: ^3.3.1
+        specifier: 'catalog:'
         version: 3.3.1
       magicast:
-        specifier: ^0.5.2
+        specifier: 'catalog:'
         version: 0.5.2
       pathe:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
     devDependencies:
-      '@types/js-yaml':
-        specifier: ^4.0.9
-        version: 4.0.9
       '@types/node':
-        specifier: ^25.6.0
+        specifier: 'catalog:'
         version: 25.6.0
       tsdown:
-        specifier: ^0.21.10
+        specifier: 'catalog:'
         version: 0.21.10(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
   packages/tasks:
@@ -176,39 +201,30 @@ importers:
       '@xtarterize/patchers':
         specifier: workspace:*
         version: link:../patchers
-      defu:
-        specifier: ^6.1.7
-        version: 6.1.7
-      js-yaml:
-        specifier: ^4.1.1
-        version: 4.1.1
       json5:
-        specifier: ^2.2.3
+        specifier: 'catalog:'
         version: 2.2.3
       magicast:
-        specifier: ^0.5.2
+        specifier: 'catalog:'
         version: 0.5.2
       nypm:
-        specifier: ^0.6.6
+        specifier: 'catalog:'
         version: 0.6.6
       pathe:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       tinyexec:
-        specifier: ^1.1.2
+        specifier: 'catalog:'
         version: 1.1.2
     devDependencies:
-      '@types/js-yaml':
-        specifier: ^4.0.9
-        version: 4.0.9
       '@types/node':
-        specifier: ^25.6.0
+        specifier: 'catalog:'
         version: 25.6.0
       tsdown:
-        specifier: ^0.21.10
+        specifier: 'catalog:'
         version: 0.21.10(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
 packages:
