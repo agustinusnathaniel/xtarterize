@@ -6,7 +6,10 @@ function commitMsgHook(): string {
 	return 'pnpm commitlint --edit $1\n'
 }
 
-async function preCommitHook(_cwd: string, profile: ProjectProfile): Promise<string> {
+async function preCommitHook(
+	_cwd: string,
+	profile: ProjectProfile,
+): Promise<string> {
 	if (profile.vitePlus) return 'vp staged\n'
 	const pkg = await readPackageJson(_cwd)
 	const hasLintStaged = !!(
