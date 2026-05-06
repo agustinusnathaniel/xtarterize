@@ -721,10 +721,11 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 			)
 
 			const needsDep = shouldInstallDep(options, profile)
+			const depName = options.depName
 			const hasDep =
 				!needsDep ||
-				pkg.devDependencies?.[options.depName!] ||
-				pkg.dependencies?.[options.depName!]
+				(depName &&
+					(pkg.devDependencies?.[depName] || pkg.dependencies?.[depName]))
 
 			const extraFiles = options.files ?? []
 			const missingFiles: string[] = []
@@ -795,13 +796,11 @@ export function createPackageJsonTask(options: PackageJsonTaskOptions): Task {
 		},
 
 		async apply(cwd, profile): Promise<void> {
-			if (shouldInstallDep(options, profile)) {
+			const depName = options.depName
+			if (depName && shouldInstallDep(options, profile)) {
 				const pkg = await readPackageJson(cwd)
-				if (
-					!pkg?.devDependencies?.[options.depName!] &&
-					!pkg?.dependencies?.[options.depName!]
-				) {
-					await addDependency([options.depName!], {
+				if (!pkg?.devDependencies?.[depName] && !pkg?.dependencies?.[depName]) {
+					await addDependency([depName], {
 						cwd,
 						dev: options.installDev ?? true,
 					})
